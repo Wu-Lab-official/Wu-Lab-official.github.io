@@ -38,7 +38,7 @@ git -c http.proxy=http://127.0.0.1:7897 push
 
 | 工具 | 版本 | 安装方式 / 位置 |
 |---|---|---|
-| Ruby + Devkit(MSYS2) | 3.3.12 x64 | `winget install RubyInstallerTeam.RubyWithDevKit.3.3` → `C:\Ruby33-x64` |
+| Ruby + Devkit(MSYS2) | 3.3.12 x64 | `winget install RubyInstallerTeam.RubyWithDevKit.3.3` → `C:\Ruby33-x64`（MSYS2 在其下 `msys64\`；项目 gems 装在 `C:\Ruby33-x64\lib\ruby\gems\3.3.0`）|
 | Bundler | 2.5.22 | 随 Ruby 自带 |
 | 依赖 gems | 99 个 | 仓库内 `bundle install`（约 2-5 分钟）|
 | Git | Git Bash 自带 | `/mingw64/bin/git` |
