@@ -191,6 +191,7 @@ exclude:
   - Rakefile
   - README
   - MAINTENANCE.md
+  - WORKLOG.md
   - tmp
   - vendor
 keep_files:

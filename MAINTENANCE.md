@@ -52,6 +52,8 @@ git -c http.proxy=http://127.0.0.1:7897 push
 
 ```
 ├── _config.yml            ★ 全站配置：标题、作者侧边栏、主题色、url 等
+├── MAINTENANCE.md         本手册（已 exclude，不发布）
+├── WORKLOG.md             ★ 工作日志，每轮改动必留痕（已 exclude，不发布）
 ├── _data/
 │   ├── navigation.yml     ★ 顶部导航菜单（顺序、名称、链接）
 │   ├── cv.json            CV 结构化数据（配合 cv-json 页）
@@ -90,13 +92,53 @@ git -c http.proxy=http://127.0.0.1:7897 push
 
 `_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*` 里全是模板演示数据，填充真实内容前可整目录清空（保留子目录结构）。`_data/comments/` 是示例评论，可删。
 
-## 4. 构建与部署流程
+## 4. 标准工作流程（SOP）
 
-1. 本地改动 → `bundle exec jekyll serve` 预览确认
-2. push 到 `main` → GitHub Pages 自动用 `github-pages` gem 构建（1-2 分钟后线上生效）
-3. 构建状态查看：仓库 **Actions** 标签页，或 commit 后的绿色勾/红色叉
-4. 仓库自带 CI 工作流 `.github/workflows/jekyll-build.yml`（用 Ruby 3.2 + `--strict_front_matter` 做构建检查，只监听 `main` 分支）
-5. Pages 设置入口：Settings → Pages（当前为 Deploy from a branch / main / root）
+每轮内容改动都按以下六步走（agent 侧同样受此约束，详见工作区 `AGENTS.md`）：
+
+### ① 改本地
+- 只改仓库内文件，改哪个文件参照 §3 对照表
+- 遵守 §5 的硬性约定（bundle exec、tzinfo-data、main 分支）
+
+### ② 本地预览验证
+```bash
+export PATH="/c/Ruby33-x64/bin:$PATH"   # 旧终端才需要
+cd /d/wu-lab/John-z39.github.io
+bundle exec jekyll serve                # 后台运行；改过 _config.yml 必须重启
+```
+- `curl` 验证主页和本轮改动页面返回 200；重大/视觉改动用浏览器截图确认
+
+### ③ 推送上线（本地确认后自动执行）
+```bash
+# 0) 确认代理可用（不通则先启动 D:\Clash Verge\clash-verge.exe）
+(echo > /dev/tcp/127.0.0.1/7897) 2>/dev/null && echo proxy OK
+# 1) 暂存具体文件（别盲目 add -A）
+git add 路径/文件.md
+# 2) 提交，信息格式 <type>: 摘要，type ∈ content/feat/fix/docs/chore
+git commit -m "content: 更新课题组简介"
+# 3) 经代理推送
+git -c http.proxy=http://127.0.0.1:7897 push
+# 4) 等 60–90 秒后验证线上
+curl -s -o /dev/null -w "%{http_code}\n" -x http://127.0.0.1:7897 https://john-z39.github.io/改动页面/
+```
+- 也可一劳永逸给 git 配置代理（配置后 push 不用再加 `-c` 参数）：
+  `git config --global http.proxy http://127.0.0.1:7897`
+  取消：`git config --global --unset http.proxy`
+
+### ④ 线上验证
+- push 后 GitHub Pages 自动构建（1–2 分钟）；构建状态看仓库 **Actions** 标签页或 commit 的勾/叉
+- `curl` 确认线上对应页面 200 才算完成
+
+### ⑤ 留痕
+- 在 `WORKLOG.md` 追加本轮条目：日期 ｜ 改动摘要 ｜ 验证结果 ｜ 遗留问题
+- 随本轮工作一并 commit（type 用 `docs` 或 `chore`）
+
+### ⑥ 规范迭代
+- 过程中发现新问题/新坑 → 对话中提出修改 `AGENTS.md`（工作区 `D:\wu-lab\AGENTS.md`）或本手册的建议 → **征得用户同意后**更新 → 一并提交
+
+### 部署机制细节
+- push 到 `main` → GitHub Pages 自动用 `github-pages` gem 构建（Settings → Pages：Deploy from a branch / main / root）
+- 仓库自带 CI 工作流 `.github/workflows/jekyll-build.yml`（Ruby 3.2 + `--strict_front_matter` 构建检查，只监听 `main`）
 
 ## 5. 已知冲突与坑（重要）
 
