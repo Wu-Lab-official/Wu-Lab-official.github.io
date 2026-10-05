@@ -26,3 +26,14 @@
   - `_config.yml` exclude 列表加入 `WORKLOG.md`
 - **验证**：构建通过，`MAINTENANCE.md`/`WORKLOG.md` 均确认不在 `_site` 中；本地 serve 200；推送后线上 200
 - **遗留**：同会话 1，内容阶段待启动
+
+## 2026-10-05 ｜ 会话 3：填入导师信息（仅本地，未推送）
+
+- **改动**
+  - 信息来源：清华深研院官方导师主页 https://www.sigs.tsinghua.edu.cn/wcj/main.htm （用户侧边栏已打开）
+  - `_config.yml`：`name` → Changjin Wu；`description` → 课题组中文简介；`author` 区块填入真实信息（姓名"吴昌进 Changjin Wu"、职称、单位、办公室"深圳 · 能源环境大楼 2107"、邮箱、`uri` 指向官方主页）；清空模板占位的 googlescholar/orcid/pubmed/github("academicpages")/bluesky 链接（真实链接待核实）
+  - `_pages/about.md`：整页替换为中文首页——课题组简介、研究方向×5、导师简介、教育/工作经历表、加入我们、联系方式（邮箱用 [at] 防爬）
+  - `images/profile.png`：替换为官方主页头像（400×599 JPEG，走本地代理 curl 下载）
+- **验证**：`bundle exec jekyll serve` 本地主页 200，`/images/profile.png` 200；HTML 检查无模板残留（仅页脚主题署名属正常）；浏览器截图确认侧边栏照片/姓名/链接、正文排版、页脚版权（© 2026 Changjin Wu）均正常
+- **遗留**：**按用户要求本轮未推送**（本地已 commit，待用户确认后再 push）；Google Scholar 等学术链接未找到可靠主页，暂留空；导航菜单仍为英文、`_posts`/`_publications` 等示例数据未清理（下一阶段）
+- **新坑**：curl 直连 sigs.tsinghua.edu.cn 报 schannel 证书吊销检查失败（CRYPT_E_NO_REVOCATION），走 Clash 代理 `-x http://127.0.0.1:7897` 正常；清华站点图片 URL 中 UUID 极易抄错，应从 HTML 程序化提取
