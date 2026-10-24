@@ -1,3 +1,5 @@
+# 研究方向
+# paper_ids 引用 publications.yml 的 id；标题/期刊/年份只在 publications.yml 维护
 - id: microrobot
   num: "01"
   title: "微纳机器人"
@@ -9,10 +11,10 @@
     - "微纳机器人的多模态驱动与运动调控"
     - "集群协同、聚集与分散行为"
     - "外场下的群体运动与功能化应用"
-  papers:
-    - "Wu C. et al. Ion-exchange enabled synthetic swarm. <em>Nature Nanotechnology</em>, 2021."
-    - "Wu C. et al. Micro/nanomotor: from single modal to multimodal propulsion. <em>Nano Research</em>, 2024."
-    - "Gao Y. et al. Magnetically manipulated optoelectronic microrobots. <em>Advanced Materials</em>, 2024."
+  paper_ids:
+    - ion-swarm
+    - micro-nanomotors
+    - magneto-opto-microrobots
 
 - id: soft-matter
   num: "02"
@@ -25,9 +27,9 @@
     - "响应性软物质的可控构筑"
     - "多物理场下的形变与运动"
     - "动态形变材料与功能器件"
-  papers:
-    - "Chen J. et al. Dynamic polymorphic active colloidal assembly. <em>Matter</em>, 2024."
-    - "Huang Y. et al. Colloidal self-assembly: from passive to active system. <em>Angewandte Chemie International Edition</em>, 2023."
+  paper_ids:
+    - dynamic-polymorphic
+    - colloidal-self-assembly
 
 - id: microfluidics
   num: "03"
@@ -40,9 +42,9 @@
     - "微流控芯片与流场编程"
     - "液滴、颗粒的生成与操控"
     - "柔性可穿戴器件与离子器件"
-  papers:
-    - "Huang Y. et al. Scalable integration of photoresponsive highly aligned nanochannels. <em>Science Advances</em>, 2024."
-    - "Yang Z. et al. CeyeHao: AI-driven microfluidic flow programming. <em>Science Advances</em>, 2025."
+  paper_ids:
+    - nanochannels
+    - ceyehao
 
 - id: field
   num: "04"
@@ -55,9 +57,9 @@
     - "外场下的捕获、富集与定向输运"
     - "靶向药物递送与微创诊疗"
     - "微纳塑料等污染物的清除"
-  papers:
-    - "Li W. et al. Self-driven magnetorobots for micro/nanoplastics removal. <em>Science Advances</em>, 2022."
-    - "Zeng B. et al. Photothermal cavitation-driven micromotor to penetrate cell membrane. <em>JACS</em>, 2025."
+  paper_ids:
+    - magnetorobots-plastics
+    - photothermal-cavitation
 
 - id: assembly
   num: "05"
@@ -70,6 +72,6 @@
     - "形貌可控的微纳颗粒合成"
     - "界面与场诱导的自组装"
     - "动态、可重构的活性组装"
-  papers:
-    - "Zheng J. et al. Photochromism from wavelength-selective colloidal phase segregation. <em>Nature</em>, 2023."
-    - "Chen J. et al. Dynamic polymorphic active colloidal assembly. <em>Matter</em>, 2024."
+  paper_ids:
+    - photochromism
+    - dynamic-polymorphic

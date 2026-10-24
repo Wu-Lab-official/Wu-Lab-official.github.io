@@ -1,20 +1,26 @@
-- year: 2025
+# 代表性论文
+# 元数据以 Crossref 记录为准（2026-10-24 逐条核对，DOI 见 CONTENT.md）
+# id 供 research.yml 的 paper_ids 引用；tags 对应 research.yml 的 id（可空格分隔多个）
+- id: jacs-ferroic-swarm
+  year: 2025
   authors: "Wu C., Huang Y., Zeng B., et al."
   title: "Chemically induced ferroic-like phase and collective chemotaxis in an active swarm"
   journal: "J. Am. Chem. Soc."
   pages: "147(44), 40225–40235"
-  tags: "swarm"
+  tags: "microrobot"
   featured: false
 
-- year: 2025
+- id: ceyehao
+  year: 2025
   authors: "Yang Z., Jiang Z., Lin H., et al."
   title: "CeyeHao: AI-driven microfluidic flow programming with hierarchically assembled obstacles and receptive field–augmented neural network"
   journal: "Sci. Adv."
   pages: "11(31), eadx2826"
-  tags: "micro"
+  tags: "microfluidics"
   featured: false
 
-- year: 2025
+- id: photothermal-cavitation
+  year: 2025
   authors: "Zeng B., Lai J., Chen J., et al."
   title: "Photothermal cavitation-driven micromotor to penetrate cell membrane"
   journal: "J. Am. Chem. Soc."
@@ -22,15 +28,26 @@
   tags: "field"
   featured: false
 
-- year: 2024
+- id: micro-nanomotors
+  year: 2025
+  authors: "Wu C., Li X., Shum H. C."
+  title: "Micro/nanomotors from single modal to multimodal propulsion"
+  journal: "Nano Research"
+  pages: "18(7), 94907105"
+  tags: "microrobot"
+  featured: false
+
+- id: nanochannels
+  year: 2024
   authors: "Huang Y., Wu C., Cao Y., et al."
   title: "Scalable integration of photoresponsive highly aligned nanochannels for self-powered ionic devices"
   journal: "Sci. Adv."
   pages: "10(51), eads5591"
-  tags: "micro"
+  tags: "microfluidics"
   featured: false
 
-- year: 2024
+- id: dynamic-polymorphic
+  year: 2024
   authors: "Chen J., Li X., Liang Q., et al."
   title: "Dynamic polymorphic active colloidal assembly and optically guided reconfigurable photonics"
   journal: "Matter"
@@ -38,82 +55,83 @@
   tags: "assembly"
   featured: false
 
-- year: 2024
+- id: magneto-opto-microrobots
+  year: 2024
   authors: "Gao Y., Guo Y., Yang Y., et al."
-  title: "Magnetically manipulated optoelectronic microrobots for optically targeted non-genetic neuromodulation"
+  title: "Magnetically manipulated optoelectronic hybrid microrobots for optically targeted non-genetic neuromodulation"
   journal: "Adv. Mater."
   pages: "36(8), 2305632"
-  tags: "swarm"
+  tags: "microrobot"
   featured: false
 
-- year: 2024
+- id: template-silicon-micromotor
+  year: 2024
   authors: "Gao Y., Ou L., Liu K., et al."
   title: "Template-guided silicon micromotor assembly for enhanced cell manipulation"
   journal: "Angew. Chem. Int. Ed."
   pages: "63(28), e202405895"
-  tags: "swarm"
+  tags: "microrobot"
   featured: false
 
-- year: 2024
-  authors: "Wu C., Li X., Shum H. C."
-  title: "Micro/nanomotor: from single modal to multimodal propulsion"
-  journal: "Nano Research"
-  pages: "18(7), 94907105"
-  tags: "swarm"
-  featured: false
-
-- year: 2023
-  authors: "Zheng J., Chen J., Jin Y., et al."
-  title: "Photochromism from wavelength-selective colloidal phase segregation"
-  journal: "Nature"
-  pages: "617, 499–506"
-  tags: "assembly"
-  featured: true
-
-- year: 2023
-  authors: "Huang Y., Wu C., Dai J., et al."
-  title: "Polymeric coating for tunable self-thermophoretic nanomotor"
-  journal: "J. Am. Chem. Soc."
-  pages: "145(36), 19945"
-  tags: "soft"
-  featured: false
-
-- year: 2023
+- id: colloidal-self-assembly
+  year: 2024
   authors: "Huang Y., Wu C., Chen J., Tang J."
-  title: "Colloidal self-assembly: from passive to active system"
+  title: "Colloidal self-assembly: from passive to active systems"
   journal: "Angew. Chem. Int. Ed."
   pages: "63(9), e202313885"
   tags: "assembly"
   featured: false
 
-- year: 2022
+- id: photochromism
+  year: 2023
+  authors: "Zheng J., Chen J., Jin Y., et al."
+  title: "Photochromism from wavelength-selective colloidal phase segregation"
+  journal: "Nature"
+  pages: "617(7961), 499–506"
+  tags: "assembly"
+  featured: true
+
+- id: tunable-thermophoretic-nanomotors
+  year: 2023
+  authors: "Huang Y., Wu C., Dai J., et al."
+  title: "Tunable self-thermophoretic nanomotors with polymeric coating"
+  journal: "J. Am. Chem. Soc."
+  pages: "145(36), 19945–19952"
+  tags: "soft-matter"
+  featured: false
+
+- id: magnetorobots-plastics
+  year: 2022
   authors: "Li W., Wu C., Xiong Z., et al."
-  title: "Self-driven magnetorobots for recyclable and scalable micro/nanoplastics removal from non-marine waters"
+  title: "Self-driven magnetorobots for recyclable and scalable micro/nanoplastic removal from nonmarine waters"
   journal: "Sci. Adv."
-  pages: "8, 1731"
+  pages: "8(45), eade1731"
   tags: "field"
   featured: true
 
-- year: 2021
+- id: ion-swarm
+  year: 2021
   authors: "Wu C., Dai J., Li X., et al."
   title: "Ion-exchange enabled synthetic swarm"
   journal: "Nat. Nanotechnol."
-  pages: "16, 288–295"
-  tags: "swarm"
+  pages: "16(3), 288–295"
+  tags: "microrobot"
   featured: true
 
-- year: 2021
+- id: resistance-switching
+  year: 2021
   authors: "Wu C., Li X., Xu X., et al."
   title: "Self-rectifying resistance switching memory based on a dynamic p–n junction"
   journal: "Nanotechnology"
   pages: "32(8), 085203"
-  tags: "micro"
+  tags: "microfluidics"
   featured: false
 
-- year: 2017
-  authors: "Wu C., Jia Y., et al."
+- id: zno-retention
+  year: 2017
+  authors: "Wu C., Jia Y., Shin Y., et al."
   title: "Effect of internal field on the high resistance state retention of unipolar resistance switching in ferroelectric vanadium doped ZnO"
   journal: "Appl. Phys. Lett."
-  pages: "110(14), 14350"
-  tags: "micro"
+  pages: "110(14), 143502"
+  tags: "microfluidics"
   featured: false

@@ -29,8 +29,11 @@ description: "吴昌进课题组的五个研究方向：微纳机器人、智能
     </ul>
     <h3>代表论文</h3>
     <ul class="pub-mini">
-      {% for paper in item.papers %}
-      <li>{{ paper }}</li>
+      {% for pid in item.paper_ids %}
+      {% assign pub = site.data.publications | where: "id", pid | first %}
+      {% if pub %}
+      <li>{{ pub.authors }} {{ pub.title }}. <em>{{ pub.journal }}</em>, {{ pub.year }}.</li>
+      {% endif %}
       {% endfor %}
     </ul>
   </div>

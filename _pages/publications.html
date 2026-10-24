@@ -25,11 +25,9 @@ description: "吴昌进课题组代表性论文列表，可按年份、研究方
       方向
       <select id="tag-filter">
         <option value="all">全部</option>
-        <option value="swarm">集群与微纳机器人</option>
-        <option value="soft">智能软物质</option>
-        <option value="micro">微流控与器件</option>
-        <option value="field">外场操控</option>
-        <option value="assembly">颗粒与自组装</option>
+        {% for dir in site.data.research %}
+        <option value="{{ dir.id }}">{{ dir.title }}</option>
+        {% endfor %}
       </select>
     </label>
 

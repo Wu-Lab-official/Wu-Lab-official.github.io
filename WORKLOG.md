@@ -94,4 +94,19 @@
   - `MAINTENANCE.md`：§0.4 重写为参数表 + 行为细节（含 BOM 说明）；§1 推送命令改为直连优先、代理备用；§4③ 增加“agent 会话通常无法 push”的说明；§5 坑表新增三行（沙箱读不到 Ruby、credential helper 被拦、脚本 BOM）
   - 工作区 `AGENTS.md`：本地验证补“构建需一次性 danger-full-access”及降级路径；推送补“agent 会话推不上去、交给用户终端或 `-PushOnly`”；代理由“push 必需”改为“直连可用时不必开”
 - **验证**：脚本在 PowerShell 5.1 与 7 下解析均 ok（BOM 后）；脚本内构建通过；本地提交生成；push 在 agent 会话仍因凭据管道被拦而失败，已按提示留下提交待用户推送
-- **遗留**：本次提交需用户在自己终端 `git push origin main`；旧模板 demo 页仍在线；内容来源登记表、站点检查脚本未做
+## 2026-10-24 ｜ 会话 9：清理模板内容 + 论文核查 + 数据单一化 + 站点检查脚本
+
+- **背景**：用户授权“该删删、该改改”，要求继续查问题、完善流程、核实内容真实性。本轮同时处理三项：下架模板 demo、按权威记录校正论文、消除多套数据键。
+- **改动**
+  - 删除模板示例内容：`_posts`(5)、`_publications`(5)、`_portfolio`(2)、`_talks`(4)、`_teaching`(2)、`_drafts`(1)、`_data/comments`(7)、`talkmap*`、`markdown_generator/`、示例 PDF/BibTeX、`images/bio-photo*`、`images/editing-talk.png`、`images/500x300.png`、`images/themes/`、`images/wiki/`；删除旧模板页面 16 个（`cv`、`cv-json`、`terms`、`markdown`、`archive` 系列、`talkmap`、`sitemap`、`talks`、`teaching`、`portfolio`、`non-menu-page`）。构建产物 46 HTML / 44 唯一 sitemap URL → **6 HTML / 5 条**
+  - `_data/publications.yml`：15 条逐条查 Crossref。修正 **3 处标题**（Adv. Mater. 补 “Hybrid”；Angew 综述 “Systems”；Nano Research 全名）、**1 处年份**（Nano Research 2024 → 2025）、**3 处卷页**（Sci. Adv. 8(45), eade1731；APL 143502；JACS 19945–19952）；补 `id`；`tags` 改用 research 的 id（`microrobot`/`soft-matter`/`microfluidics`/`field`/`assembly`）
+  - `_data/research.yml` 的 `papers` 字符串改为 `paper_ids` 引用；`_pages/research.html` 联查 `publications.yml` 渲染；`_pages/publications.html` 筛选项从 `research.yml` 生成——三套标签键合并为一套
+  - `_pages/home.html`：“最近更新”改为 `{{ site.data.news.first.date }}`，不再手写
+  - `_data/authors.yml`：清空模板示例作者（旧布局仍会读它，保留文件 + 注释说明）
+  - `_config.yml`：exclude 增加 `CONTENT.md`；`README.md` 重写为项目说明（删除模板原文与失效配图引用）
+  - 新增 `CONTENT.md`：4 类来源、事实登记表（含核对日期）、15 条论文 DOI 核对表、与 `信息.txt` 的 5 处差异、待补清单、维护约定
+  - 新增 `scripts/check-site.ps1`：构建前删除 `_site`，断言 ①文档未发布 ②sitemap 恰为 5 条 ③页面存在 ④无多余 HTML ⑤无模板文本 ⑥404 用极简布局 ⑦exclude 完整
+  - `MAINTENANCE.md`：§3.1 改表加入 `paper_ids`/CONTENT.md/检查脚本；§3.2 重写为“仅保留布局回退 + 当前目录”；模板清理段改为已完成并给数字；§4② 加检查命令；§5 坑表加 5 行（信息.txt 笔误、SIGS 页面 GBK 输出、`_site` 不自动清理、无 front matter 的 md 会发布）；§7 加 Crossref 与导师主页
+  - 工作区 `AGENTS.md`：文档地图加 CONTENT.md；流程第 1/2 步加来源核查；验证步加 `check-site.ps1`；硬性约定加“论文元数据以 Crossref 为准”；状态/待办更新
+- **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；`bundle exec jekyll build --strict_front_matter` 通过（1.7s）；本地 `/`、`/research/`、`/publications/`、`/people/`、`/join/`、`/404.html` 均 200；`/research/` 5 个方向论文按 `paper_ids` 正确渲染；`/publications/` 15 行、筛选项 5 个；首页“最近更新 2026.10”
+- **遗留**：本次提交需用户在自己终端 push；成员/照片/DOI/PDF/招生细节仍缺（见 `CONTENT.md` §4）；`信息.txt` 与 `图片.jpg` 只在工作区、未入库；`_design/` 仍在仓库外且描述与线上不一致

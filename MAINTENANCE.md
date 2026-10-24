@@ -2,7 +2,9 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-10-24（文档纠错、404 换极简布局、AGENTS.md 加入 exclude）
+> 本文档最后更新：2026-10-24（清理模板示例内容、论文数据经 Crossref 核对、增加 CONTENT.md 与 check-site.ps1）
+>
+> 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补清单）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
 
 ---
 
@@ -33,8 +35,8 @@
 | `_pages/people.html` | 团队 `/people/` |
 | `_pages/join.html` | 加入我们 `/join/` |
 | `_pages/404.md` | 自定义 404 页 `/404.html`（极简布局）|
-| `_data/research.yml` | 5 个研究方向、问题、正文、代表论文 |
-| `_data/publications.yml` | 代表性论文条目（年份/作者/期刊/卷页/标签/featured）|
+| `_data/research.yml` | 5 个研究方向、问题、正文；`paper_ids` 引用论文 id |
+| `_data/publications.yml` | 代表性论文（**唯一数据源**：id/年份/作者/标题/期刊/卷页/tags/featured）|
 | `_data/news.yml` | 首页动态 |
 | `_data/navigation.yml` | 顶部导航（研究/论文/团队/加入我们）|
 | `assets/minimal/style.css` | 极简主题样式 |
@@ -44,7 +46,7 @@
 
 旧 AcademicPages 文件（`_layouts/default.html`、`_layouts/single.html`、`_sass/`、`assets/css/main.css`、`_includes/sidebar.html` 等）**保留作回退**，新页面不引用它们。等新站稳定后再决定是否清理。
 
-注意：保留的是**布局和样式**，旧模板的**页面和集合条目仍会正常构建**（`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`，以及 `cv`、`terms`、`markdown`、`talkmap` 等页面），它们会出现在 `/sitemap.xml` 里、可以被访问，详见 §3.2。清理前不要假设它们“不影响线上”。
+注意：保留的是**布局和样式**。旧模板的页面与集合条目已在 2026-10-24 删除，线上只剩 5 个页面（见 §3.2）。如果以后重新启用旧布局，需要自己补集合内容。
 
 仓库根的 `AGENTS.md` 是**模板作者写给 coding agent 的说明**，不是本组规范；它已加入 `_config.yml` 的 exclude，不再发布到线上（2026-10-24 之前是漏掉的，线上曾可访问 `/AGENTS.md`）。
 
@@ -56,8 +58,8 @@ GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 
 
 - 这是课题组网站的**内部建设阶段**，还没有购买/绑定正式域名；线上地址是 GitHub Pages 组织站 `https://wu-lab-official.github.io/`，不是最终发布形态。
 - 旧个人站 `john-z39.github.io` 只作备份，不再作为本项目维护对象。
-- 当前状态：极简主题已接入 Jekyll，5 个极简页面可访问；旧模板的 demo 页面和集合条目**仍在构建并出现在 sitemap 中**（见 §3.2，待清理）。导师信息、研究方向、代表性论文是真实内容；成员、照片、DOI/PDF、招生细节仍缺。
-- 现有内容来源只有三类：`信息.txt`（PI 提供）、清华 SIGS 官方导师主页、论文正式记录。除此之外不写。
+- 当前状态：极简主题 5 个页面 + 404；模板示例内容已全部清理（sitemap 从 44 条降到 5 条）；15 条代表性论文已逐条用 Crossref 核对并修正；导师信息、研究方向、论文是真实内容；成员、照片、DOI/PDF、招生细节仍缺。
+- 现有内容来源：`信息.txt`（PI 提供，在工作区根目录、不在仓库内）、清华 SIGS 官方导师主页、论文正式记录（Crossref）。**来源与核对日期登记在 `CONTENT.md`**，改内容前先查它。
 - 缺失内容统一写“待补充”或直接留空，**不要用示例、推测、行业惯例填充**。
 
 ### 0.3 填内容的规则
@@ -65,9 +67,9 @@ GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 
 1. **只写有来源的事实**。写之前先确认来源；没有来源就不写。
 2. **不写未确认的招生信息**：名额、人数、申请流程、回复时间、待遇、奖学金、联合培养、访问政策、实验平台、合作资源、产业/临床资源，都不自行补。
 3. **缺内容就空着**。页面上写“待补充”比写一段看似合理但没有依据的话好。
-4. **论文信息以正式记录为准**。标题、作者、期刊、年卷页不确定就留空；DOI/PDF 没核对就不放链接，绝不编造。
+4. **论文信息以正式记录为准**：标题、年份、卷期、页码以 Crossref / 期刊页面为准，`信息.txt` 只当线索（已发现多处笔误，见 `CONTENT.md` §3）。DOI/PDF 没核对就不放链接，绝不编造。
 5. **文案平实**。不写口号、比喻、宏大叙事；不用“编队”“主线”“微观世界”这类表达。
-6. **每次改动留痕**。在 `WORKLOG.md` 记日期、改了什么、来源、验证结果、还缺什么。
+6. **每次改动留痕**。在 `WORKLOG.md` 记日期、改了什么、来源、验证结果、还缺什么；事实类改动同时更新 `CONTENT.md` 的核对日期。
 
 ### 0.4 一键发布脚本
 
@@ -135,7 +137,7 @@ git push origin main            # 代理不通时才加 -c http.proxy=http://127
 | 依赖 gems | 99 个 | 仓库内 `bundle install`（约 2-5 分钟）|
 | Git | Git Bash 自带 | `/mingw64/bin/git` |
 | Node.js / npm | 已装（`D:\nodejs`）| 仅改前端 JS 后重建 `main.min.js` 时才需要，平时用不到 |
-| Python | 已装 | 仅 `talkmap` 和 `markdown_generator` 脚本需要，可选 |
+| Python | 已装 | 当前流程不需要（`talkmap`/`markdown_generator` 已删除）；做数据核查时可用 |
 | 代理 | Clash Verge | `D:\Clash Verge\clash-verge.exe`，混合端口 `127.0.0.1:7897` |
 
 新机器完整流程：装 Ruby（含 Devkit）→ `git clone https://github.com/Wu-Lab-official/Wu-Lab-official.github.io.git` → `bundle install` → `bundle exec jekyll serve`。Gemfile 已含 `tzinfo-data`（Windows 必需，见 §5），无需再改。
@@ -147,9 +149,10 @@ git push origin main            # 代理不通时才加 -c http.proxy=http://127
 | 想做什么 | 改哪里 |
 |---|---|
 | 改首页文字/顺序 | `_pages/home.html` |
-| 增删研究方向、改问题/正文/代表论文 | `_data/research.yml` |
-| 增删论文、改作者/年份/期刊/标签 | `_data/publications.yml` |
-| 改首页“动态” | `_data/news.yml` |
+| 增删研究方向、改问题/正文 | `_data/research.yml`（`paper_ids` 引用论文 id）|
+| 增删论文、改作者/年份/期刊/标签 | `_data/publications.yml`（**唯一数据源**；先查 DOI，见 CONTENT.md）|
+| 查某条事实的来源/核对日期 | `CONTENT.md`（来源登记 + 论文核对表 + 待补清单）|
+| 改首页“动态” | `_data/news.yml`（首页“最近更新”也取这里第一条）|
 | 改导航文字/顺序 | `_data/navigation.yml` |
 | 改团队页、导师简介、教育/工作经历 | `_pages/people.html` |
 | 改加入我们、岗位、FAQ | `_pages/join.html` |
@@ -158,31 +161,28 @@ git push origin main            # 代理不通时才加 -c http.proxy=http://127
 | 改论文筛选/搜索/复制引用 | `assets/minimal/app.js` |
 | 换团队页照片 | 替换 `assets/minimal/profile.jpg`（保持 2:3，不要裁切）|
 | 改全站 title/description/url | `_config.yml` |
+| 发布前完整性检查 | `scripts/check-site.ps1` |
 
-### 3.2 旧 AcademicPages 结构（保留作回退，不再更新）
+### 3.2 旧 AcademicPages 结构（仅保留布局/样式作回退）
+
+模板示例内容已于 2026-10-24 清理：`_posts/`、`_publications/`、`_portfolio/`、`_talks/`、`_teaching/`、`markdown_generator/`、`talkmap*`、示例图片与 PDF 已删除；旧模板页面（cv、terms、markdown、archive、talkmap、sitemap 等）也已删除。当前构建只有 6 个 HTML、5 条 sitemap URL。
+
+保留下来的是**布局与样式**（`_layouts/default.html`、`_layouts/single.html`、`_sass/`、`assets/css/main.css`、旧 `_includes/`）和旧首页 `_pages/about.md`（`published: false`）。回退时把 `about.md` 改回 `permalink: /` 并启用即可，但它依赖的集合数据已删除，需要另建内容。
+
+当前目录（只列还在用的）：
 
 ```
-├── _config.yml            ★ 全站配置：标题、作者侧边栏、主题色、url 等
-├── MAINTENANCE.md         本手册（已 exclude，不发布）
-├── WORKLOG.md             ★ 工作日志，每轮改动必留痕（已 exclude，不发布）
-├── _data/
-│   ├── navigation.yml     ★ 顶部导航菜单（顺序、名称、链接）
-│   ├── cv.json            CV 结构化数据（配合 cv-json 页）
-│   └── ui-text.yml        界面文字（多语言，一般不动）
-├── _pages/                ★ 所有页面的正文 Markdown
-│   ├── about.md           旧首页（已 published: false）
-│   ├── cv.md              CV 页
-│   ├── publications.html  新论文页（极简布局）
-│   └── ...
-├── _publications/         旧模板每篇论文一个 .md（新论文页不用）
-├── _portfolio/            研究项目/Portfolio 条目
-├── _posts/                博客文章（文件名必须是 YYYY-MM-DD-标题.md）
-├── _talks/                报告/讲座条目
-├── _teaching/             课程条目
-├── images/                ★ 图片（profile.png = 侧边栏头像，建议 300×300）
-├── files/                 附件（论文 PDF 等放这里，页面里用 /files/xxx.pdf 引用）
-├── markdown_generator/    从 BibTeX/PubMed 批量生成论文条目的 Python 脚本（可选）
-└── assets/                主题 JS/CSS（一般不动；新主题在 assets/minimal/）
+├── _config.yml            全站配置：title/description/url、exclude 列表、collections（空）
+├── _layouts/minimal.html  新站骨架（旧 default/single 仅回退）
+├── _includes/minimal/     head / header / footer
+├── _pages/                home、research、publications、people、join、404、about（停用）
+├── _data/                 research / publications / news / navigation（+ 旧 cv.json、ui-text）
+├── assets/minimal/        style.css、app.js、profile.jpg、favicon.svg
+├── assets/css|js/         旧模板样式与脚本（回退用，当前页面不引用）
+├── images/                profile.png（旧侧边栏头像）、favicon、manifest
+├── files/                 论文 PDF / 附件（当前为空，缺 PDF 时放这里）
+├── scripts/               publish.ps1、check-site.ps1
+└── 文档                    MAINTENANCE.md、CONTENT.md、WORKLOG.md（均已 exclude）
 ```
 
 
@@ -198,15 +198,13 @@ git push origin main            # 代理不通时才加 -c http.proxy=http://127
 | 旧论文列表 | `_publications/`（当前新论文页不再使用）|
 | 旧模板样式 | `_sass/`、`assets/css/main.css` |
 
-### 清理模板示例内容（下一阶段做内容时要做的）
+### 模板示例内容（2026-10-24 已清理）
 
-`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*` 里仍是模板演示数据。**新极简页面不读取它们，但它们仍会被 Jekyll 正常构建并发布**：当前构建产物有 46 个 HTML、`/sitemap.xml` 里 44 个唯一 URL，包含假论文 `/publication/paper-title-number-1`、模板博客 `/posts/2012/08/blog-post-1/`、`/cv/`、`/terms/`、`/portfolio/`、`/talks/`、`/teaching/`、`/files/paper1.pdf` 等，可被搜索引擎收录。
+`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*`、示例 PDF/图片、旧模板页面（cv、terms、markdown、archive、talkmap、sitemap 等）已全部删除。构建产物从 46 个 HTML / 44 条 sitemap URL 降到 **6 个 HTML / 5 条 sitemap URL**。
 
-清理方式（下一阶段做，属破坏性改动，先征得同意）：
-- 集合条目：在 front matter 加 `published: false`，或直接删除 `_posts/`、`_publications/`、`_portfolio/`、`_talks/`、`_teaching/` 下的示例文件；
-- 旧页面：`_pages/` 下 `cv.md`、`cv-json.md`、`terms.md`、`markdown.md`、`archive-layout-with-content.md`、`non-menu-page.md`、`sitemap.md`、`talkmap.html` 及各类 archive 页加 `published: false`；
-- 静态文件：`talkmap*`、`markdown_generator/`、`files/paper*.pdf`、`files/slides*.pdf` 不再需要就删除或加进 exclude；
-- 改完用 `_site/sitemap.xml` 的 URL 列表复核，不要只看首页 200。
+以后新增页面时注意：**Jekyll 会把任何没有 `published: false` 的页面都发布出去**，包括 Markdown 静态文件（例如根目录的 `AGENTS.md` 曾因此挂到线上）。新增文件后跑一次 `scripts/check-site.ps1`，它会用白名单比对 sitemap 并检查泄漏。
+
+如果本地 `_site` 里还有已删除页面的残留文件：Jekyll 3.10 不会自动清理构建目录，`check-site.ps1` 会在构建前删除 `_site`；手工操作时用 `bundle exec jekyll clean`。
 
 
 ## 4. 标准工作流程（SOP）
@@ -224,6 +222,11 @@ cd /d/wu-lab/John-z39.github.io
 bundle exec jekyll serve                # 后台运行；改过 _config.yml 必须重启
 ```
 - `curl` 验证主页和本轮改动页面返回 200；重大/视觉改动用浏览器截图确认
+- 收尾跑一次完整性检查（构建 + 泄漏断言，约 5 秒）：
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1
+  ```
+  它会在构建前删除 `_site`，然后断言：只有 5 条 sitemap URL、没有多余 HTML、没有模板文本、404 用极简布局、文档未泄漏、exclude 未丢条目。
 
 ### ③ 推送上线（本地确认后自动执行）
 ```bash
@@ -274,6 +277,10 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 | agent 会话构建/预览报 `Permission denied`（读 `C:\Ruby33-x64\bin`）| DSH 沙箱默认只允许写工作区，Ruby 在 `C:\` 下 | 申请 `danger-full-access` 跑构建；或让用户在自己的终端跑 `publish.ps1`。不要改用别的命令绕过沙箱 |
 | agent 会话 `git push` 报 `could not read Username` / `cannot create standard input pipe for git-credential-helper-selector` | 沙箱禁止 Git 拉起 credential helper 的管道，凭据读不到（与凭据是否已存无关）| 让用户在自己终端 `git push origin main`，或 `publish.ps1 -PushOnly`；agent 不要反复重试 |
 | `publish.ps1` 语法报错、中文变乱码 | 文件被存成无 BOM 的 UTF-8，PowerShell 5.1 按 GBK 解析 | 保持 UTF-8 **with BOM**（`head -c 3` 应为 `ef bb bf`）；用 `pwsh` 运行也可，但文档默认 5.1 |
+| 论文年份/卷页对不上 | `信息.txt` 是 PI 手写清单，有笔误（如 Nano Research 年份、APL 文章号）| 一律以 Crossref 为准：`https://api.crossref.org/works/{DOI}`；差异记在 `CONTENT.md` §3 |
+| 抓清华 SIGS 页面后中文乱码 | 页面是 UTF-8，但 Windows 控制台按 GBK 输出 | 用 `curl -o` 存文件、Python 按 `utf-8` 读、结果写 UTF-8 文件再查看；不要直接 print 到控制台 |
+| 删掉的页面本地还能访问 | Jekyll 3.10 不清理 `_site` 里的旧产物 | `bundle exec jekyll clean`，或直接用 `scripts/check-site.ps1`（构建前删除 `_site`）|
+| 新增 Markdown 文件莫名上了线 | 无 front matter 的 `.md` 会被当静态文件复制 | 新增文档进 `_config.yml` 的 exclude；跑 `check-site.ps1` 复核 |
 
 ### Ruby 版本提示
 本机 3.3、CI 用 3.2，兼容良好。**暂不要升级到 Ruby 3.4+**（bundled gems 移除问题），升级前先在分支上试 `bundle install`。
@@ -288,6 +295,7 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 ```
 
 - **页面 404**：检查文件名/front matter 的 `permalink`；确认 `_config.yml` 的 include/exclude 没排掉它
+- **论文数据要改**：先查 `CONTENT.md` 的核对表和 DOI，再改 `_data/publications.yml`，最后跑 `check-site.ps1`
 - **样式丢失**：新页面看 `assets/minimal/style.css`（手写源文件，不是编译产物）；只有 404 之外的旧模板页面才用 `assets/css/main.css`（由 `_sass/` 编译，别手改）
 - **推送后线上没更新**：Actions 页看构建是否失败；或确认推的是 `main`（其他分支不部署）
 - **彻底重来**：删掉 `_site/` 目录重新 `bundle exec jekyll serve`
@@ -298,3 +306,5 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 - 模板官方文档（含各板块详细说明）：https://academicpages.github.io
 - 模板仓库 wiki（FAQ 很多）：https://github.com/academicpages/academicpages.github.io/wiki
 - GitHub Pages 文档：https://docs.github.com/pages
+- 论文元数据核对：Crossref API `https://api.crossref.org/works/{DOI}`
+- 导师官方主页：https://www.sigs.tsinghua.edu.cn/wcj/main.htm

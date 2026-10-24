@@ -192,6 +192,7 @@ exclude:
   - Rakefile
   - README
   - AGENTS.md
+  - CONTENT.md
   - MAINTENANCE.md
   - WORKLOG.md
   - tmp
