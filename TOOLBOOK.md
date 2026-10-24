@@ -58,6 +58,24 @@ git config core.sshCommand "ssh -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnl
 
 安全：key 只能写这一个仓库；私钥不进仓库、不外发；GitHub 上删除 deploy key 即失效。
 
+## 2.6 GitHub Actions（构建校验）
+
+仓库只有一个工作流：`.github/workflows/jekyll-build.yml`，`push`/`pull_request` 时在 Ubuntu + Ruby 3.2 上跑 `bundle exec jekyll build --strict_front_matter`。部署本身由 Pages 内置流程完成，CI 只负责“坏 front matter 别上线”。
+
+```bash
+# 本地复现 CI（与线上同一套 gem）
+bundle exec jekyll build --strict_front_matter
+# 看远端运行（公开仓库免登录）
+curl -s "https://api.github.com/repos/Wu-Lab-official/Wu-Lab-official.github.io/actions/runs?per_page=5"
+```
+
+| 症状 | 原因 | 处理 |
+|---|---|---|
+| push 后没有新的 Actions 运行 | 工作流 `on:` 写错（曾用 `workflow_run` 挂在不存在的 workflow 上）| 确认 `on: push: branches: [main]` |
+| CI 红叉、日志 `Could not find gem` | 仓库没提交 `Gemfile.lock`，`bundle install` 解析失败或超时 | 本地能 `bundle install` 即说明 Gemfile 没问题；重跑一次通常能过 |
+| 日志 `Liquid syntax error` | `--strict_front_matter` 抓到了坏 YAML | 本地跑同命令复现，改 front matter |
+| 权限报错 `Resource not accessible` | 工作流需要写权限 | 本工作流只需 `contents: read`，不要加多余权限 |
+
 ## 3. 症状 → 原因 → 处理
 
 | 症状 | 原因 | 处理 |

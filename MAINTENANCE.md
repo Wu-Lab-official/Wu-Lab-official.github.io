@@ -188,7 +188,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | Bundler | 2.5.22 | 随 Ruby 自带 |
 | 依赖 gems | 99 个 | 仓库内 `bundle install`（约 2-5 分钟）|
 | Git | Git Bash 自带 | `/mingw64/bin/git` |
-| Node.js / npm | 已装（`D:\nodejs`）| 仅改前端 JS 后重建 `main.min.js` 时才需要，平时用不到 |
+| Node.js / npm | 已装（`D:\nodejs`）| 旧模板的 `main.min.js` 已删，当前流程不需要 |
 | Python | 已装 | 当前流程不需要（`talkmap`/`markdown_generator` 已删除）；做数据核查时可用 |
 | 代理 | Clash Verge | `D:\Clash Verge\clash-verge.exe`，混合端口 `127.0.0.1:7897` |
 
@@ -215,43 +215,33 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | 改全站 title/description/url | `_config.yml` |
 | 发布前完整性检查 | `scripts/check-site.ps1` |
 
-### 3.2 旧 AcademicPages 结构（仅保留布局/样式作回退）
+### 3.2 目录结构（当前，只有一个主题）
 
-模板示例内容已于 2026-10-24 清理：`_posts/`、`_publications/`、`_portfolio/`、`_talks/`、`_teaching/`、`markdown_generator/`、`talkmap*`、示例图片与 PDF 已删除；旧模板页面（cv、terms、markdown、archive、talkmap、sitemap 等）也已删除。当前构建只有 6 个 HTML、5 条 sitemap URL。
-
-保留下来的是**布局与样式**（`_layouts/default.html`、`_layouts/single.html`、`_sass/`、`assets/css/main.css`、旧 `_includes/`）和旧首页 `_pages/about.md`（`published: false`）。回退时把 `about.md` 改回 `permalink: /` 并启用即可，但它依赖的集合数据已删除，需要另建内容。
-
-当前目录（只列还在用的）：
+旧 AcademicPages 渲染层已于 2026-10-24 全部删除：`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、旧头像与图标、`_pages/about.md`、`_data/ui-text.yml`、`_data/cv.json`、`_data/authors.yml`、模板 CI 工作流。需要时从 git 历史取回，当前不再保留回退副本。
 
 ```
-├── _config.yml            全站配置：title/description/url、exclude 列表、collections（空）
-├── _layouts/minimal.html  新站骨架（旧 default/single 仅回退）
+├── _config.yml            全站配置（title/description/url、author、include: _pages、exclude、plugins）
+├── _layouts/minimal.html  唯一布局
 ├── _includes/minimal/     head / header / footer
-├── _pages/                home、research、publications、people、join、404、about（停用）
-├── _data/                 research / publications / news / navigation（+ 旧 cv.json、ui-text）
+├── _pages/                home、research、publications、people、join、404
+├── _data/                 research / publications / news / navigation
 ├── assets/minimal/        style.css、app.js、profile.jpg、favicon.svg
-├── assets/css|js/         旧模板样式与脚本（回退用，当前页面不引用）
-├── images/                profile.png（旧侧边栏头像）、favicon、manifest
-├── files/                 论文 PDF / 附件（当前为空，缺 PDF 时放这里）
+├── favicon.ico            根图标（响应浏览器默认的 /favicon.ico）
+├── files/                 论文 PDF（当前为空）
 ├── scripts/               publish.ps1、check-site.ps1
-├── robots.txt             允许抓取 + 指向 sitemap（jekyll-sitemap 本来会生成一份，这里覆盖为显式版本）
-└── 文档                    MAINTENANCE.md、CONTENT.md、TOOLBOOK.md、WORKLOG.md（均已 exclude）
+├── robots.txt             显式 Allow + sitemap
+├── .github/workflows/     jekyll-build.yml（push/PR 时 strict_front_matter 构建校验）
+├── LICENSE                MIT（模板原作者 + 本组）
+└── 文档                    MAINTENANCE / CONTENT / TOOLBOOK / WORKLOG（均已 exclude）
 ```
+
+三个容易踩的点：
+
+- **`_pages` 必须显式 include**：`_config.yml` 里少了 `include: [_pages]`，构建仍会“成功”，但 `_site` 里只有 `assets`，6 个页面全不生成。
+- **`feed.xml` 与 `redirects.json` 是插件产物**：`github-pages` 会强制加载 jekyll-feed / jekyll-redirect-from，本站无 posts，feed 内容为空。这是无害产物，不要为删它去动 `plugins` 列表。
+- **删旧布局后不要再引用旧 include**：极简布局只引 `_includes/minimal/*`；`grep -rn 'include ' _layouts _includes` 可自查。
 
 设计稿在仓库外 `D:\wu-lab\_design\`，未纳入版本管理。其中 `minimal/README.md` 描述的岗位/FAQ 页面、`tokens.md` 的配色（`#F4F4F2`/`#0B6E69`）都是早期探索，与线上（`#660874`）不一致，**以 `assets/minimal/style.css` 为准**；`redesign` 分支不存在。
-
-
-### 旧模板维护任务（仅回退时使用）
-
-当前内容维护请看 **§3.1**。下面这些只适用于重新启用 AcademicPages 旧布局的情况：
-
-| 想做什么 | 改哪里 |
-|---|---|
-| 侧边栏头像/姓名/邮箱/单位 | `_config.yml` 的 `author:` 区块；头像替换 `images/profile.png` |
-| 侧边栏学术链接 | `_config.yml` 的 `author:` 区块，留空则不显示图标 |
-| 旧首页 | `_pages/about.md`（当前 `published: false`）|
-| 旧论文列表 | `_publications/`（当前新论文页不再使用）|
-| 旧模板样式 | `_sass/`、`assets/css/main.css` |
 
 ### 模板示例内容（2026-10-24 已清理）
 
@@ -338,6 +328,10 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 | 抓清华 SIGS 页面后中文乱码 | 页面是 UTF-8，但 Windows 控制台按 GBK 输出 | 用 `curl -o` 存文件、Python 按 `utf-8` 读、结果写 UTF-8 文件再查看；不要直接 print 到控制台 |
 | 删掉的页面本地还能访问 | Jekyll 3.10 不清理 `_site` 里的旧产物 | `bundle exec jekyll clean`，或直接用 `scripts/check-site.ps1`（构建前删除 `_site`）|
 | 新增 Markdown 文件莫名上了线 | 无 front matter 的 `.md` 会被当静态文件复制 | 新增文档进 `_config.yml` 的 exclude；跑 `check-site.ps1` 复核 |
+| 构建“成功”但 6 个页面全没了 | `_config.yml` 缺 `include: [_pages]`，下划线目录默认被忽略 | 补回 `include: [_pages]`；`check-site.ps1` 会报 missing page |
+| push 后 Actions 不跑构建检查 | 旧工作流用 `workflow_run` 挂在已删除的 `Cleanup bad PR` 上 | 已改 `on: push/pull_request`（2026-10-24），见 `.github/workflows/jekyll-build.yml` |
+| 每次 push 都多一条 Actions 失败 | 模板残留 `Scrape Talk Locations` 去跑已删除的 `talkmap.py` | 已删除该工作流 |
+| 线上仍挂着旧模板字体/样式 | 旧 `assets/css|js|webfonts|fonts` 无人引用但仍被复制 | 2026-10-24 已删，线上只剩 `assets/minimal` |
 
 ### Ruby 版本提示
 本机 3.3、CI 用 3.2，兼容良好。**暂不要升级到 Ruby 3.4+**（bundled gems 移除问题），升级前先在分支上试 `bundle install`。
@@ -353,7 +347,7 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 
 - **页面 404**：检查文件名/front matter 的 `permalink`；确认 `_config.yml` 的 include/exclude 没排掉它
 - **论文数据要改**：先查 `CONTENT.md` 的核对表和 DOI，再改 `_data/publications.yml`，最后跑 `check-site.ps1`
-- **样式丢失**：新页面看 `assets/minimal/style.css`（手写源文件，不是编译产物）；只有 404 之外的旧模板页面才用 `assets/css/main.css`（由 `_sass/` 编译，别手改）
+- **样式丢失**：所有页面都用 `assets/minimal/style.css`（手写源文件，不是编译产物）；旧模板样式已删除，线上不再有 `assets/css/main.css`
 - **推送后线上没更新**：Actions 页看构建是否失败；或确认推的是 `main`（其他分支不部署）
 - **彻底重来**：删掉 `_site/` 目录重新 `bundle exec jekyll serve`
 
@@ -367,3 +361,60 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 - 导师官方主页：https://www.sigs.tsinghua.edu.cn/wcj/main.htm
 - 本机工具与踩坑速查：[TOOLBOOK.md](TOOLBOOK.md)
 - GitHub SSH / Deploy Key：https://docs.github.com/authentication/connecting-to-github-with-ssh · https://docs.github.com/developers/overview/managing-deploy-keys
+
+## 8. 仓库与组织设置（管理员操作清单）
+
+> 2026-10-24 体检结论。agent 的 Deploy Key 只有 contents write，改不了这些设置；标“建议”的请在网页上操作。
+
+### 8.1 已确认正常
+
+| 项 | 现状 |
+|---|---|
+| 可见性 | public（Pages 免费版要求；仓库内容即公开） |
+| 默认分支 | `main` |
+| Pages 来源 | `main` / root，HTTPS 已启用（`http://` 301 → `https://`，HSTS 1 年） |
+| 域名 / 证书 | 未绑自定义域名；`*.github.io` 证书由 GitHub 自动续期（当前至 2026-12-29） |
+| DNS | 4 条 GitHub Pages A 记录（185.199.108–111.153） |
+| 提交邮箱 | `John-z39@users.noreply.github.com`，不泄露真实邮箱 |
+| Deploy Key | 仅此仓库、已勾 write access |
+| 仓库历史 | 2026-10-24 新建，无历史包袱 |
+| 源文件泄漏 | `/Gemfile`、`/_config.yml`、`/LICENSE`、`/.git/config` 均 404 |
+| 传输 | gzip 生效，首页 7.2 KB → 2.4 KB |
+| 缓存 | `Cache-Control: max-age=600`（GitHub Pages 固定，不可改） |
+
+### 8.2 建议修改（需要仓库/组织管理员）
+
+| 设置 | 现在 | 建议 | 原因 |
+|---|---|---|---|
+| About → Description | `wu lab` | `清华大学深圳国际研究生院 吴昌进课题组：活性软物质与智能系统` | 搜索与分享时的第一印象 |
+| About → Website | 空 | `https://wu-lab-official.github.io/` | 让 GitHub 侧也能跳转 |
+| About → Topics | 空 | `soft-matter`、`microrobotics`、`microfluidics`、`active-matter`、`tsinghua` | 可被发现 |
+| Wiki / Projects | 开启 | 关闭 | 没有内容，只会让访客点到空页 |
+| 分支保护 `main` | 无 | 禁止 force push、禁止删除分支（不要求 PR） | 防误操作覆盖历史 |
+| Actions → General | 默认 | Workflow permissions 设为 read-only；允许的 action 限定官方或要求 pin SHA | 降低供应链风险 |
+| Dependabot | 未开 | 开启 alerts + security updates | `Gemfile` 有依赖，漏洞能提前知道 |
+| Secret scanning | 公开仓库默认开 | 确认 push protection 也开 | 防误提交 token |
+| 组织资料 | 全空 | 名称、描述、网站、位置、头像 | 组织主页现在几乎是空白 |
+| 组织 profile README | 无 | 新建 `Wu-Lab-official/.github` 仓库，写 `profile/README.md` | 组织首页会显示，等于第二张名片 |
+| 组织 2FA | 未知 | Settings → Authentication security 强制开启 | 账号被盗等于站点被改 |
+| 组织 owner | 1 人（推定） | 至少 2 个 owner | 防单点失联 |
+| 成员权限 | 未知 | 一律 write，不给 admin；定期清理 Collaborators | 最小权限 |
+| Template repository | 关闭 | 保持关闭 | 避免被当成模板复制 |
+
+### 8.3 以后绑自定义域名的注意点
+
+1. 先决定用 `www.` 还是裸域；裸域要配 4 条 A 记录（above），`www` 配 CNAME 到 `wu-lab-official.github.io.`。
+2. Pages → Custom domain 填域名 → 等证书签发（几分钟到几小时）→ 勾 **Enforce HTTPS**。
+3. 仓库里**不要**手写 `CNAME` 文件与网页设置打架；由 Pages 设置写入即可。
+4. 换域名后旧 `*.github.io` 仍可访问，需要的话在旧地址做跳转（或接受双地址）。
+5. 域名到期/解析变更会导致站点 404，续费提醒要有人负责。
+
+### 8.4 长期注意事项
+
+- **公开仓库 = 全部公开**，包括历史提交；`exclude` 只影响构建，不影响可见性。
+- 组织站点仓库名必须是 `<org>.github.io`，改名等于换域名。
+- 本地目录名 `John-z39.github.io` 是旧个人仓库遗留，与 remote 不一致，判断身份看 `git remote -v`。
+- Deploy Key 无口令，泄露后到 Settings → Deploy keys 删除并重新生成，同时更新本机 `core.sshCommand`。
+- Pages 构建需 1–2 分钟，连续提交会排队；不要因为“没立刻变”重复 push。
+- 免费额度：站点 1 GB、月流量 100 GB、构建 10 次/小时；公开仓库的 Actions 不计分钟数。
+- 备份：仓库本身就是代码与内容的备份；`信息.txt`、`图片.jpg` 不在仓库，需另存私有位置。

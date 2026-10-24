@@ -1,13 +1,14 @@
-name: Jekyll build
+name: Jekyll build check
+
+# push / PR 时做一次 --strict_front_matter 构建，防止坏 front matter 直接上线。
+# 部署由 GitHub Pages 内置流程完成，本工作流只做校验。
 
 on:
-  # Run after bad-pr check
-  workflow_run:
-    workflows: ["Cleanup bad PR"]
+  push:
     branches: [main]
-    types:
-      - completed
-      
+  pull_request:
+  workflow_dispatch:
+
 permissions:
   contents: read
 

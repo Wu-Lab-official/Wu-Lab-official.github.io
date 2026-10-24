@@ -139,3 +139,18 @@
   - `scripts/publish.ps1`：push 失败提示改为 SSH 排障（publickey / timeout→443 / remote 仍是 https），去掉过时的“credential helper 被拦，请用户手动推”
 - **验证**：`ssh -i ... -T git@github.com` → `Hi Wu-Lab-official/Wu-Lab-official.github.io!`；`git push` 成功；线上 `/`、`/research/`、`/publications/`、`/people/`、`/join/`、`/404.html`、`/robots.txt`、`/sitemap.xml` 均 200；`/AGENTS.md`、`/publication/paper-title-number-1/`、`/posts/2012/08/blog-post-1/`、`/scripts/publish.ps1`、`/cv/`、`/terms/` 均 404；sitemap 5 条；robots 为显式 Allow + sitemap
 - **遗留**：key 为无口令（agent 无法交互输入），本机可读该文件者即可写此仓库，已用仓库级最小权限限制；换机需按 §0.6 重配
+
+## 2026-10-24 ｜ 会话 12：全面体检 + 删除旧渲染层 + 修复 CI + 组织/仓库设置清单
+
+- **体检方法**：线上状态码矩阵与响应头、TLS/DNS、6 个页面的 meta/死链扫描（HTMLParser 自写脚本）、GitHub 公开 API 读仓库/组织/工作流/运行记录、本地 git 树与大文件统计。
+- **发现并修复**
+  - 旧模板渲染层仍在仓库且被发布：`main.css` 54 KB、`main.min.js` 102 KB、FontAwesome/academicons 字体约 1.9 MB、旧头像 `images/profile.png`、`_sass/` 726 KB——极简主题完全不引用。已删除旧 layouts、全部旧 includes、`_sass`、`assets/css|js|webfonts|fonts`、`images`、`_pages/about.md`、`_data/ui-text.yml|cv.json|authors.yml`
+  - `.github` 模板残留：`CONTRIBUTING.md`、两个 ISSUE_TEMPLATE、PR 模板、`bad-pr.yml`、`scrape_talks.yml`（每次 push 跑失败）→ 全部删除
+  - `jekyll-build.yml` 原用 `workflow_run` 挂在已删除的 `Cleanup bad PR` 上，push 根本不触发 → 改为 `on: push/pull_request/workflow_dispatch` + `contents: read` + concurrency
+  - `_config.yml` 从 368 行精简到 60 行：去掉 comments/analytics/publication_category/collections/defaults/sass/whitelist/compress 等失效段；补 `include: [_pages]`（缺它会导致 6 个页面全部不生成、构建却“成功”）
+  - `LICENSE` 原本只有模板作者版权行 → 追加本组版权行（MIT 全文保留）
+  - `_includes/minimal/head.html` 缺分享元信息 → 补 og:type/site_name/title/description/url/locale + twitter:card，支持 `page.noindex`
+  - 404 页加 `noindex`；根目录补 `favicon.ico`（此前 `/favicon.ico` 404）
+- **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；`_site` 只剩 `404.html`、5 个页面、`assets/minimal`、`favicon.ico`、`robots.txt`、`sitemap.xml`、`feed.xml`（空，插件产物）、`redirects.json`（2 B）；`/publications/` 15 行数据、`/research/` 5 个方向；404 含 noindex；首页含 6 个 og 标签
+- **文档**：`MAINTENANCE.md` §3.2 重写为当前目录、§5 补 4 条坑、§6 样式条目修正、新增 §8 仓库与组织设置清单（正常项 / 待管理员 13 项 / 自定义域名注意 / 长期注意）；`TOOLBOOK.md` 新增 §2.6 GitHub Actions；`AGENTS.md` 状态更新
+- **遗留**：§8.2 的 13 项需管理员在网页操作（描述、topics、关闭 Wiki、分支保护、Actions 权限、Dependabot、组织资料与 profile README 等）；两个插件产物（空 feed、2 B redirects.json）无法通过配置关闭，已注明无害
