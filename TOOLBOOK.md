@@ -55,6 +55,7 @@ git config core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ss
 | `UNPROTECTED PRIVATE KEY FILE` / `Bad permissions` | 系统 OpenSSH 要求私钥仅本人可读 | `icacls "D:\wu-lab\.ssh\wu-lab-deploy" /inheritance:r /grant:r "$env:USERNAME:R"` |
 | `Could not resolve hostname github.com`（间歇，但 `nslookup`/`curl` 正常）| Git Bash 的 MSYS ssh 解析偶发失败 | `core.sshCommand` 改用 `C:/Windows/System32/OpenSSH/ssh.exe`（已改）|
 | `cannot pull with rebase: You have unstaged changes` | 工作区未提交，脚本 `-PushOnly` 拒绝操作 | 先提交或 `git stash`；`publish.ps1` 已加干净工作区检查 |
+| 校验 URL 变成 `...github.ioC:/Users/...` | 从 Git Bash 调用时 MSYS 把以 `/` 开头的参数转成了 Windows 路径 | 从 PowerShell 调用，或加 `MSYS_NO_PATHCONV=1`；脚本会跳过非法路径并警告 |
 | 推上去但 Pages 没变 | 构建中 / 推错分支 | 等 1–2 分钟；`git log origin/main -1` |
 
 安全：key 只能写这一个仓库；私钥不进仓库、不外发；GitHub 上删除 deploy key 即失效。

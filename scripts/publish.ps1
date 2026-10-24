@@ -178,6 +178,10 @@ if ($SkipVerify) {
   Start-Sleep -Seconds $VerifyWaitSeconds
   $failed = @()
   foreach ($path in $VerifyPaths) {
+    if ($path -notmatch '^/') {
+      Write-Warning "跳过非法校验路径（可能被 Git Bash 的 MSYS 路径转换破坏）：$path —— 从 Git Bash 调用时请加 MSYS_NO_PATHCONV=1"
+      continue
+    }
     $url = "https://wu-lab-official.github.io$path"
     try {
       $resp = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 30
