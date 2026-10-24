@@ -147,6 +147,24 @@ C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o Identitie
 
 故障：22 端口被墙时，把 `core.sshCommand` 里的 `-o HostName=ssh.github.com -o Port=443` 加上（GitHub 官方 443 入口）。回滚到 HTTPS：`git remote set-url origin https://github.com/Wu-Lab-official/Wu-Lab-official.github.io.git` 并 `git config --unset core.sshCommand`。
 
+### 0.7 代理（Clash）与联网检查
+
+**用户经常忘记开 Clash**，所以每轮涉及联网前先查端口，`closed` 就先提醒他启动，不要反复重试。
+
+```bash
+(echo > /dev/tcp/127.0.0.1/7897) 2>/dev/null && echo open || echo closed
+# PowerShell: Test-NetConnection 127.0.0.1 -Port 7897 -InformationLevel Quiet
+```
+
+| 情况 | 怎么做 |
+|---|---|
+| 端口 `closed`，且本轮要抓网页 / 调 Crossref / 走 HTTPS | 提醒用户启动 `D:\Clash Verge\clash-verge.exe`；明确告知会卡在哪一步 |
+| 端口 `open` | 正常干活；HTTPS 命令加 `-x http://127.0.0.1:7897` 或 `git -c http.proxy=...` |
+| `git push`（SSH remote）失败 | **与 Clash 无关**；按 §0.6 查 deploy key / `core.sshCommand` |
+| `curl` 返回 `000` / 连接超时 | 直连被墙且没走代理：要么开 Clash，要么加 `-x` |
+
+代理是备用通道，不是硬依赖：GitHub HTTPS 与 SSH 多数时候直连可用，不要为了“保险”强制走代理。
+
 ## 0.5 文档维护方针（自动维护，不需要提醒）
 
 五份文档分工固定：

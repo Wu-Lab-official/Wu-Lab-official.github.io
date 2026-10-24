@@ -155,3 +155,13 @@
 - **文档**：`MAINTENANCE.md` §3.2 重写为当前目录、§5 补 4 条坑、§6 样式条目修正、新增 §8 仓库与组织设置清单（正常项 / 待管理员 13 项 / 自定义域名注意 / 长期注意）；`TOOLBOOK.md` 新增 §2.6 GitHub Actions；`AGENTS.md` 状态更新
 - **遗留**：§8.2 的 13 项需管理员在网页操作（描述、topics、关闭 Wiki、分支保护、Actions 权限、Dependabot、组织资料与 profile README 等）
 - **同日追加**：推送时发现 Git Bash 的 MSYS ssh 会间歇性 `Could not resolve hostname github.com`（同时 `nslookup`/`curl` 正常）→ `core.sshCommand` 改用系统 OpenSSH `C:/Windows/System32/OpenSSH/ssh.exe`，并用 `icacls` 收紧私钥 ACL；`publish.ps1` 增加 pull/push 各 3 次重试，`-PushOnly` 先检查工作区是否干净（此前把“未提交改动”误报成网络失败），校验路径被 MSYS 转换时跳过并警告
+
+## 2026-10-24 ｜ 会话 13：把“提醒开 Clash”写进规范
+
+- **背景**：用户说明自己经常忘记挂 Clash（代理），要求 agent 主动提醒并写进文档。
+- **改动**
+  - `AGENTS.md` 新增「开工检查（每轮第一步，别跳）」：联网任务前先测 `127.0.0.1:7897`；`closed` 先提醒用户启动 Clash 再继续，禁止闷头重试或误判为代码问题；并注明 SSH 推送不走 HTTP 代理
+  - `TOOLBOOK.md` 新增 §2.7 代理（Clash Verge）：程序路径、端口、bash/PowerShell 检测命令、四种症状（`000`/超时、DNS 失败、代理开着 git 仍失败、浏览器能开 CLI 不能）
+  - `MAINTENANCE.md` 新增 §0.7 代理与联网检查：端口检测、何时提醒、与 SSH 推送无关的边界
+- **验证**：文档交叉引用一致（AGENTS → §0.6/§0.7、TOOLBOOK §2.5/§2.7）；未改站点文件，无需重建
+- **遗留**：无

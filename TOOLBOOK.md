@@ -78,6 +78,30 @@ curl -s "https://api.github.com/repos/Wu-Lab-official/Wu-Lab-official.github.io/
 | 日志 `Liquid syntax error` | `--strict_front_matter` 抓到了坏 YAML | 本地跑同命令复现，改 front matter |
 | 权限报错 `Resource not accessible` | 工作流需要写权限 | 本工作流只需 `contents: read`，不要加多余权限 |
 
+## 2.7 代理（Clash Verge）
+
+| 项 | 值 |
+|---|---|
+| 程序 | `D:\Clash Verge\clash-verge.exe` |
+| 混合端口 | `127.0.0.1:7897`（HTTP 与 SOCKS 同端口）|
+| 检测（bash）| `(echo > /dev/tcp/127.0.0.1/7897) 2>/dev/null && echo open \|\| echo closed` |
+| 检测（PowerShell）| `Test-NetConnection 127.0.0.1 -Port 7897 -InformationLevel Quiet` |
+
+规则：
+
+- 代理是**备用/加速**，不是硬依赖：GitHub 的 HTTPS 与 SSH 多数时候直连可用。
+- 需要代理的典型场景：`curl` 返回 `000`/超时、DNS 解析失败、Crossref 或 SIGS 页面很慢。
+- 用代理：`curl -x http://127.0.0.1:7897 <url>`、`git -c http.proxy=http://127.0.0.1:7897 <cmd>`。
+- **SSH 不走 HTTP 代理**：`git push` 走 SSH 时与 Clash 无关，推不动先按 §2.5 排查。
+- **用户经常忘记开 Clash**：agent 在联网任务前主动检测端口，`closed` 就先提醒，不要反复重试。
+
+| 症状 | 原因 | 处理 |
+|---|---|---|
+| `curl` 返回 `000` / 超时 | 直连被墙且代理没开 | 提醒用户启动 Clash，或命令里加 `-x` |
+| `Could not resolve host` | DNS 抖动；或设了 proxy 环境变量但端口没监听 | 先测 7897 端口，再 `nslookup` |
+| 代理开着但 git 仍失败 | 用了 SSH remote，代理参数对它无效 | 按 §2.5 查 SSH，不要再加 `-c http.proxy` |
+| 浏览器能开、命令行不能 | 浏览器走系统代理，CLI 需要显式 `-x` 或 `http.proxy` | 给命令加代理参数 |
+
 ## 3. 症状 → 原因 → 处理
 
 | 症状 | 原因 | 处理 |
