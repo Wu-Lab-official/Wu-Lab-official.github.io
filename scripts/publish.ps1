@@ -132,17 +132,18 @@ Write-Host "== 3/3 push ==" -ForegroundColor Cyan
 
 Invoke-NetGit @("pull", "--rebase", "origin", "main")
 if ($LASTEXITCODE -ne 0) {
-  Fail "git pull --rebase 失败（可能有冲突，或网络/凭据不可用）。解决后重跑 -PushOnly。"
+  Fail "git pull --rebase 失败（可能有冲突，或网络不可用）。解决后重跑 -PushOnly。"
 }
 
 Invoke-NetGit @("push", "origin", "main")
 if ($LASTEXITCODE -ne 0) {
   Fail @"
 git push 失败。本地提交仍在，修复后重跑本脚本 -PushOnly 即可补推。
-- 若报 Could not resolve host / connect timeout：开 Clash Verge（127.0.0.1:7897）后重跑。
-- 若报 could not read Username / credential helper Permission denied：
-  https 凭据不可用（agent 会话的沙箱会拦 credential helper 子进程管道）。
-  请在你自己的终端里执行 git push origin main，或在 Git 凭据管理器里登录 GitHub 后重跑。
+- Permission denied (publickey)：deploy key 被删/未勾 write access/core.sshCommand 路径错。
+  见 MAINTENANCE.md §0.6；自测：ssh -i D:/wu-lab/.ssh/wu-lab-deploy -T git@github.com
+- Connection timed out / Could not resolve host：22 端口不通。给 core.sshCommand 加
+  -o HostName=ssh.github.com -o Port=443（GitHub 官方 443 入口）。
+- could not read Username：remote 还是 https，改回 git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git
 "@
 }
 

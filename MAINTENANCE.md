@@ -94,9 +94,10 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 
 
 几个行为细节：
 - 当前分支不是 `main` 直接报错退出（旧版会提交后去推 `origin main`，给出“成功”的假象）。
-- 代理自动探测：7897 开着就带 `-c http.proxy`，没开就直连；不再强制要求先启动 Clash。
+- **推送走 SSH（2026-10-24 起）**：remote 是 `git@github.com:...`，本仓库的 `core.sshCommand` 指向 `D:\wu-lab\.ssh\wu-lab-deploy`（GitHub 上的 Deploy Key，只对本仓库可写）。因此 **agent 会话也能直接 push**，不再依赖 Git Credential Manager。换机或删 key 后需要重配，步骤见 §0.6。
+- 代理自动探测：7897 开着就带 `-c http.proxy`，没开就直连；SSH remote 下这两个参数不起作用，但留着无害。
 - push 前自动 `pull --rebase`，远端有新提交时不用手工处理。
-- 脚本设置 `GIT_TERMINAL_PROMPT=0` / `GCM_INTERACTIVE=never`：凭据缺失会立刻报错而不是卡在用户名提示。**首次登录或凭据过期时**，先在终端手动 `git push origin main` 让 Git 凭据管理器弹窗登录，再回来用脚本。
+- 脚本设置 `GIT_TERMINAL_PROMPT=0` / `GCM_INTERACTIVE=never`：凭据缺失会立刻报错而不是卡在用户名提示。现在走 SSH，这两个变量只是防止误用 HTTPS 时挂死。
 - 提交里如果没有 `WORKLOG.md`，会给黄色警告（规范要求每轮留痕），但不阻断。
 - push 失败时本地提交保留，按提示修网络/凭据后重跑 `-PushOnly` 即可补推。
 - **脚本是 UTF-8 with BOM**：Windows PowerShell 5.1 读无 BOM 的 UTF-8 会把中文按 GBK 解释，直接语法报错。编辑这个文件时别把 BOM 弄丢（`head -c 3` 应看到 `ef bb bf`）。
@@ -108,7 +109,36 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly
 ```
 
-要求：Ruby 在 `C:\Ruby33-x64\bin`。脚本供你在自己的终端运行，不经过 agent 的逐条审批。
+要求：Ruby 在 `C:\Ruby33-x64\bin`。
+
+### 0.6 SSH Deploy Key（推送凭据，换机必看）
+
+为什么用 Deploy Key：GitHub 的 HTTPS 推送依赖 Git Credential Manager 的子进程管道，agent 沙箱会拦（`cannot create standard input pipe for git-credential-helper-selector`）。SSH 用密钥文件，不需要这个管道，因此 agent 也能推。
+
+当前配置（本机）：
+
+| 项 | 值 |
+|---|---|
+| remote | `git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git` |
+| 私钥 | `D:\wu-lab\.ssh\wu-lab-deploy`（ed25519，无口令）|
+| 公钥 | `D:\wu-lab\.ssh\wu-lab-deploy.pub` |
+| 仓库级配置 | `git config core.sshCommand "ssh -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"` |
+| GitHub 侧 | 仓库 Settings → Deploy keys → `wu-lab-agent`，已勾 **Allow write access** |
+
+换机/重装后重配：
+
+```bash
+ssh-keygen -t ed25519 -C "wu-lab-deploy" -f /d/wu-lab/.ssh/wu-lab-deploy -N ""
+cat /d/wu-lab/.ssh/wu-lab-deploy.pub      # 贴到仓库 Settings → Deploy keys，勾 Allow write access
+cd /d/wu-lab/John-z39.github.io
+git remote set-url origin git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git
+git config core.sshCommand "ssh -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"
+ssh -i /d/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -T git@github.com   # 看到 Hi Wu-Lab-official/... 即成功
+```
+
+安全边界：这把 key 只能写这一个仓库，不能改设置、不能访问其他仓库；私钥不进仓库、不发给别人。删掉 GitHub 上的 deploy key 即失效。
+
+故障：22 端口被墙时，把 `core.sshCommand` 里的 `-o HostName=ssh.github.com -o Port=443` 加上（GitHub 官方 443 入口）。回滚到 HTTPS：`git remote set-url origin https://github.com/Wu-Lab-official/Wu-Lab-official.github.io.git` 并 `git config --unset core.sshCommand`。
 
 ## 0.5 文档维护方针（自动维护，不需要提醒）
 
@@ -144,7 +174,7 @@ powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1   # 完整性检
 # —— 推送上线（代理可选，见 §5）——
 git add 具体文件.md              # 手动提交只加改动文件
 git commit -m "说明"
-git push origin main            # 代理不通时才加 -c http.proxy=http://127.0.0.1:7897
+git push origin main            # 走 SSH（Deploy Key），不需要代理和密码；22 不通时见 §0.6
 # 已提交但 push 失败时，补推用：scripts\publish.ps1 -PushOnly
 ```
 
@@ -162,7 +192,7 @@ git push origin main            # 代理不通时才加 -c http.proxy=http://127
 | Python | 已装 | 当前流程不需要（`talkmap`/`markdown_generator` 已删除）；做数据核查时可用 |
 | 代理 | Clash Verge | `D:\Clash Verge\clash-verge.exe`，混合端口 `127.0.0.1:7897` |
 
-新机器完整流程：装 Ruby（含 Devkit）→ `git clone https://github.com/Wu-Lab-official/Wu-Lab-official.github.io.git` → `bundle install` → `bundle exec jekyll serve`。Gemfile 已含 `tzinfo-data`（Windows 必需，见 §5），无需再改。
+新机器完整流程：装 Ruby（含 Devkit）→ `git clone git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git`（或先用 HTTPS clone，再按 §0.6 配 Deploy Key）→ `bundle install` → 配 SSH（§0.6）→ `bundle exec jekyll serve`。Gemfile 已含 `tzinfo-data`（Windows 必需，见 §5），无需再改。
 
 ## 3. 目录结构（改内容看这里）
 
@@ -263,16 +293,14 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 
 git add 路径/文件.md
 # 2) 提交，信息格式 <type>: 摘要，type ∈ content/feat/fix/docs/chore
 git commit -m "content: 更新课题组简介"
-# 3) 推送：代理开着就走代理，直连也能用（今天直连可达）
+# 3) 推送：走 SSH Deploy Key（2026-10-24 起），无需代理、无需密码
 git push origin main
-#   代理不通时才用：git -c http.proxy=http://127.0.0.1:7897 -c http.sslBackend=openssl push origin main
 # 4) 等 60–90 秒后验证线上
 curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改动页面/
 ```
-- 也可一劳永逸给 git 配置代理（配置后 push 不用再加 `-c` 参数）：
-  `git config --global http.proxy http://127.0.0.1:7897`
-  取消：`git config --global --unset http.proxy`
-- **agent 会话通常无法 push**：沙箱禁止 Git 调用 credential helper 时的子进程管道（报 `cannot create standard input pipe for git-credential-helper-selector: Permission denied` 或 `could not read Username`），即使本机已存凭据。此时让用户在自己的终端执行 `git push origin main`，或运行 `publish.ps1 -PushOnly`；不要反复重试。
+- 推送凭据是仓库级 Deploy Key，配置见 §0.6；它只对本仓库可写。22 端口被墙时在 `core.sshCommand` 里加 `-o HostName=ssh.github.com -o Port=443`。
+- **agent 会话现在也能直接 push**（SSH 不走 credential helper 管道）。若报 `Permission denied (publickey)`：检查 deploy key 是否被删、是否勾了 write access、`core.sshCommand` 路径是否正确；报 `Connection timed out`：22 端口不通，换 443。
+- 不要为了“能推”去改 remote 为 HTTPS 或往 URL 里塞 token：HTTPS 在 agent 沙箱里必失败，token 明文还会留在 git 配置里。
 
 ### ④ 线上验证
 - push 后 GitHub Pages 自动构建（1–2 分钟）；构建状态看仓库 **Actions** 标签页或 commit 的勾/叉
@@ -297,12 +325,14 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 |---|---|---|
 | 敲 `jekyll` 报错/跳商店 | WindowsApps 有 535 字节的假 `jekyll` 占位 stub | 一律用 `bundle exec jekyll`；根治：设置 → 应用 → 应用执行别名 → 关闭 jekyll |
 | 构建报 `TZInfo::DataSourceNotFound` | Windows 没有系统时区库，`_config.yml` 又设了 `timezone: Etc/UTC` | 已在 Gemfile 加 `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]`（Linux CI 不受影响），勿删 |
-| git push 报 `Could not resolve host: github.com` | 国内网络直连 GitHub 被重置 | 启动 Clash Verge（`D:\Clash Verge\clash-verge.exe`），然后用 `git -c http.proxy=http://127.0.0.1:7897 push`（或给 git 全局配置代理）|
+| git push 报 `Could not resolve host: github.com` | 国内网络直连 GitHub 被重置 | 现走 SSH：先测 `ssh -T git@github.com`；22 不通则在 `core.sshCommand` 加 `-o HostName=ssh.github.com -o Port=443`。不要退回 HTTPS |
 | `bundle install` 时 `jekyll` 与 `github-pages` 版本疑虑 | Gemfile 同时写了两者 | 正常现象，Bundler 会统一解析到 3.10.x，不用管 |
 | 新终端找不到 ruby/bundle | Ruby 安装晚于终端/宿主进程启动 | 新开终端即可；旧会话先 `export PATH="/c/Ruby33-x64/bin:$PATH"` |
 | 改了 `_config.yml` 预览没变化 | 配置文件不热加载 | Ctrl+C 停掉 serve 再重启 |
 | agent 会话构建/预览报 `Permission denied`（读 `C:\Ruby33-x64\bin`）| DSH 沙箱默认只允许写工作区，Ruby 在 `C:\` 下 | 申请 `danger-full-access` 跑构建；或让用户在自己的终端跑 `publish.ps1`。不要改用别的命令绕过沙箱 |
-| agent 会话 `git push` 报 `could not read Username` / `cannot create standard input pipe for git-credential-helper-selector` | 沙箱禁止 Git 拉起 credential helper 的管道，凭据读不到（与凭据是否已存无关）| 让用户在自己终端 `git push origin main`，或 `publish.ps1 -PushOnly`；agent 不要反复重试 |
+| agent 会话 `git push` 报 `could not read Username` / `cannot create standard input pipe for git-credential-helper-selector` | 沙箱禁止 Git 拉起 credential helper 的管道（HTTPS 推送才会走它）| 改走 SSH Deploy Key（§0.6）；确认 `git remote get-url origin` 是 `git@github.com:...`。不要用 token 塞 URL |
+| agent 会话 `git push` 报 `Permission denied (publickey)` | deploy key 被删 / 未勾 write access / `core.sshCommand` 指向错 | 重新加 key 并勾 write；`ssh -i <key> -T git@github.com` 应显示 `Hi Wu-Lab-official/...` |
+| agent 会话 `git push` 报 `Connection timed out` | 22 端口被墙 | `core.sshCommand` 加 `-o HostName=ssh.github.com -o Port=443` |
 | `publish.ps1` 语法报错、中文变乱码 | 文件被存成无 BOM 的 UTF-8，PowerShell 5.1 按 GBK 解析 | 保持 UTF-8 **with BOM**（`head -c 3` 应为 `ef bb bf`）；用 `pwsh` 运行也可，但文档默认 5.1 |
 | 论文年份/卷页对不上 | `信息.txt` 是 PI 手写清单，有笔误（如 Nano Research 年份、APL 文章号）| 一律以 Crossref 为准：`https://api.crossref.org/works/{DOI}`；差异记在 `CONTENT.md` §3 |
 | 抓清华 SIGS 页面后中文乱码 | 页面是 UTF-8，但 Windows 控制台按 GBK 输出 | 用 `curl -o` 存文件、Python 按 `utf-8` 读、结果写 UTF-8 文件再查看；不要直接 print 到控制台 |
@@ -336,3 +366,4 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 - 论文元数据核对：Crossref API `https://api.crossref.org/works/{DOI}`
 - 导师官方主页：https://www.sigs.tsinghua.edu.cn/wcj/main.htm
 - 本机工具与踩坑速查：[TOOLBOOK.md](TOOLBOOK.md)
+- GitHub SSH / Deploy Key：https://docs.github.com/authentication/connecting-to-github-with-ssh · https://docs.github.com/developers/overview/managing-deploy-keys

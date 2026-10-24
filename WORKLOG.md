@@ -125,3 +125,17 @@
   - `MAINTENANCE.md`：新增 §0.5 文档维护方针；§1 加 `check-site.ps1`；§3.2 目录树补 `TOOLBOOK.md`、`robots.txt`；§5 指向 TOOLBOOK；§7 加链接
 - **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；`_site` 顶层只剩 `404.html`、`assets/`、`feed.xml`、`images/`、5 个页面目录、`redirects.json`、`robots.txt`、`sitemap.xml`；`_site/scripts` 不存在；`robots.txt` 为显式 Allow + sitemap；构建 1.8s
 - **遗留**：push 仍只能由用户在自己终端执行（agent 无凭据通道），本地提交待推；push 方案（配置 SSH key / 维持现状）待用户决定
+
+## 2026-10-24 ｜ 会话 11：推送打通（SSH Deploy Key）+ 线上全量验证
+
+- **背景**：用户追问“为什么总要我自己推”，确认 HTTPS 推送在 agent 会话里必然失败（credential helper 管道被沙箱拦），改用 GitHub 官方给自动化准备的 Deploy Key。
+- **改动**
+  - 生成仓库专用 ed25519 key：`D:\wu-lab\.ssh\wu-lab-deploy`（私钥，仅本机）+ `.pub`（公钥）；仓库 Settings → Deploy keys 添加 `wu-lab-agent` 并勾 **Allow write access**
+  - `git remote` 改为 `git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git`；本仓库 `core.sshCommand` 指定私钥、`IdentitiesOnly`、独立 `known_hosts`
+  - 首次推送成功：`0cad95f..745895f main -> main`（4 个提交），agent 会话不再需要用户代推
+  - `MAINTENANCE.md`：新增 §0.6 SSH Deploy Key（当前配置表、换机重配命令、443 回退、回滚）；§0.4/§1/§2/§4③/§5/§7 的 HTTPS+代理口径全部改为 SSH；坑表新增 publickey/timeout 两行
+  - `AGENTS.md`：流程第 4 步改为“agent 可直接 push”，补 remote/sshCommand 检查与故障处理；硬性约定加“推送走 SSH、私钥不外发”；关键事实表加推送行；状态加本轮
+  - `TOOLBOOK.md`：新增 §2.5 SSH 与推送（配置表、认证测试、443 回退、5 种报错处理）
+  - `scripts/publish.ps1`：push 失败提示改为 SSH 排障（publickey / timeout→443 / remote 仍是 https），去掉过时的“credential helper 被拦，请用户手动推”
+- **验证**：`ssh -i ... -T git@github.com` → `Hi Wu-Lab-official/Wu-Lab-official.github.io!`；`git push` 成功；线上 `/`、`/research/`、`/publications/`、`/people/`、`/join/`、`/404.html`、`/robots.txt`、`/sitemap.xml` 均 200；`/AGENTS.md`、`/publication/paper-title-number-1/`、`/posts/2012/08/blog-post-1/`、`/scripts/publish.ps1`、`/cv/`、`/terms/` 均 404；sitemap 5 条；robots 为显式 Allow + sitemap
+- **遗留**：key 为无口令（agent 无法交互输入），本机可读该文件者即可写此仓库，已用仓库级最小权限限制；换机需按 §0.6 重配

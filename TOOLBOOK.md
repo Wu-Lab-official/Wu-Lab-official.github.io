@@ -29,6 +29,35 @@
 
 原则：**不绕过沙箱**（别用 pwsh 重试被 bash 拒绝的操作）；一次审批只对一条命令有效。
 
+## 2.5 SSH 与推送（2026-10-24 起）
+
+remote 已从 HTTPS 换成 SSH，凭据是仓库级 Deploy Key，**不再走 Git Credential Manager**，所以 agent 会话也能推。
+
+| 项 | 值 |
+|---|---|
+| remote | `git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git` |
+| 私钥 / 公钥 | `D:\wu-lab\.ssh\wu-lab-deploy` / `.pub`（ed25519，无口令）|
+| 仓库级配置 | `core.sshCommand` 指定私钥 + `IdentitiesOnly` + 独立的 `known_hosts` |
+| GitHub 侧 | 仓库 Settings → Deploy keys → `wu-lab-agent`，勾 **Allow write access** |
+
+```bash
+# 认证测试（看到 Hi Wu-Lab-official/... 即成功）
+ssh -i /d/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -T git@github.com
+
+# 22 端口被墙时（GitHub 官方 443 入口）
+git config core.sshCommand "ssh -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o HostName=ssh.github.com -o Port=443 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"
+```
+
+| 症状 | 原因 | 处理 |
+|---|---|---|
+| `Permission denied (publickey)` | key 没加到仓库 / 没勾 write / `-i` 路径错 | 重加 deploy key，勾 write access |
+| `Connection timed out` | 22 端口被封 | 用上面的 443 配置 |
+| `UNPROTECTED PRIVATE KEY FILE` | 私钥权限过宽 | `icacls` 收紧，或确认目录只有本人可读 |
+| `Could not resolve hostname` | DNS/网络抖动 | 重试；`nslookup github.com` 确认解析 |
+| 推上去但 Pages 没变 | 构建中 / 推错分支 | 等 1–2 分钟；`git log origin/main -1` |
+
+安全：key 只能写这一个仓库；私钥不进仓库、不外发；GitHub 上删除 deploy key 即失效。
+
 ## 3. 症状 → 原因 → 处理
 
 | 症状 | 原因 | 处理 |
