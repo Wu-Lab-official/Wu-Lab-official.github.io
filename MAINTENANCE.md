@@ -122,8 +122,14 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly
 | remote | `git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git` |
 | 私钥 | `D:\wu-lab\.ssh\wu-lab-deploy`（ed25519，无口令）|
 | 公钥 | `D:\wu-lab\.ssh\wu-lab-deploy.pub` |
-| 仓库级配置 | `git config core.sshCommand "ssh -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"` |
+| 仓库级配置 | `git config core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"` |
 | GitHub 侧 | 仓库 Settings → Deploy keys → `wu-lab-agent`，已勾 **Allow write access** |
+
+为什么指定 Windows 自带 `ssh.exe`：Git Bash 的 MSYS ssh 在本机会间歇性报 `Could not resolve hostname github.com`（同一时刻 `nslookup` 与 `curl` 都正常），换用系统 OpenSSH 后稳定。系统 ssh 对私钥权限要求严格，首次使用需 `icacls` 收紧：
+
+```powershell
+icacls "D:\wu-lab\.ssh\wu-lab-deploy" /inheritance:r /grant:r "$env:USERNAME:R"
+```
 
 换机/重装后重配：
 
@@ -132,8 +138,9 @@ ssh-keygen -t ed25519 -C "wu-lab-deploy" -f /d/wu-lab/.ssh/wu-lab-deploy -N ""
 cat /d/wu-lab/.ssh/wu-lab-deploy.pub      # 贴到仓库 Settings → Deploy keys，勾 Allow write access
 cd /d/wu-lab/John-z39.github.io
 git remote set-url origin git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git
-git config core.sshCommand "ssh -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"
-ssh -i /d/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -T git@github.com   # 看到 Hi Wu-Lab-official/... 即成功
+git config core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"
+icacls "D:\wu-lab\.ssh\wu-lab-deploy" /inheritance:r /grant:r "$env:USERNAME:R"
+C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -T git@github.com   # 看到 Hi Wu-Lab-official/... 即成功
 ```
 
 安全边界：这把 key 只能写这一个仓库，不能改设置、不能访问其他仓库；私钥不进仓库、不发给别人。删掉 GitHub 上的 deploy key 即失效。

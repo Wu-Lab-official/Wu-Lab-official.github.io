@@ -130,21 +130,44 @@ if ($NoPush) {
 # ---------- 3. 同步 + 推送 ----------
 Write-Host "== 3/3 push ==" -ForegroundColor Cyan
 
-Invoke-NetGit @("pull", "--rebase", "origin", "main")
-if ($LASTEXITCODE -ne 0) {
-  Fail "git pull --rebase 失败（可能有冲突，或网络不可用）。解决后重跑 -PushOnly。"
+if ($PushOnly) {
+  $dirty = & git status --porcelain
+  if ($dirty) {
+    Fail "-PushOnly 需要干净的工作区（当前有未提交改动）。先提交，或 git stash 后再补推。"
+  }
+}
+
+$synced = $false
+for ($i = 1; $i -le 3; $i++) {
+  Invoke-NetGit @("pull", "--rebase", "origin", "main")
+  if ($LASTEXITCODE -eq 0) { $synced = $true; break }
+  Write-Host ("  pull 第 {0} 次失败，4 秒后重试…" -f $i) -ForegroundColor Yellow
+  Start-Sleep -Seconds 4
+}
+if (-not $synced) {
+  Fail "git pull --rebase 连续 3 次失败。先看上面的 git 输出：有冲突或未提交改动就先处理；纯网络错误再重跑 -PushOnly。"
 }
 
 Invoke-NetGit @("push", "origin", "main")
 if ($LASTEXITCODE -ne 0) {
+  # 本机 DNS 偶发解析失败（Could not resolve hostname github.com），重试即可；最多 3 次
+  $pushed = $false
+  for ($i = 1; $i -le 2; $i++) {
+    Write-Host ("  push 第 {0} 次失败，4 秒后重试…" -f ($i + 1)) -ForegroundColor Yellow
+    Start-Sleep -Seconds 4
+    Invoke-NetGit @("push", "origin", "main")
+    if ($LASTEXITCODE -eq 0) { $pushed = $true; break }
+  }
+  if (-not $pushed) {
   Fail @"
-git push 失败。本地提交仍在，修复后重跑本脚本 -PushOnly 即可补推。
+git push 失败（已重试 3 次）。本地提交仍在，修复后重跑本脚本 -PushOnly 即可补推。
 - Permission denied (publickey)：deploy key 被删/未勾 write access/core.sshCommand 路径错。
   见 MAINTENANCE.md §0.6；自测：ssh -i D:/wu-lab/.ssh/wu-lab-deploy -T git@github.com
 - Connection timed out / Could not resolve host：22 端口不通。给 core.sshCommand 加
   -o HostName=ssh.github.com -o Port=443（GitHub 官方 443 入口）。
 - could not read Username：remote 还是 https，改回 git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git
 "@
+  }
 }
 
 # ---------- 4. 线上校验 ----------

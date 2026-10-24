@@ -154,3 +154,4 @@
 - **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；线上 5 页 + `404.html` + `favicon.ico` + `robots.txt` + `sitemap.xml` 全 200，旧 `assets/css|js|webfonts`、`images/profile.png`、`feed.xml` 全 404；sitemap 5 条；404 返回状态码 404 且含 noindex；首页含 6 个 og 标签；push 触发的 `Jekyll build check` 运行成功
 - **文档**：`MAINTENANCE.md` §3.2 重写为当前目录、§5 补 4 条坑、§6 样式条目修正、新增 §8 仓库与组织设置清单（正常项 / 待管理员 13 项 / 自定义域名注意 / 长期注意）；`TOOLBOOK.md` 新增 §2.6 GitHub Actions；`AGENTS.md` 状态更新
 - **遗留**：§8.2 的 13 项需管理员在网页操作（描述、topics、关闭 Wiki、分支保护、Actions 权限、Dependabot、组织资料与 profile README 等）
+- **同日追加**：推送时发现 Git Bash 的 MSYS ssh 会间歇性 `Could not resolve hostname github.com`（同时 `nslookup`/`curl` 正常）→ `core.sshCommand` 改用系统 OpenSSH `C:/Windows/System32/OpenSSH/ssh.exe`，并用 `icacls` 收紧私钥 ACL；`publish.ps1` 增加 pull/push 各 3 次重试，`-PushOnly` 先检查工作区是否干净（此前把“未提交改动”误报成网络失败）

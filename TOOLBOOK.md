@@ -37,23 +37,24 @@ remote 已从 HTTPS 换成 SSH，凭据是仓库级 Deploy Key，**不再走 Git
 |---|---|
 | remote | `git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git` |
 | 私钥 / 公钥 | `D:\wu-lab\.ssh\wu-lab-deploy` / `.pub`（ed25519，无口令）|
-| 仓库级配置 | `core.sshCommand` 指定私钥 + `IdentitiesOnly` + 独立的 `known_hosts` |
+| 仓库级配置 | `core.sshCommand` 指定 **系统 OpenSSH**（`C:/Windows/System32/OpenSSH/ssh.exe`）+ 私钥 + `IdentitiesOnly` + 独立 `known_hosts` |
 | GitHub 侧 | 仓库 Settings → Deploy keys → `wu-lab-agent`，勾 **Allow write access** |
 
 ```bash
 # 认证测试（看到 Hi Wu-Lab-official/... 即成功）
-ssh -i /d/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -T git@github.com
+/c/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -T git@github.com
 
 # 22 端口被墙时（GitHub 官方 443 入口）
-git config core.sshCommand "ssh -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o HostName=ssh.github.com -o Port=443 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"
+git config core.sshCommand "C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o IdentitiesOnly=yes -o HostName=ssh.github.com -o Port=443 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=D:/wu-lab/.ssh/known_hosts"
 ```
 
 | 症状 | 原因 | 处理 |
 |---|---|---|
 | `Permission denied (publickey)` | key 没加到仓库 / 没勾 write / `-i` 路径错 | 重加 deploy key，勾 write access |
 | `Connection timed out` | 22 端口被封 | 用上面的 443 配置 |
-| `UNPROTECTED PRIVATE KEY FILE` | 私钥权限过宽 | `icacls` 收紧，或确认目录只有本人可读 |
-| `Could not resolve hostname` | DNS/网络抖动 | 重试；`nslookup github.com` 确认解析 |
+| `UNPROTECTED PRIVATE KEY FILE` / `Bad permissions` | 系统 OpenSSH 要求私钥仅本人可读 | `icacls "D:\wu-lab\.ssh\wu-lab-deploy" /inheritance:r /grant:r "$env:USERNAME:R"` |
+| `Could not resolve hostname github.com`（间歇，但 `nslookup`/`curl` 正常）| Git Bash 的 MSYS ssh 解析偶发失败 | `core.sshCommand` 改用 `C:/Windows/System32/OpenSSH/ssh.exe`（已改）|
+| `cannot pull with rebase: You have unstaged changes` | 工作区未提交，脚本 `-PushOnly` 拒绝操作 | 先提交或 `git stash`；`publish.ps1` 已加干净工作区检查 |
 | 推上去但 Pages 没变 | 构建中 / 推错分支 | 等 1–2 分钟；`git log origin/main -1` |
 
 安全：key 只能写这一个仓库；私钥不进仓库、不外发；GitHub 上删除 deploy key 即失效。
