@@ -151,6 +151,6 @@
   - `LICENSE` 原本只有模板作者版权行 → 追加本组版权行（MIT 全文保留）
   - `_includes/minimal/head.html` 缺分享元信息 → 补 og:type/site_name/title/description/url/locale + twitter:card，支持 `page.noindex`
   - 404 页加 `noindex`；根目录补 `favicon.ico`（此前 `/favicon.ico` 404）
-- **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；`_site` 只剩 `404.html`、5 个页面、`assets/minimal`、`favicon.ico`、`robots.txt`、`sitemap.xml`、`feed.xml`（空，插件产物）、`redirects.json`（2 B）；`/publications/` 15 行数据、`/research/` 5 个方向；404 含 noindex；首页含 6 个 og 标签
+- **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；线上 5 页 + `404.html` + `favicon.ico` + `robots.txt` + `sitemap.xml` 全 200，旧 `assets/css|js|webfonts`、`images/profile.png`、`feed.xml` 全 404；sitemap 5 条；404 返回状态码 404 且含 noindex；首页含 6 个 og 标签；push 触发的 `Jekyll build check` 运行成功
 - **文档**：`MAINTENANCE.md` §3.2 重写为当前目录、§5 补 4 条坑、§6 样式条目修正、新增 §8 仓库与组织设置清单（正常项 / 待管理员 13 项 / 自定义域名注意 / 长期注意）；`TOOLBOOK.md` 新增 §2.6 GitHub Actions；`AGENTS.md` 状态更新
-- **遗留**：§8.2 的 13 项需管理员在网页操作（描述、topics、关闭 Wiki、分支保护、Actions 权限、Dependabot、组织资料与 profile README 等）；两个插件产物（空 feed、2 B redirects.json）无法通过配置关闭，已注明无害
+- **遗留**：§8.2 的 13 项需管理员在网页操作（描述、topics、关闭 Wiki、分支保护、Actions 权限、Dependabot、组织资料与 profile README 等）

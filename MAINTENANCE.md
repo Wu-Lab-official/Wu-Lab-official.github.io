@@ -238,7 +238,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 三个容易踩的点：
 
 - **`_pages` 必须显式 include**：`_config.yml` 里少了 `include: [_pages]`，构建仍会“成功”，但 `_site` 里只有 `assets`，6 个页面全不生成。
-- **`feed.xml` 与 `redirects.json` 是插件产物**：`github-pages` 会强制加载 jekyll-feed / jekyll-redirect-from，本站无 posts，feed 内容为空。这是无害产物，不要为删它去动 `plugins` 列表。
+- **线上没有 `feed.xml` / `redirects.json`**：本地 `bundle exec` 会因 `jekyll_plugins` 组额外生成这两个文件；线上 Pages 只启用 `plugins:` 列表里的插件，所以访问是 404。`check-site.ps1` 在本地 `_site` 里会看到它们，属正常，不要为删它们去动插件列表。
 - **删旧布局后不要再引用旧 include**：极简布局只引 `_includes/minimal/*`；`grep -rn 'include ' _layouts _includes` 可自查。
 
 设计稿在仓库外 `D:\wu-lab\_design\`，未纳入版本管理。其中 `minimal/README.md` 描述的岗位/FAQ 页面、`tokens.md` 的配色（`#F4F4F2`/`#0B6E69`）都是早期探索，与线上（`#660874`）不一致，**以 `assets/minimal/style.css` 为准**；`redesign` 分支不存在。

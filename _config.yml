@@ -31,8 +31,8 @@ plugins:
 include:
   - _pages
 
-# 注：feed.xml 由 github-pages 插件组自动生成（本站无 posts，内容为空）；
-# jekyll-feed 不支持通过 feed: false 关闭，属已知无害产物。
+# 注：本地 bundle exec 构建时，jekyll_plugins 组会额外生成 feed.xml 与 redirects.json；
+# 线上 GitHub Pages 只启用本文件 plugins 列表里的插件，这两个文件不会发布（已验证 404）。
 
 # 不发布到线上的文件（仓库仍是公开的，见 CONTENT.md §5）
 exclude:
