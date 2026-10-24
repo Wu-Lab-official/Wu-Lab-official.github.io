@@ -13,10 +13,10 @@ title                    : "Wu-Lab"
 title_separator          : "-"
 name                     : &name "Changjin Wu"
 description              : &description "吴昌进课题组（Wu-Lab）：清华大学深圳国际研究生院，研究方向为活性软物质与智能系统——微纳机器人、微流控、集群智能"
-url                      : https://john-z39.github.io # The base hostname & protocol for your site e.g. "https://[your GitHub username].github.io",
+url                      : https://wu-lab-official.github.io # The base hostname & protocol for your site e.g. "https://[your GitHub username].github.io",
                                                            # or if you already have some other page hosted on Github then use "https://[your GitHub username].github.io/[Your Repo Name]"
 baseurl                  : "" # the subpath of your site, e.g. "/blog"
-repository               : "John-z39/John-z39.github.io"
+repository               : "Wu-Lab-official/Wu-Lab-official.github.io"
 
 # Site Author - The following control what appear as part of the author content on the side bar.
 #               If a field is blank the icon and link will not appear, otherwise it will be shown.

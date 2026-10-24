@@ -37,3 +37,12 @@
 - **验证**：`bundle exec jekyll serve` 本地主页 200，`/images/profile.png` 200；HTML 检查无模板残留（仅页脚主题署名属正常）；浏览器截图确认侧边栏照片/姓名/链接、正文排版、页脚版权（© 2026 Changjin Wu）均正常
 - **遗留**：**按用户要求本轮未推送**（本地已 commit，待用户确认后再 push）；Google Scholar 等学术链接未找到可靠主页，暂留空；导航菜单仍为英文、`_posts`/`_publications` 等示例数据未清理（下一阶段）
 - **新坑**：curl 直连 sigs.tsinghua.edu.cn 报 schannel 证书吊销检查失败（CRYPT_E_NO_REVOCATION），走 Clash 代理 `-x http://127.0.0.1:7897` 正常；清华站点图片 URL 中 UUID 极易抄错，应从 HTML 程序化提取
+
+## 2026-10-24 ｜ 会话 4：迁移到组织 Pages
+
+- **改动**
+  - `_config.yml`：`url` → `https://wu-lab-official.github.io`，`repository` → `Wu-Lab-official/Wu-Lab-official.github.io`
+  - `MAINTENANCE.md`：线上地址、仓库、clone 地址、线上验证 URL 同步到组织仓库
+  - 本地 `main` 原有 1 个未推送 commit（`a72faed`）一并推送到新组织仓库
+- **验证**：`bundle exec jekyll build --strict_front_matter` 构建通过；新仓库首次 push 成功；等待 Pages 构建后验证线上 200
+- **遗留**：旧个人站 `john-z39.github.io` 暂保留作备份，待新站稳定后再决定归档或跳转；GitHub Actions 仍是 `Cleanup bad PR` 触发的 build 检查，不负责 deploy

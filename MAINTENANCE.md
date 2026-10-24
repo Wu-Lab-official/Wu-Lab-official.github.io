@@ -10,8 +10,8 @@
 
 | 项目 | 值 |
 |---|---|
-| 线上地址 | https://john-z39.github.io |
-| 仓库 | `John-z39/John-z39.github.io`（本地：`D:\wu-lab\John-z39.github.io`）|
+| 线上地址 | https://wu-lab-official.github.io |
+| 仓库 | `Wu-Lab-official/Wu-Lab-official.github.io`（本地：`D:\wu-lab\John-z39.github.io`）|
 | 默认分支 | `main`（2026-09-29 由 master 改名，旧 master 已删除）|
 | 模板 | academicpages.github.io v0.9.x（Minimal Mistakes 主题分支）|
 | Jekyll | 3.10.0（由 `github-pages` gem 锁定，与 GitHub Pages 线上一致）|
@@ -46,7 +46,7 @@ git -c http.proxy=http://127.0.0.1:7897 push
 | Python | 已装 | 仅 `talkmap` 和 `markdown_generator` 脚本需要，可选 |
 | 代理 | Clash Verge | `D:\Clash Verge\clash-verge.exe`，混合端口 `127.0.0.1:7897` |
 
-新机器完整流程：装 Ruby（含 Devkit）→ `git clone https://github.com/John-z39/John-z39.github.io.git` → `bundle install` → `bundle exec jekyll serve`。Gemfile 已含 `tzinfo-data`（Windows 必需，见 §5），无需再改。
+新机器完整流程：装 Ruby（含 Devkit）→ `git clone https://github.com/Wu-Lab-official/Wu-Lab-official.github.io.git` → `bundle install` → `bundle exec jekyll serve`。Gemfile 已含 `tzinfo-data`（Windows 必需，见 §5），无需再改。
 
 ## 3. 目录结构（改内容看这里）
 
@@ -119,7 +119,7 @@ git commit -m "content: 更新课题组简介"
 # 3) 经代理推送
 git -c http.proxy=http://127.0.0.1:7897 push
 # 4) 等 60–90 秒后验证线上
-curl -s -o /dev/null -w "%{http_code}\n" -x http://127.0.0.1:7897 https://john-z39.github.io/改动页面/
+curl -s -o /dev/null -w "%{http_code}\n" -x http://127.0.0.1:7897 https://wu-lab-official.github.io/改动页面/
 ```
 - 也可一劳永逸给 git 配置代理（配置后 push 不用再加 `-c` 参数）：
   `git config --global http.proxy http://127.0.0.1:7897`
