@@ -56,5 +56,5 @@
   - 新增 `assets/minimal/{style.css,app.js,profile.jpg,favicon.svg}`
   - `_pages/about.md` 设为 `published: false`，旧首页退场；旧 AcademicPages 布局/样式保留作回退
   - `README.md` 增加项目说明；`MAINTENANCE.md` 增加 §0.1 当前极简主题架构和 §3.1 维护对照表
-- **验证**：`bundle exec jekyll build --strict_front_matter` 通过；本地 5 页 + CSS/JS/照片均 200；桌面截图确认首页、论文、团队页；筛选/搜索/引用沿用已验证的 `assets/minimal/app.js`
-- **遗留**：线上 Pages 需要确认 Source = main / (root)；旧模板示例数据（`_posts`/`_publications` 等）尚未清理；成员、照片、DOI/PDF、招生细节待补
+- **验证**：`bundle exec jekyll build --strict_front_matter` 通过；本地 5 页 + CSS/JS/照片均 200；桌面截图确认首页、论文、团队页；线上 `https://wu-lab-official.github.io/`、`/research/`、`/publications/`、`/people/`、`/join/` 已渲染为新版
+- **遗留**：旧模板示例数据（`_posts`/`_publications` 等）尚未清理；成员、照片、DOI/PDF、招生细节待补

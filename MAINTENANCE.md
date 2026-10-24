@@ -45,6 +45,8 @@
 
 `_pages/about.md` 已设为 `published: false`，旧首页不再参与构建；需要回退时把它改回 `permalink: /` 并启用即可。
 
+GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 “GitHub Actions”，当前 workflow 只做构建检查，不负责 deploy。
+
 ## 1. 快速命令速查
 
 ```bash
