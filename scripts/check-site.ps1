@@ -10,6 +10,13 @@ Set-Location $root
 $site = Join-Path $root "_site"
 $fail = New-Object System.Collections.Generic.List[string]
 
+# 0) documentation lint runs first: it is fast and does not need Ruby
+$docCheck = Join-Path $PSScriptRoot "check-docs.ps1"
+if (Test-Path $docCheck) {
+  & powershell -NoProfile -ExecutionPolicy Bypass -File $docCheck
+  if ($LASTEXITCODE -ne 0) { throw "Documentation check failed (see FAIL lines above)." }
+}
+
 if (-not $SkipBuild) {
   $rubyBin = "C:\Ruby33-x64\bin"
   $bundle = Join-Path $rubyBin "bundle.bat"
@@ -30,7 +37,7 @@ if (-not $SkipBuild) {
 }
 
 # 1) internal docs must never be published
-foreach ($f in @("AGENTS.md", "CONTENT.md", "MAINTENANCE.md", "WORKLOG.md", "README.md")) {
+foreach ($f in @("AGENTS.md", "CONTENT.md", "MAINTENANCE.md", "TOOLBOOK.md", "WORKLOG.md", "README.md")) {
   if (Test-Path (Join-Path $site $f)) { $fail.Add("leaked doc: /$f") }
 }
 
@@ -81,7 +88,7 @@ if (-not (Test-Path $notFound)) {
 
 # 7) docs must stay out of the build (exclude list)
 $config = Get-Content (Join-Path $root "_config.yml") -Raw
-foreach ($f in @("MAINTENANCE.md", "WORKLOG.md", "CONTENT.md", "AGENTS.md")) {
+foreach ($f in @("MAINTENANCE.md", "WORKLOG.md", "CONTENT.md", "TOOLBOOK.md", "AGENTS.md")) {
   if ($config -notmatch [regex]::Escape($f)) { $fail.Add("_config.yml exclude missing $f") }
 }
 

@@ -17,9 +17,9 @@
 | `_data/news.yml` | 首页动态与“最近更新”日期 |
 | `_layouts/minimal.html`、`_includes/minimal/` | 极简主题骨架 |
 | `assets/minimal/` | 样式、脚本、照片、图标 |
-| `scripts/publish.ps1` | 构建 → 提交 → 推送 → 线上校验 |
+| `scripts/` | `publish.ps1`（构建 → 提交 → 推送 → 线上校验）、`check-site.ps1`（站点断言）、`check-docs.ps1`（文档断言）|
 
-旧 AcademicPages 布局（`_layouts/default.html`、`_sass/`、`assets/css/main.css`）保留作回退，新页面不使用；模板示例内容已清理。
+旧 AcademicPages 渲染层已于 2026-10-24 删除（取回方式见 [MAINTENANCE.md](MAINTENANCE.md) §0.1），模板示例内容已清理。
 
 ## 文档
 

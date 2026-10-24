@@ -1,7 +1,7 @@
 # 工具与踩坑手册
 
 > 本文件记录**本机实际能用的命令**和**已经踩过的坑**，目的是少走弯路：动手前扫一眼症状表，别重复报错。
-> 最后更新：2026-10-24（建立；汇总 2026-09 ～ 2026-10 的实战问题）
+> 最后更新：2026-10-24（第二轮：修正“agent 无法 push”的过期结论、补 `check-docs.ps1`、统一 `Gemfile.lock` 口径）
 > 相关：[MAINTENANCE.md](MAINTENANCE.md)（怎么改页面）· [CONTENT.md](CONTENT.md)（内容来源）· 工作区 `AGENTS.md`（agent 流程）
 
 ## 1. 环境：什么能用、怎么调
@@ -24,7 +24,7 @@
 | `bundle: command not found` / `ls: cannot open directory '/c/Ruby33-x64/bin': Permission denied` | workspace-write 读不到工作区外的 Ruby | 该条命令申请一次性 `danger-full-access` |
 | `curl` 返回 `000`、`Could not resolve host` | 沙箱禁网 | 同上；先确认直连可用再考虑代理 |
 | `fatal: Unable to create '.git/index.lock': Permission denied` | git 写 `.git` 被拦 | 同上；只对 commit/rm/fetch 这类命令申请 |
-| `cannot create standard input pipe for git-credential-helper-selector: Permission denied` | 沙箱拦 git 调凭据助手的子进程管道 | **agent 无解**，push 交用户终端；不要改写 remote/换 SSH 重试 |
+| `cannot create standard input pipe for git-credential-helper-selector: Permission denied` | 沙箱拦 git 拉起凭据助手的子进程管道——**只有 HTTPS 推送会走它** | 改走 SSH Deploy Key（§2.5），agent 会话可直接 push；不要退回 HTTPS，也不要把 token 塞进 URL |
 | `.ps1` 报“语句块或类型定义中缺少右 }” | 文件无 BOM，5.1 按 GBK 解析 | 重新保存为 UTF-8 with BOM（`head -c 3` 应为 `ef bb bf`）|
 
 原则：**不绕过沙箱**（别用 pwsh 重试被 bash 拒绝的操作）；一次审批只对一条命令有效。
@@ -74,7 +74,7 @@ curl -s "https://api.github.com/repos/Wu-Lab-official/Wu-Lab-official.github.io/
 | 症状 | 原因 | 处理 |
 |---|---|---|
 | push 后没有新的 Actions 运行 | 工作流 `on:` 写错（曾用 `workflow_run` 挂在不存在的 workflow 上）| 确认 `on: push: branches: [main]` |
-| CI 红叉、日志 `Could not find gem` | 仓库没提交 `Gemfile.lock`，`bundle install` 解析失败或超时 | 本地能 `bundle install` 即说明 Gemfile 没问题；重跑一次通常能过 |
+| CI 红叉、日志 `Could not find gem` | 仓库有意不提交 `Gemfile.lock`（`.gitignore` 已忽略），CI 每次浮动解析，网络抖动时会超时 | 重跑一次；本地 `bundle install` 能过即 Gemfile 没问题。若改成提交 lock，要同步改 `.gitignore` 与本条说明 |
 | 日志 `Liquid syntax error` | `--strict_front_matter` 抓到了坏 YAML | 本地跑同命令复现，改 front matter |
 | 权限报错 `Resource not accessible` | 工作流需要写权限 | 本工作流只需 `contents: read`，不要加多余权限 |
 
@@ -116,6 +116,7 @@ curl -s "https://api.github.com/repos/Wu-Lab-official/Wu-Lab-official.github.io/
 | 抓清华 SIGS 页面乱码 | 页面本身是 UTF-8，控制台按 GBK 显示 | `curl -o` 存文件 → Python `encoding='utf-8'` 读 → 写 UTF-8 文件 |
 | `-Paths "a,b,c"` 被当成一个路径 | PowerShell `-File` 不解析数组 | 脚本内按逗号拆分（`publish.ps1` 已处理）|
 | 论文年份/卷页对不上 | `信息.txt` 是手写清单，有笔误 | 以 Crossref 为准，差异记 `CONTENT.md` §3 |
+| 改完文档不确定有没有写坏（编号/表格/引用）| 多处手改容易错位，肉眼很难全查 | 跑 `powershell -File scripts\\check-docs.ps1`：标题编号、§ 引用、表格列数、最后更新、相对链接 |
 | `Could not read from remote repository` / `Host key verification failed` | 代理/网络/首次连 SSH | 先直连试；不要改 remote 地址 |
 
 ## 4. 常用命令速查
@@ -129,12 +130,15 @@ bundle exec jekyll build --strict_front_matter
 # 本地预览（改 _config.yml 后必须重启）
 bundle exec jekyll serve --port 4001
 
-# 完整性检查：清 _site + 构建 + 7 项断言
+# 完整性检查：清 _site + 构建 + 7 项站点断言 + 文档断言（check-docs.ps1）
 powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1
 
-# 发布（你自己终端里跑；agent 只能到 commit）
+# 发布（agent 会话也能直接 push；SSH 配置见 §2.5）
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 说明" -Paths 路径1,路径2
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly -SkipVerify   # 只补推
+
+# 只查文档：标题编号 / § 引用 / 表格列数 / 最后更新 / 相对链接
+powershell -ExecutionPolicy Bypass -File scripts\\check-docs.ps1
 
 # 查论文元数据
 curl -s "https://api.crossref.org/works/10.1021/jacs.5c10021" | head -c 500
@@ -153,4 +157,4 @@ curl -s "https://api.crossref.org/works/10.1021/jacs.5c10021" | head -c 500
 - 仓库：`D:\wu-lab\John-z39.github.io`；工作区：`D:\wu-lab`
 - 线上：https://wu-lab-official.github.io（组织 Pages，Deploy from branch: main / root）
 - Ruby 3.3.12，gems 在 `C:\Ruby33-x64\lib\ruby\gems\3.3.0`
-- 不要提交：`_site/`、`.sass-cache/`、`Gemfile.lock`（已在 `.gitignore`）
+- 不要提交：`_site/`、`.sass-cache/`；`Gemfile.lock` 被 `.gitignore` 有意忽略（后果见 §2.6）

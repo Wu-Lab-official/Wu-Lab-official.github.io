@@ -165,3 +165,27 @@
   - `MAINTENANCE.md` 新增 §0.7 代理与联网检查：端口检测、何时提醒、与 SSH 推送无关的边界
 - **验证**：文档交叉引用一致（AGENTS → §0.6/§0.7、TOOLBOOK §2.5/§2.7）；未改站点文件，无需重建
 - **遗留**：无
+
+## 2026-10-24 ｜ 会话 14：文档一致性返工 + 新增 check-docs.ps1
+
+- **背景**：应要求评估上一轮维护的五份文档。结论：骨架可用（来源分级、可验证数字、隐私边界），但同一事实在多处复述后漂移；文档自己写着“不要互相复制”，实际重复最严重的正是规范本身。
+- **发现（均已改）**
+  - “旧模板保留作回退”与事实相反：渲染层早已在会话 12 删除，AGENTS 开头、README、MAINTENANCE §0.1/基本信息表、以及“把 `_pages/about.md` 改回 `permalink: /`”这条操作指引全部指向不存在的文件
+  - TOOLBOOK §2 仍写“agent 无解，push 交用户终端”，与同文件 §2.5（SSH 已打通）自相矛盾；§4 还写着“agent 只能到 commit”
+  - CONTENT §5 的子节编号是 6.1–6.3；来源表 S1/S2 挤在同一行（渲染时 S2 行消失）
+  - MAINTENANCE §0.5 排在 §0.7 之后；§4① 写“遵守 §5 的硬性约定”，但 §5 是坑表
+  - MAINTENANCE §5 坑表有一行 `assets/css|js|...` 未转义竖线，表格实际渲染成 6 列
+  - `scripts/` 还留着模板的 `cv_markdown_to_json.py`、`update_cv_json.sh`（`cv.json` 已删，属死代码）
+  - `check-site.ps1` 的泄漏断言名单漏了 `TOOLBOOK.md`
+- **改动**
+  - 新增 `scripts/check-docs.ps1`：断言标题编号（H2 升序、H3 必须挂在当前 H2 下）、`§x.y` 交叉引用在目标文档中存在、Markdown 表格列数一致、文档头部“最后更新”日期、相对 `.md` 链接可达；ASCII-only，避免 5.1 无 BOM 解析问题
+  - `check-site.ps1` 调用 `check-docs.ps1`，并把 `TOOLBOOK.md` 加入泄漏断言与 exclude 断言
+  - MAINTENANCE：§0.5 归位到 §0.6 前并改为 H3；加目录表；“回退”统一为“已删除 + `git show 9744940^:<path>` 取回 + 依赖提醒”；§3.2 删除段改指 §0.1；§4① 引用改为工作区 AGENTS 的硬性约定；§1/§3.1 补 `check-docs.ps1`；目录树补该脚本
+  - CONTENT：补“最后更新”与复核周期（S2 每学期）；S1/S2 拆成两行；6.1–6.3 → 5.1–5.3
+  - TOOLBOOK：修正“agent 无法 push”的过期结论；统一 `Gemfile.lock` 口径（有意不提交，CI 浮动解析）；补 `check-docs.ps1` 命令与“文档改坏了怎么办”症状行
+  - README / AGENTS：回退口径改为指向 MAINTENANCE §0.1；AGENTS 收尾自查四项 → 五项（加文档断言）；方案 B 历史条目补“同日后续会话已删除”
+  - 删除模板残留 `scripts/cv_markdown_to_json.py`、`scripts/update_cv_json.sh`
+- **验证**：`check-docs.ps1` → `PASS: docs ok (6 files)`（改前失败 9 条：编号 3、表格 2、日期 1、引用 3）；`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`，构建 0.6s；删除脚本后全仓库无引用（`update_cv_json.sh` 内部引用为自引用）
+- **遗留**
+  - `AGENTS.md` 与 MAINTENANCE §0.5 的“收尾自查”仍各存一份清单：工作区文件不在仓库内，clone 后需要它，暂不合并；两处都加了第 5 项，靠 check-docs 兜住结构漂移
+  - WORKLOG 历史条目里的旧口径（如会话 5“旧布局保留作回退”）按“只加不改”保留，不作追溯修改

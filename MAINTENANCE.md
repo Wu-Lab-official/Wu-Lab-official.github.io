@@ -2,9 +2,23 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-10-24（清理模板示例内容、论文数据经 Crossref 核对、增加 CONTENT.md 与 check-site.ps1）
+> 本文档最后更新：2026-10-24（第二轮：统一“旧模板已删除”口径、修正小节编号与交叉引用、补 §0.5 位置与 `check-docs.ps1`）
 >
 > 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
+
+## 目录
+
+| 节 | 内容 |
+|---|---|
+| §0 | 基本信息、视觉层、填内容规则、发布脚本、文档方针、SSH、代理 |
+| §1 | 快速命令速查（构建 / 检查 / 推送 / 线上验证）|
+| §2 | 本机环境清单（换机重装）|
+| §3 | 目录结构：改哪个文件（含易踩的坑）|
+| §4 | 标准工作流程（SOP 六步）|
+| §5 | 已知冲突与坑（高频问题表）|
+| §6 | 故障排查 |
+| §7 | 参考链接 |
+| §8 | 仓库与组织设置（管理员清单）|
 
 ---
 
@@ -15,7 +29,7 @@
 | 线上地址 | https://wu-lab-official.github.io |
 | 仓库 | `Wu-Lab-official/Wu-Lab-official.github.io`（本地：`D:\wu-lab\John-z39.github.io`）|
 | 默认分支 | `main`（2026-09-29 由 master 改名，旧 master 已删除）|
-| 模板 | 旧模板 academicpages.github.io v0.9.x **仅保留作回退**；当前渲染层为自建极简主题（见 §0.1），不再走 Minimal Mistakes |
+| 模板 | 旧模板 academicpages.github.io v0.9.x **已于 2026-10-24 删除**（取回方式见 §3.2）；当前渲染层是自建极简主题（见 §0.1），不走 Minimal Mistakes |
 | Jekyll | 3.10.0（由 `github-pages` gem 锁定，与 GitHub Pages 线上一致）|
 | 部署方式 | push 到 main → GitHub Pages 自动构建（无需本地构建上传）|
 
@@ -44,13 +58,16 @@
 | `assets/minimal/profile.jpg` | 团队页照片（原始 2:3，不裁切）|
 | `assets/minimal/favicon.svg` | 站点图标 |
 
-旧 AcademicPages 文件（`_layouts/default.html`、`_layouts/single.html`、`_sass/`、`assets/css/main.css`、`_includes/sidebar.html` 等）**保留作回退**，新页面不引用它们。等新站稳定后再决定是否清理。
+旧 AcademicPages 渲染层（`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、`images/profile.png`、`_pages/about.md`、`_data/ui-text.yml|cv.json|authors.yml`）已于 2026-10-24 全部删除，**仓库里没有回退副本**。需要取回某个文件时从 git 历史取，不要凭记忆重建：
 
-注意：保留的是**布局和样式**。旧模板的页面与集合条目已在 2026-10-24 删除，线上只剩 5 个页面（见 §3.2）。如果以后重新启用旧布局，需要自己补集合内容。
+```bash
+git show 9744940^:_layouts/default.html        # 9744940 = 删除旧渲染层的提交，^ 表示它的父提交
+git show 9744940^:assets/css/main.scss         # 旧样式是 scss，不是编译后的 main.css
+```
+
+这些旧文件互相依赖（`default.html` 依赖 `compress` 布局与 `_sass`，样式依赖 `minimal-mistakes` 的 sass 变量），单独取回一般不能直接跑；真要回退，取回后必须重新 `bundle exec jekyll build --strict_front_matter` 验证。
 
 仓库内模板自带的 `AGENTS.md` 已于 2026-10-24 删除：它的内容是模板作者写给 coding agent 的说明，与本组规范无关；2026-10-24 之前它没被 exclude，线上曾可访问 `/AGENTS.md`。`_config.yml` 的 exclude 仍保留 `AGENTS.md` 条目，防止以后误放同名文件。
-
-`_pages/about.md` 已设为 `published: false`，旧首页不再参与构建；需要回退时把它改回 `permalink: /` 并启用即可。
 
 GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 “GitHub Actions”，当前 workflow 只做构建检查，不负责 deploy。
 
@@ -111,6 +128,28 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly
 
 要求：Ruby 在 `C:\Ruby33-x64\bin`。
 
+### 0.5 文档维护方针（自动维护，不需要提醒）
+
+五份文档分工固定：
+
+| 文档 | 回答什么 | 什么时候改 |
+|---|---|---|
+| `WORKLOG.md` | 做过什么 | 每轮都追加，只加不改旧条目 |
+| `CONTENT.md` | 事实从哪来、核对到哪天、哪些不能公开 | 增删改事实/论文时 |
+| `MAINTENANCE.md`（本文件）| 怎么改、在哪改、怎么发 | 目录结构、流程、脚本参数变化时 |
+| `TOOLBOOK.md` | 用什么命令、踩过什么坑 | 遇到新报错/新环境差异时 |
+| 工作区 `AGENTS.md` | agent 规范与边界 | 仅经用户同意后改 |
+
+每轮收尾自查（缺一项算没做完）：
+
+1. `WORKLOG.md` 有本轮条目（日期、改动、验证结果、遗留）？
+2. 改过事实/论文 → `CONTENT.md` 的表格与核对日期同步？
+3. 改了目录/流程/脚本参数 → 本文件 §3 对照表、§4 命令同步？
+4. 踩了新坑 → `TOOLBOOK.md` 的“症状→原因→处理”加行？
+5. 跑过 `scripts/check-site.ps1`（内含 `check-docs.ps1`，断言编号/§ 引用/表格/日期）？
+
+原则：文档与改动同一个提交；页面数、sitemap 数等数字以 `scripts/check-site.ps1` 输出为准；不写“以后再补”，缺什么写进 `CONTENT.md` §4；每份文档头部保留“最后更新”。
+
 ### 0.6 SSH Deploy Key（推送凭据，换机必看）
 
 为什么用 Deploy Key：GitHub 的 HTTPS 推送依赖 Git Credential Manager 的子进程管道，agent 沙箱会拦（`cannot create standard input pipe for git-credential-helper-selector`）。SSH 用密钥文件，不需要这个管道，因此 agent 也能推。
@@ -165,27 +204,6 @@ C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o Identitie
 
 代理是备用通道，不是硬依赖：GitHub HTTPS 与 SSH 多数时候直连可用，不要为了“保险”强制走代理。
 
-## 0.5 文档维护方针（自动维护，不需要提醒）
-
-五份文档分工固定：
-
-| 文档 | 回答什么 | 什么时候改 |
-|---|---|---|
-| `WORKLOG.md` | 做过什么 | 每轮都追加，只加不改旧条目 |
-| `CONTENT.md` | 事实从哪来、核对到哪天、哪些不能公开 | 增删改事实/论文时 |
-| `MAINTENANCE.md`（本文件）| 怎么改、在哪改、怎么发 | 目录结构、流程、脚本参数变化时 |
-| `TOOLBOOK.md` | 用什么命令、踩过什么坑 | 遇到新报错/新环境差异时 |
-| 工作区 `AGENTS.md` | agent 规范与边界 | 仅经用户同意后改 |
-
-每轮收尾自查四项：
-
-1. `WORKLOG.md` 有本轮条目（日期、改动、验证结果、遗留）？
-2. 改过事实/论文 → `CONTENT.md` 的表格与核对日期同步？
-3. 改了目录/流程/脚本参数 → 本文件 §3 对照表、§4 命令同步？
-4. 踩了新坑 → `TOOLBOOK.md` 的“症状→原因→处理”加行？
-
-原则：文档与改动同一个提交；页面数、sitemap 数等数字以 `scripts/check-site.ps1` 输出为准；不写“以后再补”，缺什么写进 `CONTENT.md` §4；每份文档头部保留“最后更新”。
-
 ## 1. 快速命令速查
 
 ```bash
@@ -194,7 +212,7 @@ export PATH="/c/Ruby33-x64/bin:$PATH"
 cd /d/wu-lab/John-z39.github.io
 bundle exec jekyll serve          # 预览 http://127.0.0.1:4000，Ctrl+C 停止
 bundle exec jekyll build --strict_front_matter   # 与 CI 相同参数的纯构建测试
-powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1   # 完整性检查：清 _site + 构建 + 7 项断言
+powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1   # 完整性检查：清 _site + 构建 + 7 项站点断言 + 文档断言
 
 # —— 推送上线（代理可选，见 §5）——
 git add 具体文件.md              # 手动提交只加改动文件
@@ -238,11 +256,11 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | 改论文筛选/搜索/复制引用 | `assets/minimal/app.js` |
 | 换团队页照片 | 替换 `assets/minimal/profile.jpg`（保持 2:3，不要裁切）|
 | 改全站 title/description/url | `_config.yml` |
-| 发布前完整性检查 | `scripts/check-site.ps1` |
+| 发布前完整性检查 | `scripts/check-site.ps1`（构建 + 7 项站点断言，并调用 `scripts/check-docs.ps1` 做文档断言）|
 
 ### 3.2 目录结构（当前，只有一个主题）
 
-旧 AcademicPages 渲染层已于 2026-10-24 全部删除：`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、旧头像与图标、`_pages/about.md`、`_data/ui-text.yml`、`_data/cv.json`、`_data/authors.yml`、模板 CI 工作流。需要时从 git 历史取回，当前不再保留回退副本。
+旧 AcademicPages 渲染层已于 2026-10-24 全部删除：`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、旧头像与图标、`_pages/about.md`、`_data/ui-text.yml`、`_data/cv.json`、`_data/authors.yml`、模板 CI 工作流。当前不再保留回退副本；取回方法与依赖提醒见 §0.1。
 
 ```
 ├── _config.yml            全站配置（title/description/url、author、include: _pages、exclude、plugins）
@@ -253,7 +271,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 ├── assets/minimal/        style.css、app.js、profile.jpg、favicon.svg
 ├── favicon.ico            根图标（响应浏览器默认的 /favicon.ico）
 ├── files/                 论文 PDF（当前为空）
-├── scripts/               publish.ps1、check-site.ps1
+├── scripts/               publish.ps1、check-site.ps1、check-docs.ps1
 ├── robots.txt             显式 Allow + sitemap
 ├── .github/workflows/     jekyll-build.yml（push/PR 时 strict_front_matter 构建校验）
 ├── LICENSE                MIT（模板原作者 + 本组）
@@ -283,7 +301,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 
 ### ① 改本地
 - 只改仓库内文件，改哪个文件参照 §3 对照表
-- 遵守 §5 的硬性约定（bundle exec、tzinfo-data、main 分支）
+- 遵守工作区 `AGENTS.md` 的“硬性约定”（`bundle exec`、`tzinfo-data`、`main` 分支）
 
 ### ② 本地预览验证
 ```bash
@@ -356,7 +374,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 | 构建“成功”但 6 个页面全没了 | `_config.yml` 缺 `include: [_pages]`，下划线目录默认被忽略 | 补回 `include: [_pages]`；`check-site.ps1` 会报 missing page |
 | push 后 Actions 不跑构建检查 | 旧工作流用 `workflow_run` 挂在已删除的 `Cleanup bad PR` 上 | 已改 `on: push/pull_request`（2026-10-24），见 `.github/workflows/jekyll-build.yml` |
 | 每次 push 都多一条 Actions 失败 | 模板残留 `Scrape Talk Locations` 去跑已删除的 `talkmap.py` | 已删除该工作流 |
-| 线上仍挂着旧模板字体/样式 | 旧 `assets/css|js|webfonts|fonts` 无人引用但仍被复制 | 2026-10-24 已删，线上只剩 `assets/minimal` |
+| 线上仍挂着旧模板字体/样式 | 旧 `assets/css\|js\|webfonts\|fonts` 无人引用但仍被复制 | 2026-10-24 已删，线上只剩 `assets/minimal` |
 
 ### Ruby 版本提示
 本机 3.3、CI 用 3.2，兼容良好。**暂不要升级到 Ruby 3.4+**（bundled gems 移除问题），升级前先在分支上试 `bundle install`。
