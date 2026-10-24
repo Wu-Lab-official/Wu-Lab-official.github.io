@@ -52,9 +52,21 @@
 - **改动**
   - 新增 `_layouts/minimal.html`、`_includes/minimal/{head,header,footer}.html`：独立极简骨架，不再走 AcademicPages sidebar/single
   - 新增 `_pages/home.html`、`research.html`、`people.html`、`join.html`；重写 `_pages/publications.html`
-  - 新增 `_data/research.yml`（5 个方向）、`publications.yml`（15 篇）、`news.yml`（首页动态）；`navigation.yml` 改为中文 4 项
+  - 新增 `_data/research.yml`（5 个方向）、`publications.yml`（代表性论文条目）、`news.yml`（首页动态）；`navigation.yml` 改为中文 4 项
   - 新增 `assets/minimal/{style.css,app.js,profile.jpg,favicon.svg}`
   - `_pages/about.md` 设为 `published: false`，旧首页退场；旧 AcademicPages 布局/样式保留作回退
   - `README.md` 增加项目说明；`MAINTENANCE.md` 增加 §0.1 当前极简主题架构和 §3.1 维护对照表
 - **验证**：`bundle exec jekyll build --strict_front_matter` 通过；本地 5 页 + CSS/JS/照片均 200；桌面截图确认首页、论文、团队页；线上 `https://wu-lab-official.github.io/`、`/research/`、`/publications/`、`/people/`、`/join/` 已渲染为新版
 - **遗留**：旧模板示例数据（`_posts`/`_publications` 等）尚未清理；成员、照片、DOI/PDF、招生细节待补
+
+## 2026-10-24 ｜ 会话 6：内容真实性清理 + 发布脚本
+
+- **改动**
+  - 加入我们页：删除未确认的岗位人数、申请流程、回复时间、FAQ、实验平台/合作资源；只保留“可联系了解博士后/博士/硕士”+ 联系方式
+  - 团队页：删除“首批成员招募中”和“开放岗位”表；成员/校友改为“待补充”
+  - 首页：删除“开放多个岗位”“开放申请”“完整列表”“全部论文”等表述；招收信息改为“邮件联系”
+  - 论文页：去掉“15 篇代表性工作”，计数改为“N 条”
+  - 新增 `scripts/publish.ps1`：构建 → add → commit → 代理 push
+  - `MAINTENANCE.md` 增加 §0.2 项目性质/现状、§0.3 内容真实性规则、§0.4 一键发布；`README.md` 增加项目状态
+- **验证**：`bundle exec jekyll build --strict_front_matter` 通过；5 页本地 200
+- **遗留**：成员名单、照片、论文 DOI/PDF、招生细节需 PI 提供；未确认的信息继续留空，不补

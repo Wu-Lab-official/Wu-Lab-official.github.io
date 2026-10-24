@@ -33,7 +33,7 @@
 | `_pages/people.html` | 团队 `/people/` |
 | `_pages/join.html` | 加入我们 `/join/` |
 | `_data/research.yml` | 5 个研究方向、问题、正文、代表论文 |
-| `_data/publications.yml` | 15 篇代表性论文（年份/作者/期刊/卷页/标签/featured）|
+| `_data/publications.yml` | 代表性论文条目（年份/作者/期刊/卷页/标签/featured）|
 | `_data/news.yml` | 首页动态 |
 | `_data/navigation.yml` | 顶部导航（研究/论文/团队/加入我们）|
 | `assets/minimal/style.css` | 极简主题样式 |
@@ -46,6 +46,40 @@
 `_pages/about.md` 已设为 `published: false`，旧首页不再参与构建；需要回退时把它改回 `permalink: /` 并启用即可。
 
 GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 “GitHub Actions”，当前 workflow 只做构建检查，不负责 deploy。
+
+### 0.2 项目性质与现状
+
+- 这是课题组网站的**内部建设阶段**，还没有购买/绑定正式域名；线上地址是 GitHub Pages 组织站 `https://wu-lab-official.github.io/`，不是最终发布形态。
+- 旧个人站 `john-z39.github.io` 只作备份，不再作为本项目维护对象。
+- 当前状态：极简主题已接入 Jekyll，5 个页面可访问；导师信息、研究方向、代表性论文是真实内容；成员、照片、DOI/PDF、招生细节仍缺。
+- 现有内容来源只有三类：`信息.txt`（PI 提供）、清华 SIGS 官方导师主页、论文正式记录。除此之外不写。
+- 缺失内容统一写“待补充”或直接留空，**不要用示例、推测、行业惯例填充**。
+
+### 0.3 填内容的规则
+
+1. **只写有来源的事实**。写之前先确认来源；没有来源就不写。
+2. **不写未确认的招生信息**：名额、人数、申请流程、回复时间、待遇、奖学金、联合培养、访问政策、实验平台、合作资源、产业/临床资源，都不自行补。
+3. **缺内容就空着**。页面上写“待补充”比写一段看似合理但没有依据的话好。
+4. **论文信息以正式记录为准**。标题、作者、期刊、年卷页不确定就留空；DOI/PDF 没核对就不放链接，绝不编造。
+5. **文案平实**。不写口号、比喻、宏大叙事；不用“编队”“主线”“微观世界”这类表达。
+6. **每次改动留痕**。在 `WORKLOG.md` 记日期、改了什么、来源、验证结果、还缺什么。
+
+### 0.4 一键发布脚本
+
+日常改内容可以用脚本，避免每次手动 build / add / commit / push：
+
+```powershell
+# 在仓库根目录运行
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 更新成员名单"
+```
+
+脚本会：构建检查 → `git add -A` → commit → 经代理 push。只提交不推送：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 本地预览" -NoPush
+```
+
+要求：Ruby 在 `C:\Ruby33-x64\bin`；push 时 Clash Verge 的 `127.0.0.1:7897` 必须已启动。脚本供你在自己的终端运行，不经过 agent 的逐条审批。
 
 ## 1. 快速命令速查
 

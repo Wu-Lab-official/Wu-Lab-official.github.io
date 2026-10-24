@@ -55,7 +55,7 @@
     });
 
     if (count) {
-      count.textContent = visible + " 篇";
+      count.textContent = visible + " 条";
     }
     if (empty) {
       empty.classList.toggle("is-visible", visible === 0);

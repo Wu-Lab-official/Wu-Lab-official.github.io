@@ -3,9 +3,12 @@
 清华大学深圳国际研究生院吴昌进课题组的官方网站。
 
 - 线上：https://wu-lab-official.github.io/
+- 状态：内部建设阶段，尚未购买/绑定正式域名；旧个人站 `john-z39.github.io` 仅作备份
 - 仓库：`Wu-Lab-official/Wu-Lab-official.github.io`
 - 技术：Jekyll + 极简主题（`_layouts/minimal.html`、`_pages/*.html`、`_data/*.yml`、`assets/minimal/`）
-- 维护：见 [MAINTENANCE.md](MAINTENANCE.md)；工作记录见 [WORKLOG.md](WORKLOG.md)
+- 维护：见 [MAINTENANCE.md](MAINTENANCE.md)；内容真实性规则和填内容思路在 §0.2–§0.4
+- 一键发布：`powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: ..."`
+- 工作记录见 [WORKLOG.md](WORKLOG.md)
 - 旧 AcademicPages 布局保留作回退，新页面不再使用。
 
 ---
