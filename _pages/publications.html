@@ -1,36 +1,71 @@
 ---
-layout: archive
-title: "Publications"
+layout: minimal
+title: "代表性论文"
 permalink: /publications/
-author_profile: true
+description: "吴昌进课题组代表性论文列表，可按年份、研究方向筛选，支持标题、作者、期刊搜索。"
 ---
 
-{% if site.author.googlescholar %}
-  <div class="wordwrap">You can also find my articles on <a href="{{site.author.googlescholar}}">my Google Scholar profile</a>.</div>
-{% endif %}
+<header class="page-head shell">
+  <p class="kicker">论文</p>
+  <h1>代表性论文</h1>
+  <p class="lede">{{ site.data.publications | size }} 篇代表性工作，按年份排列。可按年份与研究方向筛选，或直接搜索标题、作者、期刊。DOI 与 PDF 链接待补。</p>
+</header>
 
-{% include base_path %}
+<div class="shell">
+  <div class="filters">
+    <div class="filter-group" role="group" aria-label="按年份筛选">
+      <button class="filter is-active" type="button" data-filter="year" data-value="all" aria-pressed="true">全部</button>
+      {% assign years = site.data.publications | map: "year" | uniq %}
+      {% for year in years %}
+      <button class="filter" type="button" data-filter="year" data-value="{{ year }}" aria-pressed="false">{{ year }}</button>
+      {% endfor %}
+    </div>
 
-<!-- New style rendering if publication categories are defined -->
-{% if site.publication_category %}
-  {% for category in site.publication_category  %}
-    {% assign title_shown = false %}
-    {% for post in site.publications reversed %}
-      {% if post.category != category[0] %}
-        {% continue %}
-      {% endif %}
-      {% unless title_shown %}
-        <h2>{{ category[1].title }}</h2><hr />
-        {% assign title_shown = true %}
-      {% endunless %}
-      {% include archive-single.html %}
-    {% endfor %}
-  {% endfor %}
-{% else %}
-  {% for post in site.publications reversed %}
-    {% include archive-single.html %}
-  {% endfor %}
-{% endif %}
+    <label class="select-label" for="tag-filter">
+      方向
+      <select id="tag-filter">
+        <option value="all">全部</option>
+        <option value="swarm">集群与微纳机器人</option>
+        <option value="soft">智能软物质</option>
+        <option value="micro">微流控与器件</option>
+        <option value="field">外场操控</option>
+        <option value="assembly">颗粒与自组装</option>
+      </select>
+    </label>
 
+    <label class="search-label" for="search">
+      搜索
+      <input id="search" type="search" placeholder="标题、作者、期刊" autocomplete="off">
+    </label>
 
+    <p class="result-count" id="result-count" aria-live="polite">{{ site.data.publications | size }} 篇</p>
+  </div>
 
+  <table class="pub-table">
+    <thead>
+      <tr>
+        <th scope="col">年份</th>
+        <th scope="col">作者</th>
+        <th scope="col">标题</th>
+        <th scope="col">期刊</th>
+        <th scope="col">卷页</th>
+        <th scope="col">引用</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pub in site.data.publications %}
+      <tr data-year="{{ pub.year }}" data-tags="{{ pub.tags }}">
+        <td class="col-year">{{ pub.year }}</td>
+        <td class="col-authors">{{ pub.authors | escape }}</td>
+        <td class="col-title"><span class="title">{{ pub.title | escape }}</span></td>
+        <td class="col-journal">{{ pub.journal | escape }}</td>
+        <td class="col-pages">{{ pub.pages | escape }}</td>
+        <td class="col-cite"><button class="cite" type="button" aria-label="复制该条目的文本引用">引用</button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="empty" id="empty">没有匹配的论文。可以换一个年份、方向，或清空搜索词。</p>
+  <p class="pub-note">注：论文元数据来自课题组资料；DOI、PDF 与部分作者信息待核对。引用按钮复制的是当前条目的文本引用。</p>
+</div>

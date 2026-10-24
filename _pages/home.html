@@ -1,0 +1,126 @@
+---
+layout: minimal
+title: "活性软物质与智能系统"
+permalink: /
+description: "清华大学深圳国际研究生院吴昌进课题组，研究活性软物质、微纳机器人、微流控与集群智能。"
+---
+
+<section class="hero shell">
+  <div class="hero-main">
+    <p class="kicker">清华大学深圳国际研究生院 · 深圳</p>
+    <h1>活性软物质<br>与智能系统</h1>
+    <p class="lede">课题组研究活性胶体等耗散系统，关注微观个体的运动、群体行为，以及可被外场调控的活性材料与器件。应用方向包括微创诊疗、靶向递送与环境治理。</p>
+    <p class="hero-links">
+      <a href="{{ '/research/' | relative_url }}">研究方向</a>
+      <a href="{{ '/join/' | relative_url }}">加入我们</a>
+    </p>
+  </div>
+
+  <aside class="factsheet" aria-label="课题组信息">
+    <dl>
+      <div>
+        <dt>依托</dt>
+        <dd>清华大学深圳国际研究生院</dd>
+      </div>
+      <div>
+        <dt>坐标</dt>
+        <dd>深圳 · 能源环境大楼 2107</dd>
+      </div>
+      <div>
+        <dt>成立</dt>
+        <dd>2026</dd>
+      </div>
+      <div>
+        <dt>论文</dt>
+        <dd>20 余篇（含 Nat. Nanotechnol.）</dd>
+      </div>
+      <div>
+        <dt>招聘</dt>
+        <dd>博士后 / 博士 / 硕士，开放申请</dd>
+      </div>
+    </dl>
+    <p class="factsheet-note">最近更新 2026.10</p>
+  </aside>
+</section>
+
+<section class="section shell">
+  <div class="section-label">
+    <h2>研究方向</h2>
+  </div>
+  <div class="section-body">
+    <ol class="direction-list">
+      {% for item in site.data.research %}
+      <li>
+        <a href="{{ '/research/' | relative_url }}#{{ item.id }}">
+          <span class="num">{{ item.num }}</span>
+          <span class="dir-title">{{ item.title }}</span>
+          <span class="dir-desc">{{ item.desc }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+    <p class="more"><a href="{{ '/research/' | relative_url }}">全部研究方向</a></p>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="section-label">
+    <h2>代表性论文</h2>
+    <p>完整列表按年份排列，可按方向筛选。</p>
+  </div>
+  <div class="section-body">
+    {% assign featured = site.data.publications | where: "featured", true %}
+    <ul class="pub-preview">
+      {% for pub in featured %}
+      <li>
+        <span class="pub-year">{{ pub.year }}</span>
+        <div>
+          <a class="pub-title" href="{{ '/publications/' | relative_url }}">{{ pub.title | escape }}</a>
+          <p class="pub-meta">{{ pub.journal }} · {{ pub.pages }}</p>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="more"><a href="{{ '/publications/' | relative_url }}">全部论文</a></p>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="section-label">
+    <h2>动态</h2>
+    <p>组内消息与招募状态。</p>
+  </div>
+  <div class="section-body">
+    <ul class="news-list">
+      {% for item in site.data.news %}
+      <li>
+        <time datetime="{{ item.datetime }}">{{ item.date }}</time>
+        <p>{{ item.text }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="section-label">
+    <h2>课题组</h2>
+    <p>2026 年入职清华大学深圳国际研究生院。</p>
+  </div>
+  <div class="section-body">
+    <p class="body-copy">吴昌进，清华大学深圳国际研究生院教研系列助理教授、特别研究员、博士生导师。博士毕业于香港大学，曾任香港大学工学院研究助理教授、香港先进生物医学仪器中心首席科学家。长期从事活性软物质与智能系统研究。</p>
+    <p class="more"><a href="{{ '/people/' | relative_url }}">团队与导师简介</a></p>
+  </div>
+</section>
+
+<section class="section shell">
+  <div class="section-label">
+    <h2>加入我们</h2>
+    <p>2026 年开放多个岗位。</p>
+  </div>
+  <div class="section-body">
+    <p class="body-copy">欢迎化学、材料、物理、生物医学工程、机械/电子等背景的同学和研究者联系。来信请附 CV 与一段研究兴趣说明。</p>
+    <p class="join-contact"><a href="mailto:wuchangjin@sz.tsinghua.edu.cn">wuchangjin@sz.tsinghua.edu.cn</a></p>
+    <p class="more"><a href="{{ '/join/' | relative_url }}">岗位与申请方式</a></p>
+  </div>
+</section>

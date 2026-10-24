@@ -1,6 +1,7 @@
 ---
-permalink: /
-title: "吴昌进课题组"
+permalink: /about-legacy/
+title: "吴昌进课题组（旧版首页）"
+published: false
 author_profile: true
 redirect_from: 
   - /about/

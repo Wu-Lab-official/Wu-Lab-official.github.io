@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+{% include minimal/head.html %}
+</head>
+<body>
+  <a class="skip" href="#main">跳到正文</a>
+  {% include minimal/header.html %}
+  <main id="main">
+    {{ content }}
+  </main>
+  {% include minimal/footer.html %}
+  <script src="{{ '/assets/minimal/app.js' | relative_url }}"></script>
+</body>
+</html>

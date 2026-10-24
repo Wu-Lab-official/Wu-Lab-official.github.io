@@ -1,0 +1,75 @@
+- id: microrobot
+  num: "01"
+  title: "微纳机器人"
+  en: "Microrobotics"
+  desc: "个体运动与集群智能调控"
+  question: "单个微纳机器人如何运动？一群个体如何在没有中央控制时形成有序运动？"
+  body: "我们从单体的推进机制出发，研究多模态驱动、群体协同与可控聚集。研究重点是局部相互作用如何产生全局秩序，以及这种秩序能否被外场稳定地调控。"
+  work:
+    - "微纳机器人的多模态驱动与运动调控"
+    - "集群协同、聚集与分散行为"
+    - "外场下的群体运动与功能化应用"
+  papers:
+    - "Wu C. et al. Ion-exchange enabled synthetic swarm. <em>Nature Nanotechnology</em>, 2021."
+    - "Wu C. et al. Micro/nanomotor: from single modal to multimodal propulsion. <em>Nano Research</em>, 2024."
+    - "Gao Y. et al. Magnetically manipulated optoelectronic microrobots. <em>Advanced Materials</em>, 2024."
+
+- id: soft-matter
+  num: "02"
+  title: "智能软物质"
+  en: "Active Soft Matter"
+  desc: "可控构筑与多物理场应激响应"
+  question: "材料如何感知光、热、磁、化学梯度，并改变自身构型与运动状态？"
+  body: "我们可控构筑具有应激响应的软物质体系，研究材料在多物理场下的形变、运动与功能变化。这里的“智能”指材料对环境的响应能力，而不是算法。"
+  work:
+    - "响应性软物质的可控构筑"
+    - "多物理场下的形变与运动"
+    - "动态形变材料与功能器件"
+  papers:
+    - "Chen J. et al. Dynamic polymorphic active colloidal assembly. <em>Matter</em>, 2024."
+    - "Huang Y. et al. Colloidal self-assembly: from passive to active system. <em>Angewandte Chemie International Edition</em>, 2023."
+
+- id: microfluidics
+  num: "03"
+  title: "微流控与微纳器件"
+  en: "Microfluidics & Devices"
+  desc: "流场编程、柔性可穿戴与离子器件"
+  question: "通道的几何形状如何决定流场？流场又如何决定最终的产物？"
+  body: "我们用层级排布的障碍结构做流场编程，控制液滴与颗粒的生成、分割和输运；并将这套方法用于柔性可穿戴器件与离子器件。"
+  work:
+    - "微流控芯片与流场编程"
+    - "液滴、颗粒的生成与操控"
+    - "柔性可穿戴器件与离子器件"
+  papers:
+    - "Huang Y. et al. Scalable integration of photoresponsive highly aligned nanochannels. <em>Science Advances</em>, 2024."
+    - "Yang Z. et al. CeyeHao: AI-driven microfluidic flow programming. <em>Science Advances</em>, 2025."
+
+- id: field
+  num: "04"
+  title: "外场操控活性胶体"
+  en: "Field-driven Colloids"
+  desc: "精准诊疗、靶向递送与环境治理"
+  question: "外场如何影响活性胶体的运动与分布？相关基础研究如何走向应用？"
+  body: "我们用光、热、磁、化学梯度等外场操控活性胶体，研究捕获、富集、输运与靶向，面向精准微创诊疗、靶向药物递送和环境治理。"
+  work:
+    - "外场下的捕获、富集与定向输运"
+    - "靶向药物递送与微创诊疗"
+    - "微纳塑料等污染物的清除"
+  papers:
+    - "Li W. et al. Self-driven magnetorobots for micro/nanoplastics removal. <em>Science Advances</em>, 2022."
+    - "Zeng B. et al. Photothermal cavitation-driven micromotor to penetrate cell membrane. <em>JACS</em>, 2025."
+
+- id: assembly
+  num: "05"
+  title: "颗粒合成与自组装"
+  en: "Colloidal Assembly"
+  desc: "形貌可控颗粒与功能材料自组装"
+  question: "颗粒的表面化学如何影响其排列？被动自组装与主动组装如何衔接？"
+  body: "我们合成形貌可控的无机、有机微纳颗粒，研究它们在界面与场作用下的自发排列。被动自组装提供结构基础，主动组装使结构可以被外场调整。"
+  work:
+    - "形貌可控的微纳颗粒合成"
+    - "界面与场诱导的自组装"
+    - "动态、可重构的活性组装"
+  papers:
+    - "Zheng J. et al. Photochromism from wavelength-selective colloidal phase segregation. <em>Nature</em>, 2023."
+    - "Chen J. et al. Dynamic polymorphic active colloidal assembly. <em>Matter</em>, 2024."

@@ -17,6 +17,34 @@
 | Jekyll | 3.10.0（由 `github-pages` gem 锁定，与 GitHub Pages 线上一致）|
 | 部署方式 | push 到 main → GitHub Pages 自动构建（无需本地构建上传）|
 
+### 0.1 当前视觉层：极简主题（2026-10-24，方案 B）
+
+站点仍是 Jekyll，但新页面不再使用 AcademicPages 的 sidebar / single 布局，改用一套独立的极简布局：
+
+| 文件 | 作用 |
+|---|---|
+| `_layouts/minimal.html` | 全站骨架：head、导航、页脚、脚本 |
+| `_includes/minimal/head.html` | title / description / canonical / CSS |
+| `_includes/minimal/header.html` | 品牌、中文导航、移动菜单 |
+| `_includes/minimal/footer.html` | 版权、邮箱、导师主页 |
+| `_pages/home.html` | 首页 `/` |
+| `_pages/research.html` | 研究方向 `/research/` |
+| `_pages/publications.html` | 论文 `/publications/` |
+| `_pages/people.html` | 团队 `/people/` |
+| `_pages/join.html` | 加入我们 `/join/` |
+| `_data/research.yml` | 5 个研究方向、问题、正文、代表论文 |
+| `_data/publications.yml` | 15 篇代表性论文（年份/作者/期刊/卷页/标签/featured）|
+| `_data/news.yml` | 首页动态 |
+| `_data/navigation.yml` | 顶部导航（研究/论文/团队/加入我们）|
+| `assets/minimal/style.css` | 极简主题样式 |
+| `assets/minimal/app.js` | 移动菜单、论文筛选/搜索、复制引用 |
+| `assets/minimal/profile.jpg` | 团队页照片（原始 2:3，不裁切）|
+| `assets/minimal/favicon.svg` | 站点图标 |
+
+旧 AcademicPages 文件（`_layouts/default.html`、`_layouts/single.html`、`_sass/`、`assets/css/main.css`、`_includes/sidebar.html` 等）**保留作回退**，新页面不引用它们。等新站稳定后再决定是否清理。
+
+`_pages/about.md` 已设为 `published: false`，旧首页不再参与构建；需要回退时把它改回 `permalink: /` 并启用即可。
+
 ## 1. 快速命令速查
 
 ```bash
@@ -50,6 +78,24 @@ git -c http.proxy=http://127.0.0.1:7897 push
 
 ## 3. 目录结构（改内容看这里）
 
+### 3.1 当前极简主题（优先看这里）
+
+| 想做什么 | 改哪里 |
+|---|---|
+| 改首页文字/顺序 | `_pages/home.html` |
+| 增删研究方向、改问题/正文/代表论文 | `_data/research.yml` |
+| 增删论文、改作者/年份/期刊/标签 | `_data/publications.yml` |
+| 改首页“动态” | `_data/news.yml` |
+| 改导航文字/顺序 | `_data/navigation.yml` |
+| 改团队页、导师简介、教育/工作经历 | `_pages/people.html` |
+| 改加入我们、岗位、FAQ | `_pages/join.html` |
+| 改全局颜色/字号/间距 | `assets/minimal/style.css` |
+| 改论文筛选/搜索/复制引用 | `assets/minimal/app.js` |
+| 换团队页照片 | 替换 `assets/minimal/profile.jpg`（保持 2:3，不要裁切）|
+| 改全站 title/description/url | `_config.yml` |
+
+### 3.2 旧 AcademicPages 结构（保留作回退，不再更新）
+
 ```
 ├── _config.yml            ★ 全站配置：标题、作者侧边栏、主题色、url 等
 ├── MAINTENANCE.md         本手册（已 exclude，不发布）
@@ -59,11 +105,11 @@ git -c http.proxy=http://127.0.0.1:7897 push
 │   ├── cv.json            CV 结构化数据（配合 cv-json 页）
 │   └── ui-text.yml        界面文字（多语言，一般不动）
 ├── _pages/                ★ 所有页面的正文 Markdown
-│   ├── about.md           首页/关于（个人或课题组简介）
+│   ├── about.md           旧首页（已 published: false）
 │   ├── cv.md              CV 页
-│   ├── publications.html  论文列表页（一般只改 _publications 内容）
+│   ├── publications.html  新论文页（极简布局）
 │   └── ...
-├── _publications/         每篇论文一个 .md（论文页数据源）
+├── _publications/         旧模板每篇论文一个 .md（新论文页不用）
 ├── _portfolio/            研究项目/Portfolio 条目
 ├── _posts/                博客文章（文件名必须是 YYYY-MM-DD-标题.md）
 ├── _talks/                报告/讲座条目
@@ -71,26 +117,26 @@ git -c http.proxy=http://127.0.0.1:7897 push
 ├── images/                ★ 图片（profile.png = 侧边栏头像，建议 300×300）
 ├── files/                 附件（论文 PDF 等放这里，页面里用 /files/xxx.pdf 引用）
 ├── markdown_generator/    从 BibTeX/PubMed 批量生成论文条目的 Python 脚本（可选）
-└── assets/                主题 JS/CSS（一般不动）
+└── assets/                主题 JS/CSS（一般不动；新主题在 assets/minimal/）
 ```
 
-### 常见维护任务
+
+### 旧模板维护任务（仅回退时使用）
+
+当前内容维护请看 **§3.1**。下面这些只适用于重新启用 AcademicPages 旧布局的情况：
 
 | 想做什么 | 改哪里 |
 |---|---|
 | 侧边栏头像/姓名/邮箱/单位 | `_config.yml` 的 `author:` 区块；头像替换 `images/profile.png` |
-| 侧边栏学术链接（Google Scholar/ORCID/GitHub 等）| `_config.yml` 的 `author:` 区块，留空则不显示图标 |
-| 导航菜单增删/改名/排序 | `_data/navigation.yml` |
-| 网站标题/描述/主题配色 | `_config.yml` 的 `title` / `description` / `site_theme`（可选 default/air/sunrise/mint/dirt/contrast）|
-| 首页内容 | `_pages/about.md` |
-| 发论文 | `_publications/` 复制现有条目改内容（或用 markdown_generator 脚本批量生成），PDF 放 `files/` |
-| 发动态/博客 | `_posts/` 新建 `YYYY-MM-DD-标题.md` |
-| CV | `_pages/cv.md`（Markdown 版）或 `_data/cv.json`（JSON 版，导航二选一）|
-| 改某个页面的正文 | `_pages/` 下对应 .md 文件 |
+| 侧边栏学术链接 | `_config.yml` 的 `author:` 区块，留空则不显示图标 |
+| 旧首页 | `_pages/about.md`（当前 `published: false`）|
+| 旧论文列表 | `_publications/`（当前新论文页不再使用）|
+| 旧模板样式 | `_sass/`、`assets/css/main.css` |
 
 ### 清理模板示例内容（下一阶段做内容时要做的）
 
-`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*` 里全是模板演示数据，填充真实内容前可整目录清空（保留子目录结构）。`_data/comments/` 是示例评论，可删。
+`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*` 里仍是模板演示数据；新极简页面不读取它们，暂时不影响线上。彻底清理前先确认没有旧页面还在引用。
+
 
 ## 4. 标准工作流程（SOP）
 

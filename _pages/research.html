@@ -1,0 +1,38 @@
+---
+layout: minimal
+title: "研究方向"
+permalink: /research/
+description: "吴昌进课题组的五个研究方向：微纳机器人、智能软物质、微流控与微纳器件、外场操控活性胶体、颗粒合成与自组装。"
+---
+
+<header class="page-head shell">
+  <p class="kicker">研究</p>
+  <h1>研究方向</h1>
+  <p class="lede">课题组研究活性胶体等耗散系统，关注微观个体的运动、外场下的群体行为，以及相关的材料、器件与诊疗应用。</p>
+</header>
+
+{% for item in site.data.research %}
+<article class="direction shell" id="{{ item.id }}">
+  <div class="direction-index">
+    <span class="num">{{ item.num }}</span>
+    <span class="dir-en">{{ item.en | escape }}</span>
+  </div>
+  <div class="direction-body">
+    <h2>{{ item.title }}</h2>
+    <p class="direction-q">{{ item.question }}</p>
+    <p>{{ item.body }}</p>
+    <h3>具体工作</h3>
+    <ul>
+      {% for work in item.work %}
+      <li>{{ work }}</li>
+      {% endfor %}
+    </ul>
+    <h3>代表论文</h3>
+    <ul class="pub-mini">
+      {% for paper in item.papers %}
+      <li>{{ paper }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</article>
+{% endfor %}

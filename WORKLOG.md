@@ -46,3 +46,15 @@
   - 本地 `main` 原有 1 个未推送 commit（`a72faed`）一并推送到新组织仓库
 - **验证**：`bundle exec jekyll build --strict_front_matter` 构建通过；新仓库首次 push 成功；等待 Pages 构建后验证线上 200
 - **遗留**：旧个人站 `john-z39.github.io` 暂保留作备份，待新站稳定后再决定归档或跳转；GitHub Actions 仍是 `Cleanup bad PR` 触发的 build 检查，不负责 deploy
+
+## 2026-10-24 ｜ 会话 5：方案 B，极简版接入 Jekyll
+
+- **改动**
+  - 新增 `_layouts/minimal.html`、`_includes/minimal/{head,header,footer}.html`：独立极简骨架，不再走 AcademicPages sidebar/single
+  - 新增 `_pages/home.html`、`research.html`、`people.html`、`join.html`；重写 `_pages/publications.html`
+  - 新增 `_data/research.yml`（5 个方向）、`publications.yml`（15 篇）、`news.yml`（首页动态）；`navigation.yml` 改为中文 4 项
+  - 新增 `assets/minimal/{style.css,app.js,profile.jpg,favicon.svg}`
+  - `_pages/about.md` 设为 `published: false`，旧首页退场；旧 AcademicPages 布局/样式保留作回退
+  - `README.md` 增加项目说明；`MAINTENANCE.md` 增加 §0.1 当前极简主题架构和 §3.1 维护对照表
+- **验证**：`bundle exec jekyll build --strict_front_matter` 通过；本地 5 页 + CSS/JS/照片均 200；桌面截图确认首页、论文、团队页；筛选/搜索/引用沿用已验证的 `assets/minimal/app.js`
+- **遗留**：线上 Pages 需要确认 Source = main / (root)；旧模板示例数据（`_posts`/`_publications` 等）尚未清理；成员、照片、DOI/PDF、招生细节待补
