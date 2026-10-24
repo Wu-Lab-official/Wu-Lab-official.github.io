@@ -111,3 +111,17 @@
   - 删除仓库内模板自带的 `AGENTS.md`（与本组无关，且会被 agent 当作项目规范加载）；工作区 `AGENTS.md` 保留为本组规范，exclude 中的 `AGENTS.md` 条目保留防回归
 - **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；`bundle exec jekyll build --strict_front_matter` 通过（1.7s）；本地 `/`、`/research/`、`/publications/`、`/people/`、`/join/`、`/404.html` 均 200；`/research/` 5 个方向论文按 `paper_ids` 正确渲染；`/publications/` 15 行、筛选项 5 个；首页“最近更新 2026.10”
 - **遗留**：本次提交需用户在自己终端 push；成员/照片/DOI/PDF/招生细节仍缺（见 `CONTENT.md` §4）；`信息.txt` 与 `图片.jpg` 只在工作区、未入库；`_design/` 仍在仓库外且描述与线上不一致
+
+## 2026-10-24 ｜ 会话 10：push 能力说明 + 工具手册 + 文档自动维护方针 + 隐私边界
+
+- **背景**：用户追问“为什么总要我自己 push、脚本还有没有用”，要求汇总常用工具与坑、把文档自动维护方针写进文档、并检查哪些内容会被上传/不能推。
+- **改动**
+  - 新增 `TOOLBOOK.md`：环境与命令（Ruby/Bundler、Jekyll、git、PowerShell、Python、curl、代理、Crossref）、沙箱限制表、症状→原因→处理表、常用命令速查、排查顺序
+  - 新增 `robots.txt`：显式 `Allow: /` + sitemap 指向（覆盖 jekyll-sitemap 生成的单行版本）
+  - `_config.yml`：exclude 增加 `TOOLBOOK.md` 与 `scripts`——此前 `publish.ps1`、`check-site.ps1` 会被发布到线上 `/scripts/`，现已不再上传
+  - 删除模板脚手架 `Dockerfile`、`docker-compose.yaml`、`_config_docker.yml`、`package.json`、`.devcontainer`（其中 `docker-compose.yaml` 会出现在线上）
+  - `CONTENT.md`：新增 §5 隐私边界（本地 / 仓库但不上线 / 上线 / 绝对不能提交 四类 + 提交前检查），原 §5 维护约定顺延为 §6
+  - `AGENTS.md`：新增“文档自动维护方针”——五份文档分工、每轮收尾自查四项、数字以 `check-site.ps1` 为准
+  - `MAINTENANCE.md`：新增 §0.5 文档维护方针；§1 加 `check-site.ps1`；§3.2 目录树补 `TOOLBOOK.md`、`robots.txt`；§5 指向 TOOLBOOK；§7 加链接
+- **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；`_site` 顶层只剩 `404.html`、`assets/`、`feed.xml`、`images/`、5 个页面目录、`redirects.json`、`robots.txt`、`sitemap.xml`；`_site/scripts` 不存在；`robots.txt` 为显式 Allow + sitemap；构建 1.8s
+- **遗留**：push 仍只能由用户在自己终端执行（agent 无凭据通道），本地提交待推；push 方案（配置 SSH key / 维持现状）待用户决定

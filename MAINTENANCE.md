@@ -4,7 +4,7 @@
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
 > 本文档最后更新：2026-10-24（清理模板示例内容、论文数据经 Crossref 核对、增加 CONTENT.md 与 check-site.ps1）
 >
-> 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补清单）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
+> 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
 
 ---
 
@@ -110,6 +110,27 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly
 
 要求：Ruby 在 `C:\Ruby33-x64\bin`。脚本供你在自己的终端运行，不经过 agent 的逐条审批。
 
+## 0.5 文档维护方针（自动维护，不需要提醒）
+
+五份文档分工固定：
+
+| 文档 | 回答什么 | 什么时候改 |
+|---|---|---|
+| `WORKLOG.md` | 做过什么 | 每轮都追加，只加不改旧条目 |
+| `CONTENT.md` | 事实从哪来、核对到哪天、哪些不能公开 | 增删改事实/论文时 |
+| `MAINTENANCE.md`（本文件）| 怎么改、在哪改、怎么发 | 目录结构、流程、脚本参数变化时 |
+| `TOOLBOOK.md` | 用什么命令、踩过什么坑 | 遇到新报错/新环境差异时 |
+| 工作区 `AGENTS.md` | agent 规范与边界 | 仅经用户同意后改 |
+
+每轮收尾自查四项：
+
+1. `WORKLOG.md` 有本轮条目（日期、改动、验证结果、遗留）？
+2. 改过事实/论文 → `CONTENT.md` 的表格与核对日期同步？
+3. 改了目录/流程/脚本参数 → 本文件 §3 对照表、§4 命令同步？
+4. 踩了新坑 → `TOOLBOOK.md` 的“症状→原因→处理”加行？
+
+原则：文档与改动同一个提交；页面数、sitemap 数等数字以 `scripts/check-site.ps1` 输出为准；不写“以后再补”，缺什么写进 `CONTENT.md` §4；每份文档头部保留“最后更新”。
+
 ## 1. 快速命令速查
 
 ```bash
@@ -118,6 +139,7 @@ export PATH="/c/Ruby33-x64/bin:$PATH"
 cd /d/wu-lab/John-z39.github.io
 bundle exec jekyll serve          # 预览 http://127.0.0.1:4000，Ctrl+C 停止
 bundle exec jekyll build --strict_front_matter   # 与 CI 相同参数的纯构建测试
+powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1   # 完整性检查：清 _site + 构建 + 7 项断言
 
 # —— 推送上线（代理可选，见 §5）——
 git add 具体文件.md              # 手动提交只加改动文件
@@ -182,7 +204,8 @@ git push origin main            # 代理不通时才加 -c http.proxy=http://127
 ├── images/                profile.png（旧侧边栏头像）、favicon、manifest
 ├── files/                 论文 PDF / 附件（当前为空，缺 PDF 时放这里）
 ├── scripts/               publish.ps1、check-site.ps1
-└── 文档                    MAINTENANCE.md、CONTENT.md、WORKLOG.md（均已 exclude）
+├── robots.txt             允许抓取 + 指向 sitemap（jekyll-sitemap 本来会生成一份，这里覆盖为显式版本）
+└── 文档                    MAINTENANCE.md、CONTENT.md、TOOLBOOK.md、WORKLOG.md（均已 exclude）
 ```
 
 设计稿在仓库外 `D:\wu-lab\_design\`，未纳入版本管理。其中 `minimal/README.md` 描述的岗位/FAQ 页面、`tokens.md` 的配色（`#F4F4F2`/`#0B6E69`）都是早期探索，与线上（`#660874`）不一致，**以 `assets/minimal/style.css` 为准**；`redesign` 分支不存在。
@@ -268,6 +291,8 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 
 ## 5. 已知冲突与坑（重要）
 
+> 完整的“症状 → 原因 → 处理”表和命令速查见 [TOOLBOOK.md](TOOLBOOK.md)；这里只留最容易反复踩的几条。
+
 | 问题 | 原因 | 解决 |
 |---|---|---|
 | 敲 `jekyll` 报错/跳商店 | WindowsApps 有 535 字节的假 `jekyll` 占位 stub | 一律用 `bundle exec jekyll`；根治：设置 → 应用 → 应用执行别名 → 关闭 jekyll |
@@ -310,3 +335,4 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 - GitHub Pages 文档：https://docs.github.com/pages
 - 论文元数据核对：Crossref API `https://api.crossref.org/works/{DOI}`
 - 导师官方主页：https://www.sigs.tsinghua.edu.cn/wcj/main.htm
+- 本机工具与踩坑速查：[TOOLBOOK.md](TOOLBOOK.md)

@@ -70,7 +70,35 @@
 | 新闻 | 组内动态、获奖、参会 | PI |
 | 基金 | 项目编号与经费（一般不公开）| PI |
 
-## 5. 维护约定
+## 5. 隐私边界：哪些在本地、哪些会上传、哪些不能推
+
+**前提**：仓库是**公开**的（GitHub Pages 免费版要求公开仓库），`git push` 即公开，历史记录很难彻底清除。`_config.yml` 的 exclude 只控制“构建时不复制到 `_site`”，**不控制仓库可见性**，两者不要混为一谈。
+
+### 6.1 文件在哪
+
+| 位置 | 内容 | 是否公开 |
+|---|---|---|
+| 只在本地工作区 `D:\wu-lab`（不进 git）| `信息.txt`、`图片.jpg`、`_design/`、`AGENTS.md`、`.commitmsg`、`_site/`、`.sass-cache/`、`.dsh*/`、`.zcode/` | 否 |
+| 进仓库但不上线（exclude 或下划线开头）| `MAINTENANCE.md`、`CONTENT.md`、`TOOLBOOK.md`、`WORKLOG.md`、`README.md`、`scripts/`、`_config.yml`、`_data/`、`_layouts/`、`_includes/`、`_sass/` | **是（可被 clone）**，但不出现在网站上 |
+| 进仓库并上线（任何人可访问）| `_pages/` 生成的 5 个页面、`assets/minimal/`、`assets/css/`、`assets/js/`、`images/`、`files/`、`404.html`、`robots.txt`、`sitemap.xml`、`feed.xml` | **是** |
+| 已公开的个人信息 | `assets/minimal/profile.jpg`（团队页照片）、`_config.yml` 中的姓名/邮箱/单位 | 是，属团队页展示用途，PI 已知 |
+
+### 6.2 绝对不能提交（公开仓库）
+
+- 私钥、访问 token、密码、`.env`、含凭据的 `git remote` URL
+- 简历原文（`信息.txt`）、身份证/学号/手机号/住址、未公开的联系方式
+- 成员个人信息（姓名可以，联系方式、学号、身份证不行；需本人同意）
+- 原始照片、未经压缩/裁切的大图（要上线就导出成展示尺寸再放 `assets/minimal/`）
+- 未公开的经费金额、合作方合同、内部沟通记录
+
+### 6.3 提交前检查
+
+1. `git status` 看新增文件，确认没有上面这些；
+2. `git ls-files | grep -iE '信息|图片|简历|token|secret|\.env|id_rsa|\.pem'` 应为空；
+3. 跑 `scripts/check-site.ps1`，确认线上页面只有 5 个、没有内部文件；
+4. 需要备份 `信息.txt`/`图片.jpg` 时，放私有网盘或加密压缩包，不要进仓库。
+
+## 6. 维护约定
 
 - 新增论文：先在 Crossref 查 DOI，再写 `_data/publications.yml`，并在本表 §3 追加一行。
 - 论文只维护在 `_data/publications.yml`；`_data/research.yml` 用 `paper_ids` 引用，不复制标题。

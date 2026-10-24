@@ -194,7 +194,9 @@ exclude:
   - AGENTS.md
   - CONTENT.md
   - MAINTENANCE.md
+  - TOOLBOOK.md
   - WORKLOG.md
+  - scripts
   - tmp
   - vendor
 keep_files:

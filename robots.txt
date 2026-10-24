@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wu-lab-official.github.io/sitemap.xml
