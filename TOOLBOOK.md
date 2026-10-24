@@ -11,7 +11,7 @@
 | Ruby + Bundler | `C:\Ruby33-x64\bin\bundle.bat`；bash 里 `export PATH="/c/Ruby33-x64/bin:$PATH"` | 一律 `bundle exec jekyll ...`；WindowsApps 里有个假 `jekyll` stub，直接敲会进商店 |
 | Jekyll | 3.10.0，由 `github-pages` gem 锁定 | 与线上同版本；`serve` 默认 4000，被占用就 `--port 4001`；改 `_config.yml` 必须重启 |
 | Git | `git`，默认分支 `main` | 提交规范 `<type>: 摘要`；中文信息用 `git commit -F <utf8文件>`，别用 `-m` |
-| PowerShell | `powershell`（5.1，默认）/ `pwsh`（7） | 脚本必须 **UTF-8 with BOM**；5.1 下 `-File` 传 `a,b,c` 不会拆成数组，脚本要自己按逗号拆 |
+| PowerShell | `powershell`（5.1；本机**没装 7**，`pwsh` 命令不存在）| 脚本必须 **UTF-8 with BOM**；5.1 下 `-File` 传 `a,b,c` 不会拆成数组，脚本要自己按逗号拆 |
 | Python | `/d/miniconda3/python.exe`（3.13） | `python`/`python3` 是 WindowsApps stub，不可用；miniconda base **没有 PyYAML**，简单 YAML 手写解析 |
 | curl | `curl` | 只有 `danger-full-access` 下能出网；沙箱内返回 `000` |
 | 代理 | Clash Verge，`127.0.0.1:7897` | 直连 GitHub 可用时不必开；抓清华页面有时需要 |
@@ -24,6 +24,7 @@
 | `bundle: command not found` / `ls: cannot open directory '/c/Ruby33-x64/bin': Permission denied` | workspace-write 读不到工作区外的 Ruby | 该条命令申请一次性 `danger-full-access` |
 | `curl` 返回 `000`、`Could not resolve host` | 沙箱禁网 | 同上；先确认直连可用再考虑代理 |
 | `fatal: Unable to create '.git/index.lock': Permission denied` | git 写 `.git` 被拦 | 同上；只对 commit/rm/fetch 这类命令申请 |
+| `mv` / `cp` / `sed -i` 改工作区文件报 `Permission denied`（例如 `mv: unable to remove target`）| 本会话 bash 的文件写被整体拦，只有专用文件工具能写工作区 | 用 `write` / `edit` 工具改文件；`sed -i`、`printf > 文件` 都不可用；删除/提交/推送/构建申请一次性 `danger-full-access` |
 | `cannot create standard input pipe for git-credential-helper-selector: Permission denied` | 沙箱拦 git 拉起凭据助手的子进程管道——**只有 HTTPS 推送会走它** | 改走 SSH Deploy Key（§2.5），agent 会话可直接 push；不要退回 HTTPS，也不要把 token 塞进 URL |
 | `.ps1` 报“语句块或类型定义中缺少右 }” | 文件无 BOM，5.1 按 GBK 解析 | 重新保存为 UTF-8 with BOM（`head -c 3` 应为 `ef bb bf`）|
 

@@ -186,6 +186,10 @@
   - README / AGENTS：回退口径改为指向 MAINTENANCE §0.1；AGENTS 收尾自查四项 → 五项（加文档断言）；方案 B 历史条目补“同日后续会话已删除”
   - 删除模板残留 `scripts/cv_markdown_to_json.py`、`scripts/update_cv_json.sh`
 - **验证**：`check-docs.ps1` → `PASS: docs ok (6 files)`（改前失败 9 条：编号 3、表格 2、日期 1、引用 3）；`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`，构建 0.6s；删除脚本后全仓库无引用（`update_cv_json.sh` 内部引用为自引用）
+- **新坑**
+  - 本会话 bash 对工作区**完全没有写权限**：`mv`/`cp`/`sed -i`/`printf > 文件` 全被拒（`mv: unable to remove target`、`sed: couldn't open temporary file`），只有 `write`/`edit` 工具能改文件 → 已记入 TOOLBOOK §2
+  - `.ps1` 无法用 bash 补 BOM（写不进去），所以 `check-docs.ps1` 保持 **ASCII-only**，中文标记（`§`、`最后更新`）用 `[char]0x…` 拼；否则 5.1 会按 GBK 解析
+  - `pwsh` 在本机不存在（`command -v pwsh` 为空），TOOLBOOK 与 MAINTENANCE 原来写“可用 pwsh(7)”有误，已改为“只有 5.1”
 - **遗留**
   - `AGENTS.md` 与 MAINTENANCE §0.5 的“收尾自查”仍各存一份清单：工作区文件不在仓库内，clone 后需要它，暂不合并；两处都加了第 5 项，靠 check-docs 兜住结构漂移
   - WORKLOG 历史条目里的旧口径（如会话 5“旧布局保留作回退”）按“只加不改”保留，不作追溯修改

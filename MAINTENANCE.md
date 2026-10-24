@@ -366,7 +366,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 | agent 会话 `git push` 报 `could not read Username` / `cannot create standard input pipe for git-credential-helper-selector` | 沙箱禁止 Git 拉起 credential helper 的管道（HTTPS 推送才会走它）| 改走 SSH Deploy Key（§0.6）；确认 `git remote get-url origin` 是 `git@github.com:...`。不要用 token 塞 URL |
 | agent 会话 `git push` 报 `Permission denied (publickey)` | deploy key 被删 / 未勾 write access / `core.sshCommand` 指向错 | 重新加 key 并勾 write；`ssh -i <key> -T git@github.com` 应显示 `Hi Wu-Lab-official/...` |
 | agent 会话 `git push` 报 `Connection timed out` | 22 端口被墙 | `core.sshCommand` 加 `-o HostName=ssh.github.com -o Port=443` |
-| `publish.ps1` 语法报错、中文变乱码 | 文件被存成无 BOM 的 UTF-8，PowerShell 5.1 按 GBK 解析 | 保持 UTF-8 **with BOM**（`head -c 3` 应为 `ef bb bf`）；用 `pwsh` 运行也可，但文档默认 5.1 |
+| `publish.ps1` 语法报错、中文变乱码 | 文件被存成无 BOM 的 UTF-8，PowerShell 5.1 按 GBK 解析 | 保持 UTF-8 **with BOM**（`head -c 3` 应为 `ef bb bf`）；本机只有 5.1，`pwsh` 未安装 |
 | 论文年份/卷页对不上 | `信息.txt` 是 PI 手写清单，有笔误（如 Nano Research 年份、APL 文章号）| 一律以 Crossref 为准：`https://api.crossref.org/works/{DOI}`；差异记在 `CONTENT.md` §3 |
 | 抓清华 SIGS 页面后中文乱码 | 页面是 UTF-8，但 Windows 控制台按 GBK 输出 | 用 `curl -o` 存文件、Python 按 `utf-8` 读、结果写 UTF-8 文件再查看；不要直接 print 到控制台 |
 | 删掉的页面本地还能访问 | Jekyll 3.10 不清理 `_site` 里的旧产物 | `bundle exec jekyll clean`，或直接用 `scripts/check-site.ps1`（构建前删除 `_site`）|
