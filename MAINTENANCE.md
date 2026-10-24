@@ -48,7 +48,7 @@
 
 注意：保留的是**布局和样式**。旧模板的页面与集合条目已在 2026-10-24 删除，线上只剩 5 个页面（见 §3.2）。如果以后重新启用旧布局，需要自己补集合内容。
 
-仓库根的 `AGENTS.md` 是**模板作者写给 coding agent 的说明**，不是本组规范；它已加入 `_config.yml` 的 exclude，不再发布到线上（2026-10-24 之前是漏掉的，线上曾可访问 `/AGENTS.md`）。
+仓库内模板自带的 `AGENTS.md` 已于 2026-10-24 删除：它的内容是模板作者写给 coding agent 的说明，与本组规范无关；2026-10-24 之前它没被 exclude，线上曾可访问 `/AGENTS.md`。`_config.yml` 的 exclude 仍保留 `AGENTS.md` 条目，防止以后误放同名文件。
 
 `_pages/about.md` 已设为 `published: false`，旧首页不再参与构建；需要回退时把它改回 `permalink: /` 并启用即可。
 
@@ -184,6 +184,8 @@ git push origin main            # 代理不通时才加 -c http.proxy=http://127
 ├── scripts/               publish.ps1、check-site.ps1
 └── 文档                    MAINTENANCE.md、CONTENT.md、WORKLOG.md（均已 exclude）
 ```
+
+设计稿在仓库外 `D:\wu-lab\_design\`，未纳入版本管理。其中 `minimal/README.md` 描述的岗位/FAQ 页面、`tokens.md` 的配色（`#F4F4F2`/`#0B6E69`）都是早期探索，与线上（`#660874`）不一致，**以 `assets/minimal/style.css` 为准**；`redesign` 分支不存在。
 
 
 ### 旧模板维护任务（仅回退时使用）

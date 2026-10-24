@@ -108,5 +108,6 @@
   - 新增 `scripts/check-site.ps1`：构建前删除 `_site`，断言 ①文档未发布 ②sitemap 恰为 5 条 ③页面存在 ④无多余 HTML ⑤无模板文本 ⑥404 用极简布局 ⑦exclude 完整
   - `MAINTENANCE.md`：§3.1 改表加入 `paper_ids`/CONTENT.md/检查脚本；§3.2 重写为“仅保留布局回退 + 当前目录”；模板清理段改为已完成并给数字；§4② 加检查命令；§5 坑表加 5 行（信息.txt 笔误、SIGS 页面 GBK 输出、`_site` 不自动清理、无 front matter 的 md 会发布）；§7 加 Crossref 与导师主页
   - 工作区 `AGENTS.md`：文档地图加 CONTENT.md；流程第 1/2 步加来源核查；验证步加 `check-site.ps1`；硬性约定加“论文元数据以 Crossref 为准”；状态/待办更新
+  - 删除仓库内模板自带的 `AGENTS.md`（与本组无关，且会被 agent 当作项目规范加载）；工作区 `AGENTS.md` 保留为本组规范，exclude 中的 `AGENTS.md` 条目保留防回归
 - **验证**：`check-site.ps1` → `PASS: 6 html, 5 sitemap urls, no leaks`；`bundle exec jekyll build --strict_front_matter` 通过（1.7s）；本地 `/`、`/research/`、`/publications/`、`/people/`、`/join/`、`/404.html` 均 200；`/research/` 5 个方向论文按 `paper_ids` 正确渲染；`/publications/` 15 行、筛选项 5 个；首页“最近更新 2026.10”
 - **遗留**：本次提交需用户在自己终端 push；成员/照片/DOI/PDF/招生细节仍缺（见 `CONTENT.md` §4）；`信息.txt` 与 `图片.jpg` 只在工作区、未入库；`_design/` 仍在仓库外且描述与线上不一致
