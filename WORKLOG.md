@@ -85,3 +85,13 @@
   - 缺内容来源登记表（事实→来源→核对日期）与站点泄漏检查脚本；方向标签三套键（`research.id` / `publications.tags` / `publications.html` 写死的选项）未统一
   - “方案 B”在 MAINTENANCE 与 `_design/方案构想-v2` 中含义不同；`_design/minimal/README.md` 仍描述已删除的岗位/FAQ，`tokens.md` 配色与线上 `#660874` 不一致
   - 本轮本地构建需 `danger-full-access`（workspace-write 下读不到 `C:\Ruby33-x64`），文档尚未记录该降级路径；push 时 Clash Verge 未启动，推送待用户开启代理后执行
+
+## 2026-10-24 ｜ 会话 8：重写 publish.ps1 + 记录沙箱推送限制
+
+- **背景**：P0 提交本地成功但 push 失败。排查确认不是脚本逻辑，而是沙箱禁止 Git 拉起 credential helper 的管道（`cannot create standard input pipe for git-credential-helper-selector: Permission denied`），无 SSH key，直连 GitHub 本身可达（200）。用户确认后重写脚本并把该限制写进文档。
+- **改动**
+  - `scripts/publish.ps1` 重写：分支守卫（非 main 直接拒绝）；`-Paths` 限定暂存范围；`-PushOnly` 补推已有提交（旧版此场景直接退出）；代理自动探测（7897 开则走代理，否则直连）；push 前 `pull --rebase`；push 失败给可操作提示；push 后按 `-VerifyPaths`/`-VerifyWaitSeconds` 校验线上；未改 WORKLOG 给警告；提交信息改用 `git commit -F`（避免 PowerShell 5.1 把中文参数按 ANSI 传给 git 导致乱码）；文件保存为 UTF-8 with BOM（无 BOM 时 5.1 按 GBK 解析，直接语法报错，本次实际踩到）
+  - `MAINTENANCE.md`：§0.4 重写为参数表 + 行为细节（含 BOM 说明）；§1 推送命令改为直连优先、代理备用；§4③ 增加“agent 会话通常无法 push”的说明；§5 坑表新增三行（沙箱读不到 Ruby、credential helper 被拦、脚本 BOM）
+  - 工作区 `AGENTS.md`：本地验证补“构建需一次性 danger-full-access”及降级路径；推送补“agent 会话推不上去、交给用户终端或 `-PushOnly`”；代理由“push 必需”改为“直连可用时不必开”
+- **验证**：脚本在 PowerShell 5.1 与 7 下解析均 ok（BOM 后）；脚本内构建通过；本地提交生成；push 在 agent 会话仍因凭据管道被拦而失败，已按提示留下提交待用户推送
+- **遗留**：本次提交需用户在自己终端 `git push origin main`；旧模板 demo 页仍在线；内容来源登记表、站点检查脚本未做

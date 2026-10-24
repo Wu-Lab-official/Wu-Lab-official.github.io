@@ -78,15 +78,35 @@ GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 更新成员名单"
 ```
 
-脚本会：构建检查 → `git add -A` → commit → 经代理 push。只提交不推送：
+脚本流程：**分支守卫 → 构建检查 → 暂存 → 提交 → `git pull --rebase` → push → 等 75 秒校验线上首页**。
 
-> 为什么脚本用 `git add -A` 而 §4③ 要求只 add 具体文件：脚本先跑构建检查、失败就停，`-A` 是为了不漏掉新增的数据文件和图片；手动提交没有这层保护，所以只加明确改过的文件。
+| 参数 | 用途 |
+|---|---|
+| `-Message "content: ..."` | 提交信息，格式 `<type>: 摘要` |
+| `-Paths a.md,b.yml` | 只暂存这些路径（推荐；不给则 `git add -A` 并逐条打印）|
+| `-NoPush` | 只提交不推送 |
+| `-PushOnly` | **跳过构建和提交，只补推已有本地提交**（上次 push 失败就用这个）|
+| `-SkipVerify` | 跳过 push 后的线上校验 |
+| `-VerifyPaths /people/,/404.html` | 指定校验路径，默认只校验 `/` |
+| `-VerifyWaitSeconds 90` | 等 Pages 构建的时间，默认 75 秒 |
+
+几个行为细节：
+- 当前分支不是 `main` 直接报错退出（旧版会提交后去推 `origin main`，给出“成功”的假象）。
+- 代理自动探测：7897 开着就带 `-c http.proxy`，没开就直连；不再强制要求先启动 Clash。
+- push 前自动 `pull --rebase`，远端有新提交时不用手工处理。
+- 脚本设置 `GIT_TERMINAL_PROMPT=0` / `GCM_INTERACTIVE=never`：凭据缺失会立刻报错而不是卡在用户名提示。**首次登录或凭据过期时**，先在终端手动 `git push origin main` 让 Git 凭据管理器弹窗登录，再回来用脚本。
+- 提交里如果没有 `WORKLOG.md`，会给黄色警告（规范要求每轮留痕），但不阻断。
+- push 失败时本地提交保留，按提示修网络/凭据后重跑 `-PushOnly` 即可补推。
+- **脚本是 UTF-8 with BOM**：Windows PowerShell 5.1 读无 BOM 的 UTF-8 会把中文按 GBK 解释，直接语法报错。编辑这个文件时别把 BOM 弄丢（`head -c 3` 应看到 `ef bb bf`）。
 
 ```powershell
+# 只提交不推送
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 本地预览" -NoPush
+# 上次 push 失败，补推
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly
 ```
 
-要求：Ruby 在 `C:\Ruby33-x64\bin`；push 时 Clash Verge 的 `127.0.0.1:7897` 必须已启动。脚本供你在自己的终端运行，不经过 agent 的逐条审批。
+要求：Ruby 在 `C:\Ruby33-x64\bin`。脚本供你在自己的终端运行，不经过 agent 的逐条审批。
 
 ## 1. 快速命令速查
 
@@ -97,10 +117,11 @@ cd /d/wu-lab/John-z39.github.io
 bundle exec jekyll serve          # 预览 http://127.0.0.1:4000，Ctrl+C 停止
 bundle exec jekyll build --strict_front_matter   # 与 CI 相同参数的纯构建测试
 
-# —— 推送上线（需代理，见 §5）——
-git add 具体文件.md              # 手动提交只加改动文件；publish.ps1 内部才用 add -A
+# —— 推送上线（代理可选，见 §5）——
+git add 具体文件.md              # 手动提交只加改动文件
 git commit -m "说明"
-git -c http.proxy=http://127.0.0.1:7897 push
+git push origin main            # 代理不通时才加 -c http.proxy=http://127.0.0.1:7897
+# 已提交但 push 失败时，补推用：scripts\publish.ps1 -PushOnly
 ```
 
 **重要**：修改 `_config.yml` 后必须重启 serve（Jekyll 不会热加载配置文件）；改普通页面/文章则会自动重新生成。
@@ -206,20 +227,24 @@ bundle exec jekyll serve                # 后台运行；改过 _config.yml 必�
 
 ### ③ 推送上线（本地确认后自动执行）
 ```bash
-# 0) 确认代理可用（不通则先启动 D:\Clash Verge\clash-verge.exe）
-(echo > /dev/tcp/127.0.0.1/7897) 2>/dev/null && echo proxy OK
+# 0) 能做就优先用一键脚本（分支守卫 + 构建 + 补推 + 线上校验）
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 说明" -Paths 改动文件.md
+
+# 或者手工：
 # 1) 暂存具体文件（别盲目 add -A）
 git add 路径/文件.md
 # 2) 提交，信息格式 <type>: 摘要，type ∈ content/feat/fix/docs/chore
 git commit -m "content: 更新课题组简介"
-# 3) 经代理推送
-git -c http.proxy=http://127.0.0.1:7897 push
+# 3) 推送：代理开着就走代理，直连也能用（今天直连可达）
+git push origin main
+#   代理不通时才用：git -c http.proxy=http://127.0.0.1:7897 -c http.sslBackend=openssl push origin main
 # 4) 等 60–90 秒后验证线上
-curl -s -o /dev/null -w "%{http_code}\n" -x http://127.0.0.1:7897 https://wu-lab-official.github.io/改动页面/
+curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改动页面/
 ```
 - 也可一劳永逸给 git 配置代理（配置后 push 不用再加 `-c` 参数）：
   `git config --global http.proxy http://127.0.0.1:7897`
   取消：`git config --global --unset http.proxy`
+- **agent 会话通常无法 push**：沙箱禁止 Git 调用 credential helper 时的子进程管道（报 `cannot create standard input pipe for git-credential-helper-selector: Permission denied` 或 `could not read Username`），即使本机已存凭据。此时让用户在自己的终端执行 `git push origin main`，或运行 `publish.ps1 -PushOnly`；不要反复重试。
 
 ### ④ 线上验证
 - push 后 GitHub Pages 自动构建（1–2 分钟）；构建状态看仓库 **Actions** 标签页或 commit 的勾/叉
@@ -246,6 +271,9 @@ curl -s -o /dev/null -w "%{http_code}\n" -x http://127.0.0.1:7897 https://wu-lab
 | `bundle install` 时 `jekyll` 与 `github-pages` 版本疑虑 | Gemfile 同时写了两者 | 正常现象，Bundler 会统一解析到 3.10.x，不用管 |
 | 新终端找不到 ruby/bundle | Ruby 安装晚于终端/宿主进程启动 | 新开终端即可；旧会话先 `export PATH="/c/Ruby33-x64/bin:$PATH"` |
 | 改了 `_config.yml` 预览没变化 | 配置文件不热加载 | Ctrl+C 停掉 serve 再重启 |
+| agent 会话构建/预览报 `Permission denied`（读 `C:\Ruby33-x64\bin`）| DSH 沙箱默认只允许写工作区，Ruby 在 `C:\` 下 | 申请 `danger-full-access` 跑构建；或让用户在自己的终端跑 `publish.ps1`。不要改用别的命令绕过沙箱 |
+| agent 会话 `git push` 报 `could not read Username` / `cannot create standard input pipe for git-credential-helper-selector` | 沙箱禁止 Git 拉起 credential helper 的管道，凭据读不到（与凭据是否已存无关）| 让用户在自己终端 `git push origin main`，或 `publish.ps1 -PushOnly`；agent 不要反复重试 |
+| `publish.ps1` 语法报错、中文变乱码 | 文件被存成无 BOM 的 UTF-8，PowerShell 5.1 按 GBK 解析 | 保持 UTF-8 **with BOM**（`head -c 3` 应为 `ef bb bf`）；用 `pwsh` 运行也可，但文档默认 5.1 |
 
 ### Ruby 版本提示
 本机 3.3、CI 用 3.2，兼容良好。**暂不要升级到 Ruby 3.4+**（bundled gems 移除问题），升级前先在分支上试 `bundle install`。
