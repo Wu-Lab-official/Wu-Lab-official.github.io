@@ -2,7 +2,7 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-09-29（环境搭建 & 可行性验证完成日）
+> 本文档最后更新：2026-10-24（文档纠错、404 换极简布局、AGENTS.md 加入 exclude）
 
 ---
 
@@ -13,7 +13,7 @@
 | 线上地址 | https://wu-lab-official.github.io |
 | 仓库 | `Wu-Lab-official/Wu-Lab-official.github.io`（本地：`D:\wu-lab\John-z39.github.io`）|
 | 默认分支 | `main`（2026-09-29 由 master 改名，旧 master 已删除）|
-| 模板 | academicpages.github.io v0.9.x（Minimal Mistakes 主题分支）|
+| 模板 | 旧模板 academicpages.github.io v0.9.x **仅保留作回退**；当前渲染层为自建极简主题（见 §0.1），不再走 Minimal Mistakes |
 | Jekyll | 3.10.0（由 `github-pages` gem 锁定，与 GitHub Pages 线上一致）|
 | 部署方式 | push 到 main → GitHub Pages 自动构建（无需本地构建上传）|
 
@@ -32,6 +32,7 @@
 | `_pages/publications.html` | 论文 `/publications/` |
 | `_pages/people.html` | 团队 `/people/` |
 | `_pages/join.html` | 加入我们 `/join/` |
+| `_pages/404.md` | 自定义 404 页 `/404.html`（极简布局）|
 | `_data/research.yml` | 5 个研究方向、问题、正文、代表论文 |
 | `_data/publications.yml` | 代表性论文条目（年份/作者/期刊/卷页/标签/featured）|
 | `_data/news.yml` | 首页动态 |
@@ -43,6 +44,10 @@
 
 旧 AcademicPages 文件（`_layouts/default.html`、`_layouts/single.html`、`_sass/`、`assets/css/main.css`、`_includes/sidebar.html` 等）**保留作回退**，新页面不引用它们。等新站稳定后再决定是否清理。
 
+注意：保留的是**布局和样式**，旧模板的**页面和集合条目仍会正常构建**（`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`，以及 `cv`、`terms`、`markdown`、`talkmap` 等页面），它们会出现在 `/sitemap.xml` 里、可以被访问，详见 §3.2。清理前不要假设它们“不影响线上”。
+
+仓库根的 `AGENTS.md` 是**模板作者写给 coding agent 的说明**，不是本组规范；它已加入 `_config.yml` 的 exclude，不再发布到线上（2026-10-24 之前是漏掉的，线上曾可访问 `/AGENTS.md`）。
+
 `_pages/about.md` 已设为 `published: false`，旧首页不再参与构建；需要回退时把它改回 `permalink: /` 并启用即可。
 
 GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 “GitHub Actions”，当前 workflow 只做构建检查，不负责 deploy。
@@ -51,7 +56,7 @@ GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 
 
 - 这是课题组网站的**内部建设阶段**，还没有购买/绑定正式域名；线上地址是 GitHub Pages 组织站 `https://wu-lab-official.github.io/`，不是最终发布形态。
 - 旧个人站 `john-z39.github.io` 只作备份，不再作为本项目维护对象。
-- 当前状态：极简主题已接入 Jekyll，5 个页面可访问；导师信息、研究方向、代表性论文是真实内容；成员、照片、DOI/PDF、招生细节仍缺。
+- 当前状态：极简主题已接入 Jekyll，5 个极简页面可访问；旧模板的 demo 页面和集合条目**仍在构建并出现在 sitemap 中**（见 §3.2，待清理）。导师信息、研究方向、代表性论文是真实内容；成员、照片、DOI/PDF、招生细节仍缺。
 - 现有内容来源只有三类：`信息.txt`（PI 提供）、清华 SIGS 官方导师主页、论文正式记录。除此之外不写。
 - 缺失内容统一写“待补充”或直接留空，**不要用示例、推测、行业惯例填充**。
 
@@ -75,6 +80,8 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 
 
 脚本会：构建检查 → `git add -A` → commit → 经代理 push。只提交不推送：
 
+> 为什么脚本用 `git add -A` 而 §4③ 要求只 add 具体文件：脚本先跑构建检查、失败就停，`-A` 是为了不漏掉新增的数据文件和图片；手动提交没有这层保护，所以只加明确改过的文件。
+
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 本地预览" -NoPush
 ```
@@ -91,8 +98,8 @@ bundle exec jekyll serve          # 预览 http://127.0.0.1:4000，Ctrl+C 停止
 bundle exec jekyll build --strict_front_matter   # 与 CI 相同参数的纯构建测试
 
 # —— 推送上线（需代理，见 §5）——
-git -c http.proxy=http://127.0.0.1:7897 add -A
-git -c http.proxy=http://127.0.0.1:7897 commit -m "说明"
+git add 具体文件.md              # 手动提交只加改动文件；publish.ps1 内部才用 add -A
+git commit -m "说明"
 git -c http.proxy=http://127.0.0.1:7897 push
 ```
 
@@ -125,6 +132,7 @@ git -c http.proxy=http://127.0.0.1:7897 push
 | 改导航文字/顺序 | `_data/navigation.yml` |
 | 改团队页、导师简介、教育/工作经历 | `_pages/people.html` |
 | 改加入我们、岗位、FAQ | `_pages/join.html` |
+| 改 404 页 | `_pages/404.md`（需保留 `layout: minimal`，否则会退回旧模板样式）|
 | 改全局颜色/字号/间距 | `assets/minimal/style.css` |
 | 改论文筛选/搜索/复制引用 | `assets/minimal/app.js` |
 | 换团队页照片 | 替换 `assets/minimal/profile.jpg`（保持 2:3，不要裁切）|
@@ -171,7 +179,13 @@ git -c http.proxy=http://127.0.0.1:7897 push
 
 ### 清理模板示例内容（下一阶段做内容时要做的）
 
-`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*` 里仍是模板演示数据；新极简页面不读取它们，暂时不影响线上。彻底清理前先确认没有旧页面还在引用。
+`_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*` 里仍是模板演示数据。**新极简页面不读取它们，但它们仍会被 Jekyll 正常构建并发布**：当前构建产物有 46 个 HTML、`/sitemap.xml` 里 44 个唯一 URL，包含假论文 `/publication/paper-title-number-1`、模板博客 `/posts/2012/08/blog-post-1/`、`/cv/`、`/terms/`、`/portfolio/`、`/talks/`、`/teaching/`、`/files/paper1.pdf` 等，可被搜索引擎收录。
+
+清理方式（下一阶段做，属破坏性改动，先征得同意）：
+- 集合条目：在 front matter 加 `published: false`，或直接删除 `_posts/`、`_publications/`、`_portfolio/`、`_talks/`、`_teaching/` 下的示例文件；
+- 旧页面：`_pages/` 下 `cv.md`、`cv-json.md`、`terms.md`、`markdown.md`、`archive-layout-with-content.md`、`non-menu-page.md`、`sitemap.md`、`talkmap.html` 及各类 archive 页加 `published: false`；
+- 静态文件：`talkmap*`、`markdown_generator/`、`files/paper*.pdf`、`files/slides*.pdf` 不再需要就删除或加进 exclude；
+- 改完用 `_site/sitemap.xml` 的 URL 列表复核，不要只看首页 200。
 
 
 ## 4. 标准工作流程（SOP）
@@ -220,7 +234,7 @@ curl -s -o /dev/null -w "%{http_code}\n" -x http://127.0.0.1:7897 https://wu-lab
 
 ### 部署机制细节
 - push 到 `main` → GitHub Pages 自动用 `github-pages` gem 构建（Settings → Pages：Deploy from a branch / main / root）
-- 仓库自带 CI 工作流 `.github/workflows/jekyll-build.yml`（Ruby 3.2 + `--strict_front_matter` 构建检查，只监听 `main`）
+- 仓库自带 CI 工作流 `.github/workflows/jekyll-build.yml`（Ruby 3.2 + `--strict_front_matter` 构建检查），但它的触发条件是 `workflow_run`——挂在 “Cleanup bad PR” 工作流完成之后，而后者只响应 `pull_request_target`。**push 到 `main` 不会触发构建检查**，所以 push 前必须本地跑一遍 `bundle exec jekyll build --strict_front_matter`，不要指望 CI 兜底。
 
 ## 5. 已知冲突与坑（重要）
 
@@ -246,7 +260,7 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 ```
 
 - **页面 404**：检查文件名/front matter 的 `permalink`；确认 `_config.yml` 的 include/exclude 没排掉它
-- **样式丢失**：确认 `assets/css/main.css` 能访问（主题样式是编译产物，别手改 `_sass` 之外的地方）
+- **样式丢失**：新页面看 `assets/minimal/style.css`（手写源文件，不是编译产物）；只有 404 之外的旧模板页面才用 `assets/css/main.css`（由 `_sass/` 编译，别手改）
 - **推送后线上没更新**：Actions 页看构建是否失败；或确认推的是 `main`（其他分支不部署）
 - **彻底重来**：删掉 `_site/` 目录重新 `bundle exec jekyll serve`
 

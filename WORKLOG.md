@@ -70,3 +70,18 @@
   - `MAINTENANCE.md` 增加 §0.2 项目性质/现状、§0.3 内容真实性规则、§0.4 一键发布；`README.md` 增加项目状态
 - **验证**：`bundle exec jekyll build --strict_front_matter` 通过；5 页本地 200；`scripts/publish.ps1` 实测完成 build → commit → push（提交 `072c64a`）；线上 `/join/` 和 `/publications/` 已更新
 - **遗留**：成员名单、照片、论文 DOI/PDF、招生细节需 PI 提供；未确认的信息继续留空，不补
+
+## 2026-10-24 ｜ 会话 7：文档体检 + P0 纠错（AGENTS.md 泄漏 / 404 / 过期事实）
+
+- **背景**：应要求复核上一轮维护的文档。静态核对发现文档多处与仓库/构建产物不符，按用户确认的范围只做 P0（文档纠错、排除 AGENTS.md、404 换极简布局），旧模板 demo 页暂不动。
+- **改动**
+  - `_config.yml`：exclude 增加 `AGENTS.md`（此前线上可访问 `/AGENTS.md`，内容是模板作者写给 agent 的说明）
+  - `_pages/404.md`：改为 `layout: minimal` + 中文 404（原来走旧 AcademicPages 布局，`lang="en"`、加载 `assets/css/main.css`）
+  - `MAINTENANCE.md`：更新最后更新日期；模板行改为“旧模板仅回退、当前为极简主题”；新增 404 相关两行；§0.2 状态改为“demo 页仍在构建并在 sitemap 中”；§0.1 补“保留布局≠页面已下线”说明与 AGENTS.md exclude 说明；§1 与 §4③ 统一 `git add` 口径（手动只加具体文件，仅 `publish.ps1` 用 `-A`，并说明原因）；§3.2 重写 demo 数据段（46 HTML / 44 唯一 sitemap URL，列出泄漏 URL 与四种清理方式）；CI 段改为“`jekyll-build.yml` 由 `workflow_run` 触发，push 到 main 不会跑构建检查”；§6 样式排障改为 `assets/minimal/style.css`
+  - 工作区 `AGENTS.md`：exclude 说明补入 `AGENTS.md` 及“模板说明非本组规范”；当前状态补本轮条目与“demo 页待下架”待办
+- **验证**：`bundle exec jekyll build --strict_front_matter` 通过（3.2s）；`_site` 中已无 `AGENTS.md`/`MAINTENANCE.md`/`WORKLOG.md`；`_site/404.html` 为 `lang="zh-CN"`、仅引用 `assets/minimal/style.css`、标题“页面不存在 · Wu-Lab”；本地 serve 下 `/`、`/404.html`、`/research/`、`/publications/`、`/people/`、`/join/`、CSS 均 200；sitemap 仍为 46 条 / 44 唯一（demo 页未处理，符合本轮范围）
+- **遗留**
+  - 旧模板 demo 页/集合条目仍在线上且被 sitemap 收录（假论文、模板博客、`/cv/`、`/terms/`、`/portfolio/`、`/talks/`、`/teaching/`、`/files/paper*.pdf` 等），待用户同意后整体下架
+  - 缺内容来源登记表（事实→来源→核对日期）与站点泄漏检查脚本；方向标签三套键（`research.id` / `publications.tags` / `publications.html` 写死的选项）未统一
+  - “方案 B”在 MAINTENANCE 与 `_design/方案构想-v2` 中含义不同；`_design/minimal/README.md` 仍描述已删除的岗位/FAQ，`tokens.md` 配色与线上 `#660874` 不一致
+  - 本轮本地构建需 `danger-full-access`（workspace-write 下读不到 `C:\Ruby33-x64`），文档尚未记录该降级路径；push 时 Clash Verge 未启动，推送待用户开启代理后执行

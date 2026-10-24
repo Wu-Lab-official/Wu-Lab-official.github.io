@@ -191,6 +191,7 @@ exclude:
   - package.json*
   - Rakefile
   - README
+  - AGENTS.md
   - MAINTENANCE.md
   - WORKLOG.md
   - tmp
