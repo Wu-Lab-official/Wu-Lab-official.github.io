@@ -68,5 +68,5 @@
   - 论文页：去掉“15 篇代表性工作”，计数改为“N 条”
   - 新增 `scripts/publish.ps1`：构建 → add → commit → 代理 push
   - `MAINTENANCE.md` 增加 §0.2 项目性质/现状、§0.3 内容真实性规则、§0.4 一键发布；`README.md` 增加项目状态
-- **验证**：`bundle exec jekyll build --strict_front_matter` 通过；5 页本地 200
+- **验证**：`bundle exec jekyll build --strict_front_matter` 通过；5 页本地 200；`scripts/publish.ps1` 实测完成 build → commit → push（提交 `072c64a`）；线上 `/join/` 和 `/publications/` 已更新
 - **遗留**：成员名单、照片、论文 DOI/PDF、招生细节需 PI 提供；未确认的信息继续留空，不补
