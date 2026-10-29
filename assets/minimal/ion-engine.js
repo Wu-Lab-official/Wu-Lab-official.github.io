@@ -791,11 +791,13 @@
 
       for (var s = 0; s < sources.length; s++) {
         var src = sources[s];
-        if (src.intensity <= 0.01) continue;
+        /* 按可见亮度扣掉黑位：光越暗，吸引力越接近 0，避免余辉拖住粒子 */
+        if (src.intensity <= 0.10) continue;
+        var vis = (src.intensity - 0.10) / 0.90;
         var dx = src.x - p.x, dy = src.y - p.y;
         var d = Math.sqrt(dx * dx + dy * dy) || 1;
         if (d > 420) continue;
-        var w = src.intensity * Math.exp(-d / 220);
+        var w = vis * Math.exp(-d / 220);
         lfx += (dx / d) * w;
         lfy += (dy / d) * w;
       }

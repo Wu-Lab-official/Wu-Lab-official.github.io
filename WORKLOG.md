@@ -235,3 +235,20 @@
 - **验证**：`node --check` 通过；本地 1440×1000 预览 404 深色、研究页单螺旋、论文棒状、团队页 60 秒长跑未聚成单团、趋光 15/60 秒未密堆积；600×900 窄屏菜单按钮可见；`http://127.0.0.1:8766/` 目录路由全部 200；`check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`
 - **推送**：`cc17d41` 已推送（github.com:22 的 DNS 间歇失败，按 MAINTENANCE §0.6 临时改走 `ssh://git@ssh.github.com:443/...`，推完已恢复原 remote）；线上 `/`、`/research/`、`/publications/`、`/people/`、`/join/`、`/404.html` 均 200；404 为深色 `data-mode="photo"` 且含内联 `background:#0d0f13 !important`；线上 JS 已含 `wulab-bg-v3`、`p.phase`、趋光 `noiseStep(...,18,...)`；已用无头浏览器复查线上 404 深色与单螺旋
 - **遗留**：正常 Edge 的 0.5 秒变浅仍怀疑扩展（Immersive Translate / Tampermonkey 等；InPrivate 正常是强证据）；若 class/内联样式/observer 后仍复现，需要用户逐个禁用扩展定位
+
+## 2026-10-29 ｜ 会话 18：趋光吸引力余辉、上下文核对与仓库审查
+
+- **背景**：上下文压缩后核对仓库/线上状态；用户反馈趋光光源变暗后吸引力仍残留几秒，粒子停在已暗光源附近；要求维护文档并审查现有文件/资源。
+- **改动**
+  - `updatePhoto()`：光源吸引力改为按**可见亮度**计算：`vis = (intensity - 0.10) / 0.90`，`intensity <= 0.10` 时直接跳过；`w = vis * exp(-d/220)`。这样光越暗吸引力越接近 0，避免余辉继续拖住粒子；仍保持线性、与光照强度同步
+  - `README.md` 文档索引补 `TOOLBOOK.md`
+  - `TOOLBOOK.md` 更新最后更新日期；补“CC Safety Net 拦截 SSH 环境覆盖时，临时改 remote 走 `ssh.github.com:443`，推后恢复”的踩坑行
+- **审查**
+  - 工作区干净，最新提交 `d48c3fc`；压缩未造成文件丢失
+  - `check-site.ps1`：`PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`
+  - 构建后扫描 6 个 HTML：本地 `href/src` 无断链、同页锚点无缺失、CSS 无外部 `url()`；图片有 `alt`，profile 尺寸 400×599
+  - 线上额外路径 `/feed.xml`、`/redirects.json` 均 404（本地构建产物不会发布）；6 个页面此前线上均 200
+  - 删除根目录 `.sass-cache/`（97 个文件、约 3.25 MB 的旧构建缓存，已被 `.gitignore` 忽略）
+  - 未逐一重抓外链：Clash 7897 端口当前 closed；内部链接/资源检查不受影响
+- **验证**：`node --check` 通过；`check-site.ps1` PASS；构建产物无泄漏
+- **推送**：待提交/推送，完成后补线上复查

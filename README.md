@@ -25,6 +25,7 @@
 
 - [MAINTENANCE.md](MAINTENANCE.md)：怎么改、在哪改、发布、故障排查
 - [CONTENT.md](CONTENT.md)：内容来源登记、论文核对记录、待补清单
+- [TOOLBOOK.md](TOOLBOOK.md)：本机命令、沙箱/推送/代理踩坑
 - [WORKLOG.md](WORKLOG.md)：历次改动记录
 
 ## 本地预览与发布
