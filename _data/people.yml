@@ -1,0 +1,19 @@
+# 团队成员 / 校友（唯一数据源）
+# 页面会自动渲染；空数组时显示“待补充”。
+# 新增成员时复制下面注释里的字段，取消注释并填写即可。
+#
+# members:
+#   - name: 张三
+#     role: 博士研究生
+#     email: zhangsan@example.com
+#     photo: /assets/minimal/people/zhangsan.jpg
+#     note: 活性胶体与微纳机器人
+#
+# alumni:
+#   - name: 李四
+#     role: 硕士
+#     year: "2026"
+#     note: 现于某单位
+
+members: []
+alumni: []

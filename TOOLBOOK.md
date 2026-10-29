@@ -110,6 +110,8 @@ curl -s "https://api.github.com/repos/Wu-Lab-official/Wu-Lab-official.github.io/
 | 症状 | 原因 | 处理 |
 |---|---|---|
 | 改了页面但线上没变 | 没 push / push 到别的分支 / Pages 还在构建 | `git status -sb` 看 ahead；等 1–2 分钟；看仓库 Actions |
+| 移动端背景默认不动 | 系统“减少动态效果”或旧 `wulab-bg-paused-v2` 会话键 | 移动端忽略 `prefers-reduced-motion` 默认播放，暂停键升级为 v3；页脚按钮仍可手动暂停 |
+| 移动端按钮/菜单点不到 | 正文与 masthead 层叠顺序相同，菜单被盖住 | `.masthead` 保持 `z-index: 3`，高于 `main`/`.footer` 的 1 |
 | 页面 404 | 文件名、front matter `permalink`、被 exclude | 对照 `_site` 是否有对应文件 |
 | 删掉的页面本地还能访问 | Jekyll 3.10 不清理 `_site` | `bundle exec jekyll clean` 或 `check-site.ps1`（构建前删 `_site`）|
 | 新增 `.md` 莫名上了线 | 无 front matter 的 md 被当静态文件复制 | 加进 `_config.yml` exclude；跑 `check-site.ps1` |

@@ -52,6 +52,7 @@
 | `_pages/404.md` | 自定义 404 页 `/404.html`（极简布局）|
 | `_data/research.yml` | 5 个研究方向、问题、正文；`paper_ids` 引用论文 id |
 | `_data/publications.yml` | 代表性论文（**唯一数据源**：id/年份/作者/标题/期刊/卷页/tags/featured）|
+| `_data/people.yml` | 团队成员/校友（成员、校友数组；空数组显示“待补充”）|
 | `_data/news.yml` | 首页动态 |
 | `_data/navigation.yml` | 顶部导航（研究/论文/团队/加入我们）|
 | `assets/minimal/style.css` | 极简主题样式 + 背景层级 / 404 深色变量 |
@@ -63,6 +64,8 @@
 背景按页面 `bg_mode` 分模式：**同一模式**跨页面用 `sessionStorage` 续接粒子；**模式变化**（如首页 ion → 研究页 spiral）丢弃旧快照、重新初始化，避免把上一模式的分布硬套到新形状。404 固定 `photo + theme: dark`，是唯一的深色页面；移动菜单依赖 `.masthead { z-index: 3 }` 高于 `main`，否则下拉导航会被正文盖住。
 
 404 深色还把关键变量与 `background/color !important` 直接内联到 `<html>`/`<body>`，并用 `MutationObserver` 重刷，防止浏览器扩展删主题。改深色配色时三处要同步：`style.css` 的 `html[data-theme="dark"], html.theme-dark` 变量、`_layouts/minimal.html` 的内联变量、`ion-engine.js` 的 `DARK_VARS`。
+
+移动端背景默认播放；`prefers-reduced-motion` 只在非移动端自动暂停，移动端用户仍可用页脚“暂停背景动效”手动暂停。暂停偏好 key 为 `wulab-bg-paused-v3`，旧会话的暂停状态不会让移动端默认静止。
 
 旧 AcademicPages 渲染层（`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、`images/profile.png`、`_pages/about.md`、`_data/ui-text.yml|cv.json|authors.yml`）已于 2026-10-24 全部删除，**仓库里没有回退副本**。需要取回某个文件时从 git 历史取，不要凭记忆重建：
 
@@ -255,7 +258,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | 查某条事实的来源/核对日期 | `CONTENT.md`（来源登记 + 论文核对表 + 待补清单）|
 | 改首页“动态” | `_data/news.yml`（首页“最近更新”也取这里第一条）|
 | 改导航文字/顺序 | `_data/navigation.yml` |
-| 改团队页、导师简介、教育/工作经历 | `_pages/people.html` |
+| 改团队页、导师简介、教育/工作经历 | `_pages/people.html`；成员/校友数据改 `_data/people.yml` |
 | 改加入我们、岗位、FAQ | `_pages/join.html` |
 | 改 404 页 | `_pages/404.md`（需保留 `layout: minimal`，否则 404 会失去极简布局）|
 | 改某页背景模式 | 页面 front matter `bg_mode`：`ion`/`chase`/`rod`/`spiral`/`photo` |
@@ -277,7 +280,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 ├── _layouts/minimal.html  唯一布局
 ├── _includes/minimal/     head / header / footer / background
 ├── _pages/                home、research、publications、people、join、404
-├── _data/                 research / publications / news / navigation
+├── _data/                 research / publications / people / news / navigation
 ├── assets/minimal/        style.css、app.js、ion-engine.js、profile.jpg、favicon.svg
 ├── favicon.ico            根图标（响应浏览器默认的 /favicon.ico）
 ├── files/                 论文 PDF（当前为空）

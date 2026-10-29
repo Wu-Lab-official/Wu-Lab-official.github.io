@@ -15,7 +15,7 @@
 
   var TAU = Math.PI * 2;
   var STORE_KEY = "wulab-bg-v3";
-  var PAUSE_KEY = "wulab-bg-paused-v2";
+  var PAUSE_KEY = "wulab-bg-paused-v3";
   var MAX_SOURCES = 3;
 
   var LIGHT = {
@@ -1362,6 +1362,7 @@
 
   function setPaused(paused, remember) {
     state.paused = !!paused;
+    bg.setAttribute("data-bg-paused", state.paused ? "1" : "0");
     if (state.paused) {
       stop();
       draw();
@@ -1392,6 +1393,7 @@
 
   function init() {
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    var isMobile = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 720;
     state.reduced = reduce.matches;
 
     var remembered = null;
@@ -1400,7 +1402,11 @@
     } catch (err) {
       remembered = null;
     }
-    state.paused = reduce.matches || remembered === "1";
+
+    /* 移动端默认播放：系统“减少动态效果”或旧会话暂停不再让画面静止；
+       只有用户主动暂停（v3 键）才保持暂停。 */
+    state.paused = remembered === "1" || (reduce.matches && !isMobile);
+    bg.setAttribute("data-bg-paused", state.paused ? "1" : "0");
 
     state.w = window.innerWidth;
     state.h = window.innerHeight;

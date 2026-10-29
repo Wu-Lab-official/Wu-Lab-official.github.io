@@ -760,6 +760,55 @@ input[type="search"] {
   font-weight: 600;
 }
 
+.member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px 28px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.member-card {
+  min-width: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+}
+
+.member-card h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.member-photo {
+  width: 100%;
+  max-width: 160px;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.member-role,
+.member-year {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.member-contact {
+  margin: 0 0 4px;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.member-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
 .people-block > p {
   max-width: 38em;
   margin: 0 0 18px;
@@ -904,8 +953,18 @@ details p {
 
   .masthead-inner {
     align-items: center;
+    gap: 12px;
     padding-top: 20px;
     padding-bottom: 16px;
+  }
+
+  .brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .brand-en {
+    overflow-wrap: anywhere;
   }
 
   .nav {
@@ -934,6 +993,8 @@ details p {
 
   .nav-toggle {
     display: block;
+    flex: 0 0 auto;
+    white-space: nowrap;
     padding: 7px 12px;
     border: 1px solid var(--rule);
     background: none;

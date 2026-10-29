@@ -9,7 +9,7 @@ description: "吴昌进课题组导师简介与团队成员信息。"
 <header class="page-head shell">
   <p class="kicker">团队</p>
   <h1>课题组</h1>
-  <p class="lede">课题组 2026 年组建，成员名单待补充。当前页面提供导师信息。</p>
+  <p class="lede">课题组 2026 年组建，当前页面提供导师信息与团队概况。</p>
 </header>
 
 <section class="pi shell" aria-labelledby="pi-name">
@@ -59,11 +59,40 @@ description: "吴昌进课题组导师简介与团队成员信息。"
 
 <section class="people-block shell">
   <h2>成员</h2>
+  {% assign members = site.data.people.members %}
+  {% if members and members.size > 0 %}
+  <ul class="member-grid">
+    {% for member in members %}
+    <li class="member-card">
+      {% if member.photo %}<img class="member-photo" src="{{ member.photo | relative_url }}" alt="{{ member.name }}" loading="lazy">{% endif %}
+      <h3>{{ member.name }}</h3>
+      {% if member.role %}<p class="member-role">{{ member.role }}</p>{% endif %}
+      {% if member.email %}<p class="member-contact"><a href="mailto:{{ member.email }}">{{ member.email }}</a></p>{% endif %}
+      {% if member.note %}<p class="member-note">{{ member.note }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
   <p>成员名单待补充。</p>
+  {% endif %}
   <p class="more"><a href="{{ '/join/' | relative_url }}">了解招收方向</a></p>
 </section>
 
 <section class="people-block shell">
   <h2>校友</h2>
+  {% assign alumni = site.data.people.alumni %}
+  {% if alumni and alumni.size > 0 %}
+  <ul class="member-grid">
+    {% for member in alumni %}
+    <li class="member-card">
+      <h3>{{ member.name }}</h3>
+      {% if member.role %}<p class="member-role">{{ member.role }}</p>{% endif %}
+      {% if member.year %}<p class="member-year">{{ member.year }}</p>{% endif %}
+      {% if member.note %}<p class="member-note">{{ member.note }}</p>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
   <p>校友信息待补充。</p>
+  {% endif %}
 </section>

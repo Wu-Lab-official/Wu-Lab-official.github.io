@@ -252,3 +252,24 @@
   - 未逐一重抓外链：Clash 7897 端口当前 closed；内部链接/资源检查不受影响
 - **验证**：`node --check` 通过；`check-site.ps1` PASS；构建产物无泄漏
 - **推送**：`aee41d7` 已推送（仍走 `ssh.github.com:443` 临时 remote，推完已恢复）；线上 6 个页面均 200，线上 JS 已含 `var vis = (src.intensity - 0.10) / 0.90`，404 仍为深色且内联背景生效；无头浏览器复查线上 404 正常
+
+## 2026-10-29 ｜ 会话 19：移动端默认播放、团队数据化与可扩展性收尾
+
+- **背景**：PC 正常，但移动端背景默认暂停、需手动点播放；用户要求继续维护文档、保证交接，并让后续填成员/论文/方向更方便。
+- **移动端**
+  - 暂停键升级为 `wulab-bg-paused-v3`，旧 `v2` 的暂停状态不再影响新会话
+  - 移动端（`pointer: coarse` 或宽度 <720）不再因 `prefers-reduced-motion` 自动暂停；桌面端仍尊重“减少动态效果”
+  - `bg` 增加 `data-bg-paused` 诊断属性；页脚按钮仍可手动暂停
+  - 390px 真机视口（CDP emulation）复核：菜单按钮在 x=318、宽 52，可点开；`nav` 打开后 z-index 30、覆盖正文，点击命中 NAV；另给品牌/按钮补 `flex` 防挤压规则，避免以后标题变长再次挤出
+- **可扩展性**
+  - 新增 `_data/people.yml`：`members`/`alumni` 数组，注释内含字段示例；`people.html` 改为循环渲染，空数组时保留“待补充”
+  - 增加 `.member-grid`/`.member-card`/`.member-photo` 等样式，后续加成员只改 YAML；照片约定放 `assets/minimal/people/`
+  - `README.md`、`MAINTENANCE.md` 的目录/数据表补 `people.yml`；MAINTENANCE 补移动端默认播放说明
+  - `TOOLBOOK.md` 补“移动端默认不动”“菜单点不到”两条症状
+- **验证**
+  - `node --check` 通过；`check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`
+  - 移动端 reduced-motion：`data-bg-paused="0"`；桌面 reduced-motion：`data-bg-paused="1"`
+  - 390px CDP 真机视口：菜单按钮 x=318、宽 52；点击后 `nav` 打开、z-index 30、覆盖正文；临时加入测试成员验证 `member-card` 循环后已恢复空数组
+  - 空 `people.yml` 渲染“成员名单待补充/校友信息待补充”；成员卡模板未加入虚构成员
+  - 未逐一重抓外链（Clash 7897 closed）；站内链接/锚点/资源继续由构建后脚本检查
+- **推送**：待提交/推送

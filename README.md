@@ -14,6 +14,7 @@
 | `_pages/` | 6 个页面（`home`、`research`、`publications`、`people`、`join`、`404`）|
 | `_data/research.yml` | 5 个研究方向；`paper_ids` 引用论文 |
 | `_data/publications.yml` | 代表性论文（唯一数据源）|
+| `_data/people.yml` | 团队成员/校友（空数组时页面显示“待补充”）|
 | `_data/news.yml` | 首页动态与“最近更新”日期 |
 | `_layouts/minimal.html`、`_includes/minimal/` | 极简主题骨架 |
 | `assets/minimal/` | 样式、脚本、照片、图标 |
