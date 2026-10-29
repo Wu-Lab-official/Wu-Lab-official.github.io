@@ -2,7 +2,7 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-10-24（第二轮：统一“旧模板已删除”口径、修正小节编号与交叉引用、补 §0.5 位置与 `check-docs.ps1`）
+> 本文档最后更新：2026-10-29（全站活性粒子背景：五模式、404 深色趋光、状态继承、光标互动）
 >
 > 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
 
@@ -42,7 +42,8 @@
 | `_layouts/minimal.html` | 全站骨架：head、导航、页脚、脚本 |
 | `_includes/minimal/head.html` | title / description / canonical / CSS |
 | `_includes/minimal/header.html` | 品牌、中文导航、移动菜单 |
-| `_includes/minimal/footer.html` | 版权、邮箱、导师主页 |
+| `_includes/minimal/footer.html` | 版权、邮箱、导师主页、暂停背景按钮 |
+| `_includes/minimal/background.html` | 全站固定背景层（canvas + `data-mode`）|
 | `_pages/home.html` | 首页 `/` |
 | `_pages/research.html` | 研究方向 `/research/` |
 | `_pages/publications.html` | 论文 `/publications/` |
@@ -53,8 +54,9 @@
 | `_data/publications.yml` | 代表性论文（**唯一数据源**：id/年份/作者/标题/期刊/卷页/tags/featured）|
 | `_data/news.yml` | 首页动态 |
 | `_data/navigation.yml` | 顶部导航（研究/论文/团队/加入我们）|
-| `assets/minimal/style.css` | 极简主题样式 |
+| `assets/minimal/style.css` | 极简主题样式 + 背景层级 / 404 深色变量 |
 | `assets/minimal/app.js` | 移动菜单、论文筛选/搜索、复制引用 |
+| `assets/minimal/ion-engine.js` | 背景引擎：离子云/追逐/棒状/螺旋/趋光、状态继承、光标互动 |
 | `assets/minimal/profile.jpg` | 团队页照片（原始 2:3，不裁切）|
 | `assets/minimal/favicon.svg` | 站点图标 |
 
@@ -251,7 +253,11 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | 改导航文字/顺序 | `_data/navigation.yml` |
 | 改团队页、导师简介、教育/工作经历 | `_pages/people.html` |
 | 改加入我们、岗位、FAQ | `_pages/join.html` |
-| 改 404 页 | `_pages/404.md`（需保留 `layout: minimal`，否则会退回旧模板样式）|
+| 改 404 页 | `_pages/404.md`（需保留 `layout: minimal`，否则 404 会失去极简布局）|
+| 改某页背景模式 | 页面 front matter `bg_mode`：`ion`/`chase`/`rod`/`spiral`/`photo` |
+| 改背景总开关/默认模式 | `_config.yml` 的 `background` / `background_default` |
+| 改 404 深色趋光 | `_pages/404.md` 的 `theme: dark` + `bg_mode: photo` |
+| 改背景引擎/光标互动 | `assets/minimal/ion-engine.js` |
 | 改全局颜色/字号/间距 | `assets/minimal/style.css` |
 | 改论文筛选/搜索/复制引用 | `assets/minimal/app.js` |
 | 换团队页照片 | 替换 `assets/minimal/profile.jpg`（保持 2:3，不要裁切）|
@@ -265,10 +271,10 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 ```
 ├── _config.yml            全站配置（title/description/url、author、include: _pages、exclude、plugins）
 ├── _layouts/minimal.html  唯一布局
-├── _includes/minimal/     head / header / footer
+├── _includes/minimal/     head / header / footer / background
 ├── _pages/                home、research、publications、people、join、404
 ├── _data/                 research / publications / news / navigation
-├── assets/minimal/        style.css、app.js、profile.jpg、favicon.svg
+├── assets/minimal/        style.css、app.js、ion-engine.js、profile.jpg、favicon.svg
 ├── favicon.ico            根图标（响应浏览器默认的 /favicon.ico）
 ├── files/                 论文 PDF（当前为空）
 ├── scripts/               publish.ps1、check-site.ps1、check-docs.ps1

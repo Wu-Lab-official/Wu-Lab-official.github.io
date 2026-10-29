@@ -1165,9 +1165,142 @@ details p {
   }
 }
 
+/* ---------- animated background ---------- */
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background: transparent;
+}
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg::before,
+.bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.bg::before {
+  z-index: 0;
+  background:
+    radial-gradient(58% 52% at 12% 8%, rgba(244, 236, 246, 0.55), transparent 70%),
+    radial-gradient(46% 42% at 88% 92%, rgba(232, 236, 242, 0.45), transparent 70%);
+}
+
+.bg::after {
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(252, 252, 250, 0.42), transparent 22%, transparent 78%, rgba(252, 252, 250, 0.38)),
+    radial-gradient(80% 60% at 50% 45%, transparent 55%, rgba(252, 252, 250, 0.28) 100%);
+}
+
+#bg-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.bg.is-ready #bg-canvas {
+  opacity: 1;
+}
+
+.masthead,
+main,
+.footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- 404 dark theme ---------- */
+
+html[data-theme="dark"] {
+  --paper: #0d0f13;
+  --ink: #f2efe8;
+  --muted: #a9a49a;
+  --rule: #2a2d34;
+  --accent: #d8b6e8;
+  --accent-soft: #2a1f31;
+  background: var(--paper);
+}
+
+html[data-theme="dark"] .bg::before {
+  background:
+    radial-gradient(55% 48% at 74% 22%, rgba(76, 66, 104, 0.30), transparent 70%),
+    radial-gradient(50% 45% at 18% 84%, rgba(28, 42, 66, 0.30), transparent 70%);
+}
+
+html[data-theme="dark"] .bg::after {
+  background:
+    linear-gradient(180deg, rgba(13, 15, 19, 0.48), transparent 24%, transparent 76%, rgba(13, 15, 19, 0.52)),
+    radial-gradient(80% 60% at 50% 45%, transparent 50%, rgba(13, 15, 19, 0.36) 100%);
+}
+
+html[data-theme="dark"] .lede {
+  color: #d6d1c8;
+}
+
+html[data-theme="dark"] .pub-table tr:hover td {
+  background: #181b21;
+}
+
+html[data-theme="dark"] ::selection {
+  background: #3a2b42;
+}
+
+/* ---------- motion toggle ---------- */
+
+.motion-toggle {
+  padding: 0 0 1px;
+  border: 0;
+  border-bottom: 1px dotted var(--rule);
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.motion-toggle:hover {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+
+.motion-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #bg-canvas {
+    transition: none;
+  }
+}
+
 @media print {
+  html,
   body {
     background: #fff;
+  }
+
+  .bg,
+  .motion-toggle {
+    display: none !important;
   }
 
   .nav,

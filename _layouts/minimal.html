@@ -1,15 +1,18 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN"{% if page.theme == 'dark' %} data-theme="dark"{% endif %}>
 <head>
 {% include minimal/head.html %}
 </head>
 <body>
+  {% if site.background %}{% include minimal/background.html %}{% endif %}
   <a class="skip" href="#main">跳到正文</a>
   {% include minimal/header.html %}
   <main id="main">
     {{ content }}
   </main>
   {% include minimal/footer.html %}
+  <noscript><style>.motion-toggle{display:none !important}</style></noscript>
   <script src="{{ '/assets/minimal/app.js' | relative_url }}"></script>
+  {% if site.background %}<script src="{{ '/assets/minimal/ion-engine.js' | relative_url }}" defer></script>{% endif %}
 </body>
 </html>

@@ -193,3 +193,18 @@
 - **遗留**
   - `AGENTS.md` 与 MAINTENANCE §0.5 的“收尾自查”仍各存一份清单：工作区文件不在仓库内，clone 后需要它，暂不合并；两处都加了第 5 项，靠 check-docs 兜住结构漂移
   - WORKLOG 历史条目里的旧口径（如会话 5“旧布局保留作回退”）按“只加不改”保留，不作追溯修改
+
+## 2026-10-29 ｜ 会话 15：全站活性粒子背景（五模式 + 状态继承 + 光标互动）
+
+- **背景**：用户确认全站上背景，要求离子云、扁平螺旋粒子（旋转速度与移速成正比，外径不超过棒状 2 倍）、全互追球形粒子、404 深色趋光，并修复切模式/页面/参数时粒子重置的问题；光标互动全部加上。
+- **改动**
+  - 新增 `_includes/minimal/background.html`：固定 canvas 层，`data-mode` 由页面 front matter 提供
+  - 新增 `assets/minimal/ion-engine.js`：单粒子集 + 五模式；离子云流场、全互追 boids+追逐、主动棒、扁平螺旋（自旋相位）、动态光源趋光；OU 布朗噪声、跨页面 `sessionStorage` 快照、暂停/减少动态/隐藏标签页
+  - 光标互动：离子云弱排斥、追逐悬停诱饵+点击放饵、趋光手持光源+点击钉灯、棒状/螺旋按住拖动搅拌；忽略链接/按钮/选区
+  - `_layouts/minimal.html`：按 `site.background` 输出背景层、加载引擎，保留 `app.js`；`<html data-theme>` 支持 404 深色
+  - `_pages/*`：首页 `ion`、研究方向 `spiral`、论文 `rod`、团队 `chase`、加入 `ion`；404 `photo` + `theme: dark`
+  - `_config.yml`：`background: true`、`background_default: ion` 总开关
+  - `style.css`：背景层级、404 深色变量、暂停按钮、打印隐藏；`footer.html` 加暂停按钮
+  - `MAINTENANCE.md`：§0.1/§3.1/§3.2 补背景文件与页面配置入口
+- **验证**：`check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`；本地 1440×1000 截图检查首页/研究方向/论文/团队/加入/404；600×900 检查首页与 404 窄屏；404 光源首帧带亮度（`life` 从 1.1–1.8 秒开始），粒子透明度按原型基线回调
+- **遗留**：新版无头 Edge（`--headless=new`）的 rAF 调度不稳定，静态截图可验证构图，但动画帧需用旧 headless 或真实浏览器；跨页面续接与触控互动仍建议在真实浏览器验收；团队成员页全互追的聚散程度可能需要按真机再调参

@@ -1,4 +1,4 @@
 <footer class="footer shell">
   <p>© {{ site.time | date: "%Y" }} 吴昌进课题组 · 清华大学深圳国际研究生院</p>
-  <p><a href="mailto:wuchangjin@sz.tsinghua.edu.cn">wuchangjin@sz.tsinghua.edu.cn</a>　<a href="https://www.sigs.tsinghua.edu.cn/wcj/main.htm" rel="noopener">导师主页</a></p>
+  <p><a href="mailto:wuchangjin@sz.tsinghua.edu.cn">wuchangjin@sz.tsinghua.edu.cn</a>　<a href="https://www.sigs.tsinghua.edu.cn/wcj/main.htm" rel="noopener">导师主页</a>{% if site.background %}　<button class="motion-toggle" type="button" data-bg-pause aria-pressed="false">暂停背景动效</button>{% endif %}</p>
 </footer>

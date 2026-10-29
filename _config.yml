@@ -9,6 +9,10 @@ repository  : "Wu-Lab-official/Wu-Lab-official.github.io"
 lang        : zh-CN
 timezone    : Asia/Shanghai
 
+# 背景动效总开关；false 时 layout 不输出 canvas，也不加载引擎
+background         : true
+background_default : ion
+
 author:
   name     : "吴昌进 Changjin Wu"
   bio      : "清华大学深圳国际研究生院 助理教授、特别研究员、博士生导师"
