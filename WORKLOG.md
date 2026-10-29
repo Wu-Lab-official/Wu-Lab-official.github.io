@@ -314,7 +314,7 @@
   - `check-site.ps1`（完整构建）→ `PASS: 6 html, 5 sitemap urls, no leaks`，构建 0.223s
   - `node --check assets/minimal/ion-engine.js` 通过
   - 反向测试：临时数据触发 duplicate id / unknown tag / missing paper / missing photo 四条 FAIL，符合预期；临时 `_pages/zz-test.md` 被自动识别为 `missing page`/`missing sitemap url`，确认白名单确实从 `_pages` 推导；两处临时文件已删除
-- **推送**：待推送（本轮完成后提交）
+- **推送**：`c5ae1ed` 已推送；本轮只动文档/校验脚本，线上页面内容未变
 - **遗留/取舍**
   - 白名单改为信任 `_pages`：以后有意新增页面不会再被脚本拦住（这是“方便加页面”的代价）；`_pages` 之外的残留 HTML、模板 demo 文本仍会被抓
   - `check-data.ps1` 用行级解析，假设 `id`/`tags`/`doi`/`paper_ids` 保持当前单行写法；改成多行 YAML 结构时要同步脚本
