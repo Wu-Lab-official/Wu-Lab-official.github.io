@@ -70,7 +70,7 @@ description: "清华大学深圳国际研究生院吴昌进课题组，研究活
     <p>按年份排列，可按方向筛选。</p>
   </div>
   <div class="section-body">
-    {% assign featured = site.data.publications | where: "featured", true %}
+    {% assign featured = site.data.publications | where: "featured", true | sort: "year" | reverse %}
     <ul class="pub-preview">
       {% for pub in featured %}
       <li>

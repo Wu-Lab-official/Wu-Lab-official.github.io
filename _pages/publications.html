@@ -12,11 +12,12 @@ description: "吴昌进课题组代表性论文列表，可按年份、研究方
   <p class="lede">代表性论文，按年份排列。可按年份与研究方向筛选，或直接搜索标题、作者、期刊。DOI 与 PDF 链接待补。</p>
 </header>
 
+{% assign pubs = site.data.publications | sort: "year" | reverse %}
 <div class="shell">
   <div class="filters">
     <div class="filter-group" role="group" aria-label="按年份筛选">
       <button class="filter is-active" type="button" data-filter="year" data-value="all" aria-pressed="true">全部</button>
-      {% assign years = site.data.publications | map: "year" | uniq %}
+      {% assign years = pubs | map: "year" | uniq %}
       {% for year in years %}
       <button class="filter" type="button" data-filter="year" data-value="{{ year }}" aria-pressed="false">{{ year }}</button>
       {% endfor %}
@@ -37,7 +38,7 @@ description: "吴昌进课题组代表性论文列表，可按年份、研究方
       <input id="search" type="search" placeholder="标题、作者、期刊" autocomplete="off">
     </label>
 
-    <p class="result-count" id="result-count" aria-live="polite">{{ site.data.publications | size }} 条</p>
+    <p class="result-count" id="result-count" aria-live="polite">{{ pubs | size }} 条</p>
   </div>
 
   <table class="pub-table">
@@ -52,11 +53,19 @@ description: "吴昌进课题组代表性论文列表，可按年份、研究方
       </tr>
     </thead>
     <tbody>
-      {% for pub in site.data.publications %}
+      {% for pub in pubs %}
       <tr data-year="{{ pub.year }}" data-tags="{{ pub.tags }}">
         <td class="col-year">{{ pub.year }}</td>
         <td class="col-authors">{{ pub.authors | escape }}</td>
-        <td class="col-title"><span class="title">{{ pub.title | escape }}</span></td>
+        <td class="col-title">
+          <span class="title">{{ pub.title | escape }}</span>
+          {% if pub.doi or pub.pdf %}
+          <span class="pub-links">
+            {% if pub.doi %}<a href="{% if pub.doi contains '://' %}{{ pub.doi }}{% else %}https://doi.org/{{ pub.doi }}{% endif %}" rel="noopener">DOI</a>{% endif %}
+            {% if pub.pdf %}<a href="{% if pub.pdf contains '://' %}{{ pub.pdf }}{% else %}{{ pub.pdf | relative_url }}{% endif %}" rel="noopener">PDF</a>{% endif %}
+          </span>
+          {% endif %}
+        </td>
         <td class="col-journal">{{ pub.journal | escape }}</td>
         <td class="col-pages">{{ pub.pages | escape }}</td>
         <td class="col-cite"><button class="cite" type="button" aria-label="复制该条目的文本引用">引用</button></td>

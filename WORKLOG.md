@@ -273,3 +273,20 @@
   - 空 `people.yml` 渲染“成员名单待补充/校友信息待补充”；成员卡模板未加入虚构成员
   - 未逐一重抓外链（Clash 7897 closed）；站内链接/锚点/资源继续由构建后脚本检查
 - **推送**：`fd39d57` 已推送（`ssh.github.com:443` 临时 remote，推完已恢复）；线上 6 个页面均 200；线上 JS 含 `wulab-bg-paused-v3` 与 `isMobile` 分支；移动端 reduced-motion 实测 `data-bg-paused="0"`，桌面端 reduced-motion 实测 `"1"`；线上 people 空数据仍显示“成员名单待补充”，成员卡模板不渲染假数据
+
+## 2026-10-29 ｜ 会话 20：代表性论文扩展性
+
+- **背景**：用户确认移动端默认播放已修好；追问代表性论文后续增补是否方便。
+- **论文页改动**
+  - `_pages/publications.html` 顶部统一 `sort: "year" | reverse`，表格行与年份按钮都由排序后的数组生成；新增论文放 YAML 任意位置都会自动排到正确年份，不再依赖手工顺序
+  - 年份按钮从排序后的 `pubs` 里 `map/uniq`，保证倒序
+  - 首页 `featured` 也按年份倒序，避免以后新增推荐论文排到末尾
+  - 新增可选 `doi`/`pdf` 字段：有值时标题下渲染 DOI/PDF 链接；无值时完全不影响现有 15 条
+  - `style.css` 补 `.pub-links`
+  - `publications.yml` 顶部补完整字段说明（id/year/authors/title/journal/pages/tags/featured/doi/pdf，及“任意位置、自动倒序”）
+  - `MAINTENANCE.md` §3.1 补论文条目规则和可选字段说明
+- **验证**
+  - 临时加入一条 2026 测试论文：表格首行为 2026，DOI/PDF 链接正确渲染；验证后已删除并重新构建，最终恢复 15 条真实论文
+  - `check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`
+  - 最终构建表格顺序为 2025→2024→…→2017；无测试数据残留
+- **推送**：待提交/推送

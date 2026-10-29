@@ -650,6 +650,18 @@ input[type="search"] {
   line-height: 1.55;
 }
 
+.pub-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.pub-links a {
+  color: var(--accent);
+}
+
 .pub-table .col-journal {
   width: 160px;
   font-family: var(--serif);

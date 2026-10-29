@@ -1,6 +1,18 @@
 # 代表性论文
 # 元数据以 Crossref 记录为准（2026-10-24 逐条核对，DOI 见 CONTENT.md）
-# id 供 research.yml 的 paper_ids 引用；tags 对应 research.yml 的 id（可空格分隔多个）
+#
+# 字段：
+#   id       唯一标识；research.yml 的 paper_ids 引用它
+#   year     四位数字年份
+#   authors  作者串；引用按钮直接使用
+#   title    标题
+#   journal  期刊
+#   pages    卷页/文章号
+#   tags     对应 research.yml 的 id，可空格分隔多个
+#   featured true 时进首页“代表性论文”；默认 false
+#   doi/pdf  可选；有值时论文页标题下显示链接
+#
+# 新增论文可放在任意位置；页面按 year 自动倒序，年份按钮自动生成。
 - id: jacs-ferroic-swarm
   year: 2025
   authors: "Wu C., Huang Y., Zeng B., et al."

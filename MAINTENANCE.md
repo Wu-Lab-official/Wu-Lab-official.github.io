@@ -271,6 +271,8 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | 改全站 title/description/url | `_config.yml` |
 | 发布前完整性检查 | `scripts/check-site.ps1`（构建 + 7 项站点断言，并调用 `scripts/check-docs.ps1` 做文档断言）|
 
+论文条目只改 `_data/publications.yml`：`id` 唯一、`year` 四位数字、`tags` 必须匹配 `research.yml` 的 id（可空格分隔多个）、`featured` 控制首页推荐；`doi`/`pdf` 可选，有值时标题下自动显示链接。论文可放在 YAML 任意位置，页面和年份按钮都会按 `year` 自动倒序，不需要手工排年份。
+
 ### 3.2 目录结构（当前，只有一个主题）
 
 旧 AcademicPages 渲染层已于 2026-10-24 全部删除：`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、旧头像与图标、`_pages/about.md`、`_data/ui-text.yml`、`_data/cv.json`、`_data/authors.yml`、模板 CI 工作流。当前不再保留回退副本；取回方法与依赖提醒见 §0.1。
