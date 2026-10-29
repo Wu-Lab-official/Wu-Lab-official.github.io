@@ -178,9 +178,9 @@
 
   function targetCount() {
     var factor = mode === "chase" ? 1.05 : mode === "rod" ? 0.70 : mode === "spiral" ? 0.64 : 1;
-    var n = Math.round((state.w * state.h / 14000) * factor);
+    var n = Math.round((state.w * state.h / 16000) * factor);
     var max = state.w < 720 ? 58 : 115;
-    var min = state.w < 720 ? 28 : 34;
+    var min = state.w < 720 ? 28 : 30;
     return Math.max(min, Math.min(max, n));
   }
 
@@ -221,15 +221,15 @@
     if (mode === "ion") {
       if (fresh || !p.speed) p.speed = rand(9, 21);
       p.speed = clamp(p.speed, 8, 22);
-      p.size = fresh ? rand(1.6, 4.0) : clamp(p.size || 2.7, 1.5, 4.0);
-      p.alpha = fresh ? rand(0.18, 0.38) : clamp(p.alpha || 0.27, 0.17, 0.40);
+      p.size = fresh ? rand(1.3, 3.4) : clamp(p.size || 2.2, 1.2, 3.4);
+      p.alpha = fresh ? rand(0.13, 0.28) : clamp(p.alpha || 0.20, 0.12, 0.30);
       p.vx = Math.cos(p.heading) * p.speed;
       p.vy = Math.sin(p.heading) * p.speed;
     } else if (mode === "chase") {
       if (fresh || !p.speed) p.speed = rand(18, 28);
       p.speed = clamp(p.speed, 18, 30);
-      p.size = fresh ? rand(2.5, 4.2) : clamp(p.size || 3, 2.3, 4.2);
-      p.alpha = fresh ? rand(0.24, 0.42) : clamp(p.alpha || 0.30, 0.22, 0.44);
+      p.size = fresh ? rand(2.2, 3.8) : clamp(p.size || 2.7, 2.0, 3.8);
+      p.alpha = fresh ? rand(0.18, 0.32) : clamp(p.alpha || 0.24, 0.16, 0.34);
       p.vx = Math.cos(p.heading) * p.speed;
       p.vy = Math.sin(p.heading) * p.speed;
       p.target = -1;
@@ -240,7 +240,7 @@
       p.len = fresh ? rand(18, 28) : clamp(p.len || 23, 16, 30);
       p.wid = fresh ? rand(2.2, 3.2) : clamp(p.wid || 2.6, 2.0, 3.4);
       p.size = p.wid;
-      p.alpha = fresh ? rand(0.22, 0.35) : clamp(p.alpha || 0.27, 0.20, 0.37);
+      p.alpha = fresh ? rand(0.18, 0.30) : clamp(p.alpha || 0.22, 0.16, 0.32);
     } else if (mode === "spiral") {
       if (fresh || !p.speed) p.speed = rand(18, 25);
       p.speed = clamp(p.speed, 16, 28);
@@ -248,14 +248,14 @@
       p.wid = fresh ? 1.8 : clamp(p.wid || 1.8, 1.4, 2.0);
       p.turns = fresh ? rand(2.1, 2.5) : clamp(p.turns || 2.3, 2, 2.6);
       p.size = p.len;
-      p.alpha = fresh ? rand(0.24, 0.38) : clamp(p.alpha || 0.29, 0.20, 0.40);
+      p.alpha = fresh ? rand(0.20, 0.32) : clamp(p.alpha || 0.25, 0.18, 0.34);
       p.omega = 0.38 * p.speed;
       if (fresh) p.spin = Math.random() * TAU;
     } else if (mode === "photo") {
       if (fresh || !p.speed) p.speed = rand(22, 32);
       p.speed = clamp(p.speed, 20, 34);
       p.size = fresh ? rand(1.4, 2.6) : clamp(p.size || 2, 1.2, 2.7);
-      p.alpha = fresh ? rand(0.55, 0.85) : clamp(p.alpha || 0.65, 0.5, 0.88);
+      p.alpha = fresh ? rand(0.42, 0.68) : clamp(p.alpha || 0.54, 0.38, 0.70);
       p.vx = Math.cos(p.heading) * p.speed;
       p.vy = Math.sin(p.heading) * p.speed;
     }
@@ -764,8 +764,8 @@
       ctx.lineTo(p.x, p.y);
       ctx.stroke();
 
-      drawSprite(spr, p.x, p.y, 20 + p.size * 14, p.alpha * 0.85);
-      drawDot(p.x, p.y, p.size, c, p.alpha * 1.55);
+      drawSprite(spr, p.x, p.y, 13 + p.size * 8, p.alpha * 0.58);
+      drawDot(p.x, p.y, p.size, c, p.alpha * 1.45);
     }
   }
 
@@ -781,8 +781,8 @@
       var p = parts[i];
       var c = palette.colors[p.color];
       var spr = glowSprites[p.color];
-      drawSprite(spr, p.x, p.y, 15 + p.size * 7, p.alpha * 0.70);
-      drawDot(p.x, p.y, p.size, c, p.alpha * 1.45);
+      drawSprite(spr, p.x, p.y, 12 + p.size * 6, p.alpha * 0.58);
+      drawDot(p.x, p.y, p.size, c, p.alpha * 1.40);
     }
   }
 
@@ -853,9 +853,9 @@
   }
 
   function drawLight(x, y, radius, inten) {
-    drawSprite(lightSprite, x, y, radius * 2.4, 0.9 * inten);
-    drawSprite(lightSprite, x, y, radius * 1.2, 0.55 * inten);
-    drawDot(x, y, 11, palette.light, 0.8 * inten);
+    drawSprite(lightSprite, x, y, radius * 1.65, 0.55 * inten);
+    drawSprite(lightSprite, x, y, radius * 0.85, 0.30 * inten);
+    drawDot(x, y, 8, palette.light, 0.65 * inten);
   }
 
   function drawPhoto() {
@@ -883,8 +883,8 @@
       ctx.lineTo(p.x, p.y);
       ctx.stroke();
 
-      drawSprite(spr, p.x, p.y, 10 + p.size * 7, p.alpha * 0.55);
-      drawDot(p.x, p.y, p.size, c, p.alpha);
+      drawSprite(spr, p.x, p.y, 10 + p.size * 6, p.alpha * 0.50);
+      drawDot(p.x, p.y, p.size, c, p.alpha * 1.2);
     }
   }
 

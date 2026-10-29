@@ -206,5 +206,5 @@
   - `_config.yml`：`background: true`、`background_default: ion` 总开关
   - `style.css`：背景层级、404 深色变量、暂停按钮、打印隐藏；`footer.html` 加暂停按钮
   - `MAINTENANCE.md`：§0.1/§3.1/§3.2 补背景文件与页面配置入口
-- **验证**：`check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`；本地 1440×1000 截图检查首页/研究方向/论文/团队/加入/404；600×900 检查首页与 404 窄屏；404 光源首帧带亮度（`life` 从 1.1–1.8 秒开始），粒子透明度按原型基线回调
+- **验证**：`check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`；本地 1440×1000 截图检查首页/研究方向/论文/团队/加入/404；600×900 检查首页与 404 窄屏；404 光源首帧带亮度（`life` 从 1.1–1.8 秒开始），粒子透明度按原型基线回调；线上首屏截图后又把光晕半径回调一档，避免 404 光源压住正文链接
 - **遗留**：新版无头 Edge（`--headless=new`）的 rAF 调度不稳定，静态截图可验证构图，但动画帧需用旧 headless 或真实浏览器；跨页面续接与触控互动仍建议在真实浏览器验收；团队成员页全互追的聚散程度可能需要按真机再调参
