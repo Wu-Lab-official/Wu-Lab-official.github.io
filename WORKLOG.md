@@ -272,4 +272,4 @@
   - 390px CDP 真机视口：菜单按钮 x=318、宽 52；点击后 `nav` 打开、z-index 30、覆盖正文；临时加入测试成员验证 `member-card` 循环后已恢复空数组
   - 空 `people.yml` 渲染“成员名单待补充/校友信息待补充”；成员卡模板未加入虚构成员
   - 未逐一重抓外链（Clash 7897 closed）；站内链接/锚点/资源继续由构建后脚本检查
-- **推送**：待提交/推送
+- **推送**：`fd39d57` 已推送（`ssh.github.com:443` 临时 remote，推完已恢复）；线上 6 个页面均 200；线上 JS 含 `wulab-bg-paused-v3` 与 `isMobile` 分支；移动端 reduced-motion 实测 `data-bg-paused="0"`，桌面端 reduced-motion 实测 `"1"`；线上 people 空数据仍显示“成员名单待补充”，成员卡模板不渲染假数据
