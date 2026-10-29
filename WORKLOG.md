@@ -233,5 +233,5 @@
   - 暂停偏好从 `localStorage` 改为 `sessionStorage`（新 key），避免旧暂停状态让移动端默认不动画；`prefers-reduced-motion` 仍尊重
   - 去掉 `#bg-canvas` 的 opacity 过渡，避免截图/部分浏览器在过渡刚开始时把整个 canvas 显示成近透明
 - **验证**：`node --check` 通过；本地 1440×1000 预览 404 深色、研究页单螺旋、论文棒状、团队页 60 秒长跑未聚成单团、趋光 15/60 秒未密堆积；600×900 窄屏菜单按钮可见；`http://127.0.0.1:8766/` 目录路由全部 200；`check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`
-- **推送**：用户确认后提交并推送；线上复查结果见下一条追记
+- **推送**：`cc17d41` 已推送（github.com:22 的 DNS 间歇失败，按 MAINTENANCE §0.6 临时改走 `ssh://git@ssh.github.com:443/...`，推完已恢复原 remote）；线上 `/`、`/research/`、`/publications/`、`/people/`、`/join/`、`/404.html` 均 200；404 为深色 `data-mode="photo"` 且含内联 `background:#0d0f13 !important`；线上 JS 已含 `wulab-bg-v3`、`p.phase`、趋光 `noiseStep(...,18,...)`；已用无头浏览器复查线上 404 深色与单螺旋
 - **遗留**：正常 Edge 的 0.5 秒变浅仍怀疑扩展（Immersive Translate / Tampermonkey 等；InPrivate 正常是强证据）；若 class/内联样式/observer 后仍复现，需要用户逐个禁用扩展定位
