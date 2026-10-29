@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN"{% if page.theme == 'dark' %} data-theme="dark"{% endif %}>
+<html lang="zh-CN"{% if page.theme == 'dark' %} class="theme-dark" data-theme="dark" style="--paper:#0d0f13;--ink:#f2efe8;--muted:#a9a49a;--rule:#2a2d34;--accent:#d8b6e8;--accent-soft:#2a1f31;--lede:#d6d1c8;--bg-a:rgba(76,66,104,.30);--bg-b:rgba(28,42,66,.30);--bg-fade-a:rgba(13,15,19,.48);--bg-fade-b:rgba(13,15,19,.52);--bg-vignette:rgba(13,15,19,.36);background:#0d0f13 !important;color:#f2efe8 !important;color-scheme:dark"{% endif %}>
 <head>
 {% include minimal/head.html %}
 </head>
-<body>
+<body{% if page.theme == 'dark' %} style="background:transparent !important;color:var(--ink) !important"{% endif %}>
   {% if site.background %}{% include minimal/background.html %}{% endif %}
   <a class="skip" href="#main">跳到正文</a>
   {% include minimal/header.html %}

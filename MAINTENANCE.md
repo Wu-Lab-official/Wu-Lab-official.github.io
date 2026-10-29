@@ -57,10 +57,10 @@
 | `assets/minimal/style.css` | 极简主题样式 + 背景层级 / 404 深色变量 |
 | `assets/minimal/app.js` | 移动菜单、论文筛选/搜索、复制引用 |
 | `assets/minimal/ion-engine.js` | 背景引擎：离子云/追逐/棒状/螺旋/趋光、状态继承、光标互动 |
-
-背景按页面 `bg_mode` 分模式：**同一模式**跨页面用 `sessionStorage` 续接粒子；**模式变化**（如首页 ion → 研究页 spiral）丢弃旧快照、重新初始化，避免把上一模式的分布硬套到新形状。404 固定 `photo + theme: dark`，是唯一的深色页面。
 | `assets/minimal/profile.jpg` | 团队页照片（原始 2:3，不裁切）|
 | `assets/minimal/favicon.svg` | 站点图标 |
+
+背景按页面 `bg_mode` 分模式：**同一模式**跨页面用 `sessionStorage` 续接粒子；**模式变化**（如首页 ion → 研究页 spiral）丢弃旧快照、重新初始化，避免把上一模式的分布硬套到新形状。404 固定 `photo + theme: dark`，是唯一的深色页面；移动菜单依赖 `.masthead { z-index: 3 }` 高于 `main`，否则下拉导航会被正文盖住。
 
 旧 AcademicPages 渲染层（`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、`images/profile.png`、`_pages/about.md`、`_data/ui-text.yml|cv.json|authors.yml`）已于 2026-10-24 全部删除，**仓库里没有回退副本**。需要取回某个文件时从 git 历史取，不要凭记忆重建：
 

@@ -5,6 +5,12 @@
   --rule: #d8d8d2;
   --accent: #660874;
   --accent-soft: #f4ecf6;
+  --lede: #2a2b2d;
+  --bg-a: rgba(244, 236, 246, 0.55);
+  --bg-b: rgba(232, 236, 242, 0.45);
+  --bg-fade-a: rgba(252, 252, 250, 0.42);
+  --bg-fade-b: rgba(252, 252, 250, 0.38);
+  --bg-vignette: rgba(252, 252, 250, 0.28);
   --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   --max: 1120px;
@@ -179,7 +185,7 @@ a:hover {
 .lede {
   max-width: 34em;
   margin: 0 0 28px;
-  color: #2a2b2d;
+  color: var(--lede);
   font-size: 19px;
   line-height: 1.8;
 }
@@ -1194,15 +1200,15 @@ body {
 .bg::before {
   z-index: 0;
   background:
-    radial-gradient(58% 52% at 12% 8%, rgba(244, 236, 246, 0.55), transparent 70%),
-    radial-gradient(46% 42% at 88% 92%, rgba(232, 236, 242, 0.45), transparent 70%);
+    radial-gradient(58% 52% at 12% 8%, var(--bg-a), transparent 70%),
+    radial-gradient(46% 42% at 88% 92%, var(--bg-b), transparent 70%);
 }
 
 .bg::after {
   z-index: 0;
   background:
-    linear-gradient(180deg, rgba(252, 252, 250, 0.42), transparent 22%, transparent 78%, rgba(252, 252, 250, 0.38)),
-    radial-gradient(80% 60% at 50% 45%, transparent 55%, rgba(252, 252, 250, 0.28) 100%);
+    linear-gradient(180deg, var(--bg-fade-a), transparent 22%, transparent 78%, var(--bg-fade-b)),
+    radial-gradient(80% 60% at 50% 45%, transparent 55%, var(--bg-vignette) 100%);
 }
 
 #bg-canvas {
@@ -1212,15 +1218,18 @@ body {
   display: block;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  transition: opacity 900ms ease;
+  opacity: 1;
 }
 
 .bg.is-ready #bg-canvas {
   opacity: 1;
 }
 
-.masthead,
+.masthead {
+  position: relative;
+  z-index: 3;
+}
+
 main,
 .footer {
   position: relative;
@@ -1229,37 +1238,49 @@ main,
 
 /* ---------- 404 dark theme ---------- */
 
-html[data-theme="dark"] {
+html[data-theme="dark"],
+html.theme-dark {
   --paper: #0d0f13;
   --ink: #f2efe8;
   --muted: #a9a49a;
   --rule: #2a2d34;
   --accent: #d8b6e8;
   --accent-soft: #2a1f31;
+  --lede: #d6d1c8;
+  --bg-a: rgba(76, 66, 104, 0.30);
+  --bg-b: rgba(28, 42, 66, 0.30);
+  --bg-fade-a: rgba(13, 15, 19, 0.48);
+  --bg-fade-b: rgba(13, 15, 19, 0.52);
+  --bg-vignette: rgba(13, 15, 19, 0.36);
   background: var(--paper);
 }
 
-html[data-theme="dark"] .bg::before {
+html[data-theme="dark"] .bg::before,
+html.theme-dark .bg::before {
   background:
     radial-gradient(55% 48% at 74% 22%, rgba(76, 66, 104, 0.30), transparent 70%),
     radial-gradient(50% 45% at 18% 84%, rgba(28, 42, 66, 0.30), transparent 70%);
 }
 
-html[data-theme="dark"] .bg::after {
+html[data-theme="dark"] .bg::after,
+html.theme-dark .bg::after {
   background:
     linear-gradient(180deg, rgba(13, 15, 19, 0.48), transparent 24%, transparent 76%, rgba(13, 15, 19, 0.52)),
     radial-gradient(80% 60% at 50% 45%, transparent 50%, rgba(13, 15, 19, 0.36) 100%);
 }
 
-html[data-theme="dark"] .lede {
+html[data-theme="dark"] .lede,
+html.theme-dark .lede {
   color: #d6d1c8;
 }
 
-html[data-theme="dark"] .pub-table tr:hover td {
+html[data-theme="dark"] .pub-table tr:hover td,
+html.theme-dark .pub-table tr:hover td {
   background: #181b21;
 }
 
-html[data-theme="dark"] ::selection {
+html[data-theme="dark"] ::selection,
+html.theme-dark ::selection {
   background: #3a2b42;
 }
 

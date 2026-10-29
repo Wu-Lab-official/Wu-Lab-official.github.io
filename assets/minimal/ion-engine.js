@@ -14,8 +14,8 @@
   var root = document.documentElement;
 
   var TAU = Math.PI * 2;
-  var STORE_KEY = "wulab-bg-v2";
-  var PAUSE_KEY = "wulab-bg-paused";
+  var STORE_KEY = "wulab-bg-v3";
+  var PAUSE_KEY = "wulab-bg-paused-v2";
   var MAX_SOURCES = 3;
 
   var LIGHT = {
@@ -32,13 +32,53 @@
 
   var MODES = { ion: 1, chase: 1, rod: 1, spiral: 1, photo: 1 };
 
+  function isDarkRoot() {
+    return root.getAttribute("data-theme") === "dark" || root.classList.contains("theme-dark");
+  }
+
   var mode = bg.getAttribute("data-mode") || "ion";
   if (!MODES[mode]) mode = "ion";
 
-  var theme = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+  var theme = isDarkRoot() ? "dark" : "light";
   if (mode === "photo") {
     theme = "dark";
     root.setAttribute("data-theme", "dark");
+    root.classList.add("theme-dark");
+  }
+  var pageDark = theme === "dark";
+  var darkGuardBusy = false;
+
+  var DARK_VARS = {
+    "--paper": "#0d0f13",
+    "--ink": "#f2efe8",
+    "--muted": "#a9a49a",
+    "--rule": "#2a2d34",
+    "--accent": "#d8b6e8",
+    "--accent-soft": "#2a1f31",
+    "--lede": "#d6d1c8",
+    "--bg-a": "rgba(76,66,104,.30)",
+    "--bg-b": "rgba(28,42,66,.30)",
+    "--bg-fade-a": "rgba(13,15,19,.48)",
+    "--bg-fade-b": "rgba(13,15,19,.52)",
+    "--bg-vignette": "rgba(13,15,19,.36)"
+  };
+
+  function applyDarkHardening() {
+    if (!pageDark) return;
+    root.classList.add("theme-dark");
+    root.setAttribute("data-theme", "dark");
+    for (var key in DARK_VARS) {
+      if (Object.prototype.hasOwnProperty.call(DARK_VARS, key)) {
+        root.style.setProperty(key, DARK_VARS[key]);
+      }
+    }
+    root.style.setProperty("background", "#0d0f13", "important");
+    root.style.setProperty("color", "#f2efe8", "important");
+    root.style.setProperty("color-scheme", "dark");
+    if (document.body) {
+      document.body.style.setProperty("background", "transparent", "important");
+      document.body.style.setProperty("color", "var(--ink)", "important");
+    }
   }
 
   var state = {
@@ -65,6 +105,34 @@
   var glowSprites = [];
   var lightSprite = null;
   var gaussSpare = null;
+
+  function spiralSpawnPosition() {
+    var vw = state.w || window.innerWidth || 1;
+    var vh = state.h || window.innerHeight || 1;
+    var minDist = Math.min(vw, vh) * 0.08;
+    var bestX = Math.random() * vw;
+    var bestY = Math.random() * vh;
+    var bestD = -1;
+
+    for (var attempt = 0; attempt < 30; attempt++) {
+      var x = Math.random() * vw;
+      var y = Math.random() * vh;
+      var min = Infinity;
+      for (var i = 0; i < parts.length; i++) {
+        var dx = x - parts[i].x;
+        var dy = y - parts[i].y;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if (d < min) min = d;
+      }
+      if (min === Infinity || min > minDist) return { x: x, y: y };
+      if (min > bestD) {
+        bestD = min;
+        bestX = x;
+        bestY = y;
+      }
+    }
+    return { x: bestX, y: bestY };
+  }
 
   var pointer = {
     x: 0,
@@ -185,9 +253,20 @@
   }
 
   function spawnParticle() {
+    var vw = state.w || window.innerWidth || 1;
+    var vh = state.h || window.innerHeight || 1;
+    var px, py;
+    if (mode === "spiral") {
+      var spot = spiralSpawnPosition();
+      px = spot.x;
+      py = spot.y;
+    } else {
+      px = Math.random() * vw;
+      py = Math.random() * vh;
+    }
     var p = {
-      x: Math.random() * state.w,
-      y: Math.random() * state.h,
+      x: px,
+      y: py,
       vx: 0,
       vy: 0,
       heading: Math.random() * TAU,
@@ -196,6 +275,7 @@
       alpha: 0.14,
       color: pickColor(),
       spin: Math.random() * TAU,
+      phase: Math.random() * TAU,
       omega: 0,
       len: 22,
       wid: 2,
@@ -215,6 +295,7 @@
 
   function prepareParticle(p, fresh) {
     if (p.color == null) p.color = pickColor();
+    if (p.phase == null) p.phase = Math.random() * TAU;
     if (p.pointerAffinity == null) p.pointerAffinity = rand(0.45, 1);
     if (p.lightAffinity == null) p.lightAffinity = rand(0.7, 1.3);
 
@@ -242,13 +323,13 @@
       p.size = p.wid;
       p.alpha = fresh ? rand(0.18, 0.30) : clamp(p.alpha || 0.22, 0.16, 0.32);
     } else if (mode === "spiral") {
-      if (fresh || !p.speed) p.speed = rand(18, 25);
-      p.speed = clamp(p.speed, 16, 28);
+      if (fresh || !p.speed) p.speed = rand(26, 34);
+      p.speed = clamp(p.speed, 24, 36);
       p.len = fresh ? rand(28, 38) : clamp(p.len || 32, 26, 40);
       p.wid = fresh ? 1.8 : clamp(p.wid || 1.8, 1.4, 2.0);
       p.turns = fresh ? rand(2.1, 2.5) : clamp(p.turns || 2.3, 2, 2.6);
       p.size = p.len;
-      p.alpha = fresh ? rand(0.24, 0.36) : clamp(p.alpha || 0.30, 0.22, 0.38);
+      p.alpha = fresh ? rand(0.28, 0.40) : clamp(p.alpha || 0.34, 0.24, 0.42);
       p.omega = 0.38 * p.speed;
       if (fresh) p.spin = Math.random() * TAU;
     } else if (mode === "photo") {
@@ -284,17 +365,19 @@
       x: x,
       y: y,
       radius: pinned ? rand(190, 240) : rand(180, 240),
-      life: rand(1.1, 1.8),
-      maxLife: pinned ? rand(9, 12) : rand(10, 15),
+      life: rand(2.0, 3.0),
+      maxLife: pinned ? rand(12, 16) : rand(13, 18),
       base: pinned ? 1.05 : rand(0.80, 1.0),
       intensity: pinned ? 0.95 : 0.82,
       pinned: !!pinned,
       phase: Math.random() * TAU
     };
-    sources.push(s);
-    if (sources.length > MAX_SOURCES) {
+    if (sources.length >= MAX_SOURCES) {
       var oldest = sources[0];
-      oldest.life = Math.max(oldest.life, oldest.maxLife - 0.6);
+      oldest.life = Math.min(oldest.life, oldest.maxLife * 0.82);
+    }
+    sources.push(s);
+    if (sources.length > MAX_SOURCES + 1) {
       sources.shift();
     }
     return s;
@@ -324,7 +407,7 @@
       var s = sources[i];
       s.life += dt;
       var u = s.life / s.maxLife;
-      var env = u < 0.14 ? u / 0.14 : u > 0.82 ? Math.max(0, (1 - u) / 0.18) : 1;
+      var env = u < 0.28 ? u / 0.28 : u > 0.82 ? Math.max(0, (1 - u) / 0.18) : 1;
       s.intensity = s.base * env;
       s.x += Math.sin(state.t * 0.00018 + s.phase) * 2.4 * dt;
       s.y += Math.cos(state.t * 0.00015 + s.phase * 1.3) * 1.8 * dt;
@@ -497,7 +580,11 @@
       if (d2 < 240 * 240 && d2 > 100) options.push(j);
     }
     if (options.length) p.target = options[Math.floor(Math.random() * options.length)];
-    else p.target = Math.floor(Math.random() * parts.length);
+    else {
+      do {
+        p.target = Math.floor(Math.random() * parts.length);
+      } while (parts.length > 1 && p.target === i);
+    }
     p.targetTimer = rand(2, 4);
   }
 
@@ -506,6 +593,7 @@
 
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i];
+
       var sepX = 0, sepY = 0;
       var aliX = 0, aliY = 0;
       var cohX = 0, cohY = 0;
@@ -536,12 +624,22 @@
         var cdx = cohX / cnt - p.x;
         var cdy = cohY / cnt - p.y;
         var cd = Math.sqrt(cdx * cdx + cdy * cdy) || 1;
-        ax += (cdx / cd) * 0.30;
-        ay += (cdy / cd) * 0.30;
+        ax += (cdx / cd) * 0.18;
+        ay += (cdy / cd) * 0.18;
 
         var am = Math.sqrt(aliX * aliX + aliY * aliY) || 1;
         ax += (aliX / am) * 0.62;
         ay += (aliY / am) * 0.62;
+      }
+
+      if (cnt > 8) {
+        var crowdX = p.x - cohX / cnt;
+        var crowdY = p.y - cohY / cnt;
+        var crowdD = Math.sqrt(crowdX * crowdX + crowdY * crowdY) || 1;
+        var crowd = Math.min(4, cnt - 8) * 0.35;
+        ax += (crowdX / crowdD) * crowd;
+        ay += (crowdY / crowdD) * crowd;
+        p.tumble = Math.min(p.tumble, 0.25);
       }
 
       if (p.target < 0 || p.target >= parts.length || p.targetTimer <= 0) {
@@ -590,7 +688,7 @@
       ax += (-sdy / sd) * 0.10;
       ay += (sdx / sd) * 0.10;
 
-      var vmax = 26 * (1 - 0.22 * Math.min(1, cnt / 10));
+      var vmax = 26 * (1 + 0.10 * Math.min(1, cnt / 10));
       p.vx += ax * 60 * dt;
       p.vy += ay * 60 * dt;
       var sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
@@ -624,6 +722,8 @@
       var p = parts[i];
       var s2 = 0, c2 = 0, cnt = 0;
       var sepX = 0, sepY = 0;
+      var attrX = 0, attrY = 0;
+      var sepR = spiral ? 32 : 21;
 
       for (var j = 0; j < parts.length; j++) {
         if (i === j) continue;
@@ -635,19 +735,31 @@
           c2 += Math.cos(2 * q.heading);
           cnt++;
         }
-        if (d2 < 21 * 21 && d2 > 0.01) {
+        if (d2 < sepR * sepR && d2 > 0.01) {
           var d = Math.sqrt(d2);
           sepX -= dx / d;
           sepY -= dy / d;
         }
+        if (!spiral && d2 < 100 * 100 && d2 > 30 * 30) {
+          var ad = Math.sqrt(d2);
+          attrX += dx / ad;
+          attrY += dy / ad;
+        }
       }
 
       if (cnt > 2) {
-        p.heading = lerpAngle(p.heading, 0.5 * Math.atan2(s2, c2), 0.018);
+        p.heading = lerpAngle(p.heading, 0.5 * Math.atan2(s2, c2), spiral ? 0.045 : 0.018);
       }
-      p.heading += Math.sqrt(2 * 0.14 * dt) * gauss();
+      if (spiral) {
+        p.heading = lerpAngle(
+          p.heading,
+          -0.35 + 0.05 * Math.sin(state.t * 0.0002 + p.phase),
+          0.012
+        );
+      }
+      p.heading += Math.sqrt(2 * (spiral ? 0.05 : 0.14) * dt) * gauss();
       p.heading += p.noiseA * dt;
-      p.noiseA = p.noiseA * Math.exp(-dt / 0.8) + 0.7 * Math.sqrt(dt) * gauss();
+      p.noiseA = p.noiseA * Math.exp(-dt / 0.8) + (spiral ? 0.22 : 0.7) * Math.sqrt(dt) * gauss();
 
       if (pointer.down && pointer.strength > 0.03) {
         var pdx = p.x - pointer.sx, pdy = p.y - pointer.sy;
@@ -657,11 +769,11 @@
         }
       }
 
-      noiseStep(p, dt, 3, 1.0);
+      noiseStep(p, dt, spiral ? 1.2 : 3, 1.0);
       p.vx = Math.cos(p.heading) * p.speed + p.noiseX;
       p.vy = Math.sin(p.heading) * p.speed + p.noiseY;
-      p.x += (p.vx + sepX * 26) * dt;
-      p.y += (p.vy + sepY * 26) * dt;
+      p.x += (p.vx + sepX * 26 + attrX * 2.75) * dt;
+      p.y += (p.vy + sepY * 26 + attrY * 2.75) * dt;
 
       if (spiral) {
         p.spin += p.omega * dt;
@@ -674,41 +786,54 @@
   function updatePhoto(dt) {
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i];
-      var fx = 0, fy = 0;
+      var lfx = 0, lfy = 0;
+      var rfx = 0, rfy = 0;
 
       for (var s = 0; s < sources.length; s++) {
         var src = sources[s];
         if (src.intensity <= 0.01) continue;
         var dx = src.x - p.x, dy = src.y - p.y;
         var d = Math.sqrt(dx * dx + dy * dy) || 1;
+        if (d > 420) continue;
         var w = src.intensity * Math.exp(-d / 220);
-        fx += (dx / d) * w;
-        fy += (dy / d) * w;
-        if (d < 48) {
-          fx -= (dx / d) * (1 - d / 48) * 1.6;
-          fy -= (dy / d) * (1 - d / 48) * 1.6;
+        lfx += (dx / d) * w;
+        lfy += (dy / d) * w;
+      }
+
+      /* 粒子间短程排斥：成对累加，不在归一化里与光源力混在一起 */
+      for (var j = 0; j < parts.length; j++) {
+        if (j === i) continue;
+        var q = parts[j];
+        var rdx = p.x - q.x, rdy = p.y - q.y;
+        var rd2 = rdx * rdx + rdy * rdy;
+        if (rd2 < 26 * 26 && rd2 > 0.01) {
+          var rd = Math.sqrt(rd2);
+          var rf = (1 - rd / 26) * 1.05;
+          rfx += (rdx / rd) * rf;
+          rfy += (rdy / rd) * rf;
         }
       }
 
-      var mag = Math.sqrt(fx * fx + fy * fy);
-      if (mag > 0.001) {
-        p.vx += (fx / mag) * 70 * dt;
-        p.vy += (fy / mag) * 70 * dt;
+      var lm = Math.sqrt(lfx * lfx + lfy * lfy);
+      if (lm > 0.001) {
+        p.vx += (lfx / lm) * 70 * dt;
+        p.vy += (lfy / lm) * 70 * dt;
       }
+      p.vx += rfx * 55 * dt;
+      p.vy += rfy * 55 * dt;
 
-      noiseStep(p, dt, 5, 1.2);
-      p.vx += p.noiseX * dt * 0.4;
-      p.vy += p.noiseY * dt * 0.4;
+      /* 布朗扰动：OU 速度噪声，避免斥力/引力平衡后压成密堆 */
+      noiseStep(p, dt, 18, 0.6);
 
       var sp = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-      var vmax = 42;
+      var vmax = 48;
       if (sp > vmax) {
         p.vx = (p.vx / sp) * vmax;
         p.vy = (p.vy / sp) * vmax;
       }
 
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
+      p.x += (p.vx + p.noiseX * 0.80) * dt;
+      p.y += (p.vy + p.noiseY * 0.80) * dt;
       p.heading = Math.atan2(p.vy, p.vx);
       wrap(p, 40);
     }
@@ -816,43 +941,46 @@
       var p = parts[i];
       var c = palette.colors[p.color];
       var L = p.len;
-      var amp = Math.max(4, p.wid * 2.8);
+      var amp = Math.max(4.5, p.wid * 3.0);
       var turns = p.turns;
-      var steps = Math.max(8, Math.round(L / 3.2));
 
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.heading);
       ctx.lineCap = "round";
 
-      /* 侧视 DNA：两条反向正弦链 + 碱基对横档 */
-      for (var r = 0; r <= steps; r++) {
-        var u = r / steps;
-        var x = -L / 2 + L * u;
-        var ang = u * turns * TAU + p.spin;
-        var y = Math.sin(ang) * amp;
-        var depth = Math.cos(ang);
-        ctx.strokeStyle = rgba(c, p.alpha * (0.24 + 0.14 * Math.abs(depth)));
-        ctx.lineWidth = 0.85;
-        ctx.beginPath();
-        ctx.moveTo(x, -y);
-        ctx.lineTo(x, y);
-        ctx.stroke();
+      /* 侧视单螺旋：一条正弦链，绕长轴自旋 */
+      ctx.strokeStyle = rgba(c, p.alpha * 0.14);
+      ctx.lineWidth = 7;
+      ctx.beginPath();
+      for (var k = 0; k <= 48; k++) {
+        var t = k / 48;
+        var x = -L / 2 + L * t;
+        var y = Math.sin(t * turns * TAU + p.spin) * amp;
+        if (k === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       }
+      ctx.stroke();
 
-      for (var strand = -1; strand <= 1; strand += 2) {
-        ctx.beginPath();
-        for (var k = 0; k <= 48; k++) {
-          var t = k / 48;
-          var sx = -L / 2 + L * t;
-          var sa = t * turns * TAU + p.spin;
-          var sy = strand * Math.sin(sa) * amp;
-          if (k === 0) ctx.moveTo(sx, sy);
-          else ctx.lineTo(sx, sy);
+      ctx.strokeStyle = rgba(c, p.alpha);
+      ctx.lineWidth = 2.6;
+      ctx.beginPath();
+      for (k = 0; k <= 48; k++) {
+        t = k / 48;
+        x = -L / 2 + L * t;
+        y = Math.sin(t * turns * TAU + p.spin) * amp;
+        if (k === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      for (k = 2; k <= 46; k += 3) {
+        t = k / 48;
+        x = -L / 2 + L * t;
+        var sa = t * turns * TAU + p.spin;
+        if (Math.cos(sa) > 0.35) {
+          drawDot(x, Math.sin(sa) * amp, 0.9, c, p.alpha * 0.55);
         }
-        ctx.strokeStyle = rgba(c, p.alpha * (strand === 1 ? 1 : 0.68));
-        ctx.lineWidth = strand === 1 ? 2.1 : 1.6;
-        ctx.stroke();
       }
 
       ctx.restore();
@@ -862,7 +990,8 @@
   function drawLight(x, y, radius, inten) {
     drawSprite(lightSprite, x, y, radius * 1.65, 0.55 * inten);
     drawSprite(lightSprite, x, y, radius * 0.85, 0.30 * inten);
-    drawDot(x, y, 8, palette.light, 0.65 * inten);
+    drawSprite(lightSprite, x, y, radius * 0.38, 0.50 * inten);
+    drawSprite(lightSprite, x, y, radius * 0.16, 0.42 * inten);
   }
 
   function drawPhoto() {
@@ -966,7 +1095,7 @@
   /* ---------------- 尺寸 / 主题 / 模式 ---------------- */
 
   function applyTheme() {
-    state.theme = root.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    state.theme = pageDark || isDarkRoot() ? "dark" : "light";
     if (state.mode === "photo") state.theme = "dark";
     buildSprites();
   }
@@ -1028,7 +1157,10 @@
 
     if (nextMode === "photo") {
       state.theme = "dark";
+      pageDark = true;
       root.setAttribute("data-theme", "dark");
+      root.classList.add("theme-dark");
+      applyDarkHardening();
     }
     applyTheme();
 
@@ -1158,6 +1290,7 @@
         alpha: d.alpha || 0.14,
         color: d.color || 0,
         spin: d.spin || 0,
+        phase: d.phase || Math.random() * TAU,
         omega: d.omega || 0,
         len: d.len || 22,
         wid: d.wid || 2,
@@ -1196,6 +1329,22 @@
       };
     });
 
+    if (state.mode === "spiral") {
+      var minX = state.w, maxX = 0, minY = state.h, maxY = 0;
+      for (var k = 0; k < parts.length; k++) {
+        if (parts[k].x < minX) minX = parts[k].x;
+        if (parts[k].x > maxX) maxX = parts[k].x;
+        if (parts[k].y < minY) minY = parts[k].y;
+        if (parts[k].y > maxY) maxY = parts[k].y;
+      }
+      if (maxX - minX < state.w * 0.2 && maxY - minY < state.h * 0.2) {
+        parts = [];
+        sources = [];
+        baits = [];
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -1221,7 +1370,7 @@
     syncPauseButtons();
     if (remember) {
       try {
-        localStorage.setItem(PAUSE_KEY, state.paused ? "1" : "0");
+        sessionStorage.setItem(PAUSE_KEY, state.paused ? "1" : "0");
       } catch (err) {
         /* ignore */
       }
@@ -1245,7 +1394,7 @@
 
     var remembered = null;
     try {
-      remembered = localStorage.getItem(PAUSE_KEY);
+      remembered = sessionStorage.getItem(PAUSE_KEY);
     } catch (err) {
       remembered = null;
     }
@@ -1280,6 +1429,23 @@
     syncPauseButtons();
     bindPause();
     bindPointer();
+
+    /* 某些 Edge 扩展会在页面加载后改动 html 属性/样式；404 深色页额外守住主题。 */
+    if (pageDark) {
+      applyDarkHardening();
+      try {
+        new MutationObserver(function () {
+          if (darkGuardBusy) return;
+          darkGuardBusy = true;
+          applyDarkHardening();
+          setTimeout(function () {
+            darkGuardBusy = false;
+          }, 50);
+        }).observe(root, { attributes: true, attributeFilter: ["data-theme", "class"] });
+      } catch (err) {
+        /* MutationObserver 不可用时依赖内联变量/样式 */
+      }
+    }
 
     if (reduce.addEventListener) {
       reduce.addEventListener("change", function (e) {
