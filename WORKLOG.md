@@ -289,4 +289,4 @@
   - 临时加入一条 2026 测试论文：表格首行为 2026，DOI/PDF 链接正确渲染；验证后已删除并重新构建，最终恢复 15 条真实论文
   - `check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`
   - 最终构建表格顺序为 2025→2024→…→2017；无测试数据残留
-- **推送**：待提交/推送
+- **推送**：`58b7935` 已推送（`ssh.github.com:443` 临时 remote，推完已恢复）；线上 `/publications/` 200，15 行、首行 2025、末行 2017，无测试数据；`.pub-links` 样式已上线
