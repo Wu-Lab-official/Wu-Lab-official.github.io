@@ -248,7 +248,7 @@
       p.wid = fresh ? 1.8 : clamp(p.wid || 1.8, 1.4, 2.0);
       p.turns = fresh ? rand(2.1, 2.5) : clamp(p.turns || 2.3, 2, 2.6);
       p.size = p.len;
-      p.alpha = fresh ? rand(0.20, 0.32) : clamp(p.alpha || 0.25, 0.18, 0.34);
+      p.alpha = fresh ? rand(0.28, 0.42) : clamp(p.alpha || 0.32, 0.24, 0.44);
       p.omega = 0.38 * p.speed;
       if (fresh) p.spin = Math.random() * TAU;
     } else if (mode === "photo") {
@@ -690,16 +690,6 @@
         }
       }
 
-      if (pointer.strength > 0 && pointer.allowed) {
-        var pdx = pointer.sx - p.x, pdy = pointer.sy - p.y;
-        var pd = Math.sqrt(pdx * pdx + pdy * pdy) || 1;
-        if (pd < 260) {
-          var pw = 0.55 * pointer.strength * Math.exp(-pd / 170) * p.lightAffinity;
-          fx += (pdx / pd) * pw;
-          fy += (pdy / pd) * pw;
-        }
-      }
-
       var mag = Math.sqrt(fx * fx + fy * fy);
       if (mag > 0.001) {
         p.vx += (fx / mag) * 70 * dt;
@@ -825,29 +815,46 @@
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i];
       var c = palette.colors[p.color];
-      var R = p.len / 2;
+      var L = p.len;
+      var amp = Math.max(4, p.wid * 2.8);
+      var turns = p.turns;
+      var steps = Math.max(8, Math.round(L / 3.2));
+
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.heading);
       ctx.lineCap = "round";
 
-      for (var ghost = 2; ghost >= 0; ghost--) {
-        var alpha = ghost === 0 ? p.alpha : p.alpha * 0.10;
-        var width = ghost === 0 ? 1.5 : 0.8;
-        ctx.strokeStyle = rgba(c, alpha);
-        ctx.lineWidth = width;
+      /* 侧视 DNA：两条反向正弦链 + 碱基对横档 */
+      for (var r = 0; r <= steps; r++) {
+        var u = r / steps;
+        var x = -L / 2 + L * u;
+        var ang = u * turns * TAU + p.spin;
+        var y = Math.sin(ang) * amp;
+        var depth = Math.cos(ang);
+        ctx.strokeStyle = rgba(c, p.alpha * (0.24 + 0.14 * Math.abs(depth)));
+        ctx.lineWidth = 0.85;
         ctx.beginPath();
-        for (var k = 0; k <= 42; k++) {
-          var u = k / 42;
-          var th = u * p.turns * TAU + p.spin - ghost * 0.30;
-          var r = R * u;
-          var x = Math.cos(th) * r;
-          var y = Math.sin(th) * r;
-          if (k === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
+        ctx.moveTo(x, -y);
+        ctx.lineTo(x, y);
         ctx.stroke();
       }
+
+      for (var strand = -1; strand <= 1; strand += 2) {
+        ctx.beginPath();
+        for (var k = 0; k <= 48; k++) {
+          var t = k / 48;
+          var sx = -L / 2 + L * t;
+          var sa = t * turns * TAU + p.spin;
+          var sy = strand * Math.sin(sa) * amp;
+          if (k === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
+        ctx.strokeStyle = rgba(c, p.alpha * (strand === 1 ? 1 : 0.68));
+        ctx.lineWidth = strand === 1 ? 2.1 : 1.6;
+        ctx.stroke();
+      }
+
       ctx.restore();
     }
   }
@@ -866,10 +873,6 @@
       if (!isFinite(inten)) inten = 0.8;
       inten = clamp(inten, 0, 1.2);
       drawLight(src.x, src.y, 230, inten);
-    }
-
-    if (pointer.strength > 0 && pointer.allowed) {
-      drawLight(pointer.sx, pointer.sy, 190, 0.9 * pointer.strength);
     }
 
     for (var i = 0; i < parts.length; i++) {
@@ -1012,9 +1015,16 @@
 
   function setMode(nextMode) {
     if (!MODES[nextMode]) return;
+    var changed = nextMode !== state.mode;
     mode = nextMode;
     state.mode = nextMode;
     bg.setAttribute("data-mode", nextMode);
+
+    if (changed) {
+      parts = [];
+      sources = [];
+      baits = [];
+    }
 
     if (nextMode === "photo") {
       state.theme = "dark";
@@ -1132,6 +1142,8 @@
 
     if (!data || data.v !== 2 || !data.parts || !data.parts.length) return false;
     if (Date.now() - data.saved > 30 * 60 * 1000) return false;
+    /* 模式变化时不继承上一模式的粒子分布，避免把螺旋/棒状排布硬套到另一种模式 */
+    if (data.mode !== state.mode) return false;
 
     state.t = data.t || 0;
     parts = data.parts.map(function (d) {
