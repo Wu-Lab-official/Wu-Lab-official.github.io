@@ -177,7 +177,7 @@
   /* ---------------- 粒子创建 / 模式准备 ---------------- */
 
   function targetCount() {
-    var factor = mode === "chase" ? 1.05 : mode === "rod" ? 0.70 : mode === "spiral" ? 0.64 : 1;
+    var factor = mode === "chase" ? 1.05 : mode === "rod" ? 0.70 : mode === "spiral" ? 0.50 : 1;
     var n = Math.round((state.w * state.h / 16000) * factor);
     var max = state.w < 720 ? 58 : 115;
     var min = state.w < 720 ? 28 : 30;
@@ -248,7 +248,7 @@
       p.wid = fresh ? 1.8 : clamp(p.wid || 1.8, 1.4, 2.0);
       p.turns = fresh ? rand(2.1, 2.5) : clamp(p.turns || 2.3, 2, 2.6);
       p.size = p.len;
-      p.alpha = fresh ? rand(0.28, 0.42) : clamp(p.alpha || 0.32, 0.24, 0.44);
+      p.alpha = fresh ? rand(0.24, 0.36) : clamp(p.alpha || 0.30, 0.22, 0.38);
       p.omega = 0.38 * p.speed;
       if (fresh) p.spin = Math.random() * TAU;
     } else if (mode === "photo") {
