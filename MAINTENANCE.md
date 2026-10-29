@@ -2,7 +2,7 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-10-29（全站活性粒子背景：五模式、404 深色趋光、状态继承、光标互动）
+> 本文档最后更新：2026-10-29（校准 CI/隐私表/目录；补背景引擎参数、新增页面清单与数据校验）
 >
 > 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
 
@@ -13,7 +13,7 @@
 | §0 | 基本信息、视觉层、填内容规则、发布脚本、文档方针、SSH、代理 |
 | §1 | 快速命令速查（构建 / 检查 / 推送 / 线上验证）|
 | §2 | 本机环境清单（换机重装）|
-| §3 | 目录结构：改哪个文件（含易踩的坑）|
+| §3 | 目录结构：改哪个文件、怎么加页面（含易踩的坑）|
 | §4 | 标准工作流程（SOP 六步）|
 | §5 | 已知冲突与坑（高频问题表）|
 | §6 | 故障排查 |
@@ -67,6 +67,22 @@
 
 移动端背景默认播放；`prefers-reduced-motion` 只在非移动端自动暂停，移动端用户仍可用页脚“暂停背景动效”手动暂停。暂停偏好 key 为 `wulab-bg-paused-v3`，旧会话的暂停状态不会让移动端默认静止。
 
+#### 背景引擎：调参前先看这里
+
+`assets/minimal/ion-engine.js` 是全站最复杂的文件（约 1,500 行）：一个固定 canvas、一批粒子、五种模式。
+
+| 模式 | 页面 | 行为 |
+|---|---|---|
+| `ion` | 首页、加入我们 | 离子云式流场，光标弱排斥 |
+| `chase` | 团队 | 全互追（boids + 追逐），悬停诱饵、点击放饵 |
+| `rod` | 论文 | 主动棒，按住拖动搅拌 |
+| `spiral` | 研究方向 | 侧视单螺旋，运动复用棒状 |
+| `photo` | 404 | 深色趋光，点击钉灯，自动光源 |
+
+状态键：`wulab-bg-v3`（跨页粒子快照）、`wulab-bg-paused-v3`（暂停偏好）。**模式变化时丢弃快照并重建**，同模式跨页续接。移动端默认播放，桌面端尊重 `prefers-reduced-motion`。
+
+可调参数集中在文件顶部和各 `update*` 函数：粒子数、速度区间、短程排斥半径与权重、光源吸引半径与可见亮度阈值、寿命/淡入比例、螺旋长度与方向场。改完先跑 `node --check assets/minimal/ion-engine.js`。深色三处要同步：`style.css` 的 `html[data-theme="dark"]` 变量、`_layouts/minimal.html` 的内联变量、`ion-engine.js` 的 `DARK_VARS`。
+
 旧 AcademicPages 渲染层（`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、`images/profile.png`、`_pages/about.md`、`_data/ui-text.yml|cv.json|authors.yml`）已于 2026-10-24 全部删除，**仓库里没有回退副本**。需要取回某个文件时从 git 历史取，不要凭记忆重建：
 
 ```bash
@@ -84,7 +100,7 @@ GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 
 
 - 这是课题组网站的**内部建设阶段**，还没有购买/绑定正式域名；线上地址是 GitHub Pages 组织站 `https://wu-lab-official.github.io/`，不是最终发布形态。
 - 旧个人站 `john-z39.github.io` 只作备份，不再作为本项目维护对象。
-- 当前状态：极简主题 5 个页面 + 404；模板示例内容已全部清理（sitemap 从 44 条降到 5 条）；15 条代表性论文已逐条用 Crossref 核对并修正；导师信息、研究方向、论文是真实内容；成员、照片、DOI/PDF、招生细节仍缺。
+- 当前状态：极简主题 5 个页面 + 404（页面数以 `check-site.ps1` 输出为准）；模板示例内容已全部清理；15 条代表性论文已逐条用 Crossref 核对并修正；导师信息、研究方向、论文是真实内容；成员、团队照片、DOI/PDF 值、招生细节仍缺（DOI/PDF 字段已支持，只缺值）。
 - 现有内容来源：`信息.txt`（PI 提供，在工作区根目录、不在仓库内）、清华 SIGS 官方导师主页、论文正式记录（Crossref）。**来源与核对日期登记在 `CONTENT.md`**，改内容前先查它。
 - 缺失内容统一写“待补充”或直接留空，**不要用示例、推测、行业惯例填充**。
 
@@ -155,7 +171,7 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly
 2. 改过事实/论文 → `CONTENT.md` 的表格与核对日期同步？
 3. 改了目录/流程/脚本参数 → 本文件 §3 对照表、§4 命令同步？
 4. 踩了新坑 → `TOOLBOOK.md` 的“症状→原因→处理”加行？
-5. 跑过 `scripts/check-site.ps1`（内含 `check-docs.ps1`，断言编号/§ 引用/表格/日期）？
+5. 跑过 `scripts/check-site.ps1`（内含 `check-docs.ps1` 与 `check-data.ps1`，断言文档结构、论文/方向引用）？
 
 原则：文档与改动同一个提交；页面数、sitemap 数等数字以 `scripts/check-site.ps1` 输出为准；不写“以后再补”，缺什么写进 `CONTENT.md` §4；每份文档头部保留“最后更新”。
 
@@ -221,7 +237,7 @@ export PATH="/c/Ruby33-x64/bin:$PATH"
 cd /d/wu-lab/John-z39.github.io
 bundle exec jekyll serve          # 预览 http://127.0.0.1:4000，Ctrl+C 停止
 bundle exec jekyll build --strict_front_matter   # 与 CI 相同参数的纯构建测试
-powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1   # 完整性检查：清 _site + 构建 + 7 项站点断言 + 文档断言
+powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1   # 完整性检查：清 _site + 构建 + 站点断言 + 文档/数据断言
 
 # —— 推送上线（代理可选，见 §5）——
 git add 具体文件.md              # 手动提交只加改动文件
@@ -240,7 +256,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | Bundler | 2.5.22 | 随 Ruby 自带 |
 | 依赖 gems | 99 个 | 仓库内 `bundle install`（约 2-5 分钟）|
 | Git | Git Bash 自带 | `/mingw64/bin/git` |
-| Node.js / npm | 已装（`D:\nodejs`）| 旧模板的 `main.min.js` 已删，当前流程不需要 |
+| Node.js / npm | 已装（`D:\nodejs`）| 构建不需要；改 `assets/minimal/ion-engine.js` 后用 `node --check` 验语法 |
 | Python | 已装 | 当前流程不需要（`talkmap`/`markdown_generator` 已删除）；做数据核查时可用 |
 | 代理 | Clash Verge | `D:\Clash Verge\clash-verge.exe`，混合端口 `127.0.0.1:7897` |
 
@@ -269,7 +285,8 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | 改论文筛选/搜索/复制引用 | `assets/minimal/app.js` |
 | 换团队页照片 | 替换 `assets/minimal/profile.jpg`（保持 2:3，不要裁切）|
 | 改全站 title/description/url | `_config.yml` |
-| 发布前完整性检查 | `scripts/check-site.ps1`（构建 + 7 项站点断言，并调用 `scripts/check-docs.ps1` 做文档断言）|
+| 新增页面 | 看 §3.3 的清单；页面白名单由 `_pages` 的 `permalink` 自动推导，不用改检查脚本 |
+| 发布前完整性检查 | `scripts/check-site.ps1`（构建 + 站点断言，并调用 `check-docs.ps1`/`check-data.ps1`）|
 
 论文条目只改 `_data/publications.yml`：`id` 唯一、`year` 四位数字、`tags` 必须匹配 `research.yml` 的 id（可空格分隔多个）、`featured` 控制首页推荐；`doi`/`pdf` 可选，有值时标题下自动显示链接。论文可放在 YAML 任意位置，页面和年份按钮都会按 `year` 自动倒序，不需要手工排年份。
 
@@ -285,8 +302,8 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 ├── _data/                 research / publications / people / news / navigation
 ├── assets/minimal/        style.css、app.js、ion-engine.js、profile.jpg、favicon.svg
 ├── favicon.ico            根图标（响应浏览器默认的 /favicon.ico）
-├── files/                 论文 PDF（当前为空）
-├── scripts/               publish.ps1、check-site.ps1、check-docs.ps1
+├── files/                 论文 PDF（需要时新建；空目录不会进 git）
+├── scripts/               publish.ps1、check-site.ps1、check-docs.ps1、check-data.ps1
 ├── robots.txt             显式 Allow + sitemap
 ├── .github/workflows/     jekyll-build.yml（push/PR 时 strict_front_matter 构建校验）
 ├── LICENSE                MIT（模板原作者 + 本组）
@@ -295,17 +312,27 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 
 三个容易踩的点：
 
-- **`_pages` 必须显式 include**：`_config.yml` 里少了 `include: [_pages]`，构建仍会“成功”，但 `_site` 里只有 `assets`，6 个页面全不生成。
+- **`_pages` 必须显式 include**：`_config.yml` 里少了 `include: [_pages]`，构建仍会“成功”，但 `_site` 里只有 `assets`，所有页面都不生成。
 - **线上没有 `feed.xml` / `redirects.json`**：本地 `bundle exec` 会因 `jekyll_plugins` 组额外生成这两个文件；线上 Pages 只启用 `plugins:` 列表里的插件，所以访问是 404。`check-site.ps1` 在本地 `_site` 里会看到它们，属正常，不要为删它们去动插件列表。
 - **删旧布局后不要再引用旧 include**：极简布局只引 `_includes/minimal/*`；`grep -rn 'include ' _layouts _includes` 可自查。
 
 设计稿在仓库外 `D:\wu-lab\_design\`，未纳入版本管理。其中 `minimal/README.md` 描述的岗位/FAQ 页面、`tokens.md` 的配色（`#F4F4F2`/`#0B6E69`）都是早期探索，与线上（`#660874`）不一致，**以 `assets/minimal/style.css` 为准**；`redesign` 分支不存在。
 
+### 3.3 新增页面（保持一致性的清单）
+
+1. **建文件**：在 `_pages/` 新建 `<name>.html`（内容页可复制 `join.html`，列表页参考 `publications.html`）。
+2. **front matter**：必须有 `layout: minimal`、`title`、`permalink: /<name>/`、`description`、`bg_mode`（`ion`/`chase`/`rod`/`spiral`/`photo`）；不想进 sitemap 的页面加 `sitemap: false`，错误页再加 `noindex: true`。
+3. **复用版式**：页头用 `.page-head`（`kicker` + `h1` + `lede`），正文用 `.section` / `.section-label` / `.section-body`，链接用 `.more`；不要另起一套字号/间距。确实需要新样式时改 `style.css` 的变量或相邻规则，并在 `WORKLOG.md` 说明。
+4. **导航**：要出现在顶部导航，就在 `_data/navigation.yml` 的 `main` 里加一项；`aria-current` 由 `header.html` 按 `page.url` 自动标记。
+5. **事实**：页面新增的事实先补 `CONTENT.md` §2，再写页面；没有来源写“待补充”。
+6. **检查**：跑 `scripts/check-site.ps1`。它会从 `_pages` 的 `permalink` 推导白名单和 sitemap 期望，新页面自动纳入；仍会拦截 `_pages` 之外的多余 HTML。HTML/sitemap 数量以脚本输出为准，不要再手写固定数字。
+7. **视觉**：1440×1000 和 390px 各截一次图；背景模式选与页面气质一致的（当前首页 `ion`、研究 `spiral`、论文 `rod`、团队 `chase`、加入 `ion`、404 `photo`）。
+
 ### 模板示例内容（2026-10-24 已清理）
 
 `_posts`、`_publications`、`_portfolio`、`_talks`、`_teaching`、`markdown_generator`、`talkmap*`、示例 PDF/图片、旧模板页面（cv、terms、markdown、archive、talkmap、sitemap 等）已全部删除。构建产物从 46 个 HTML / 44 条 sitemap URL 降到 **6 个 HTML / 5 条 sitemap URL**。
 
-以后新增页面时注意：**Jekyll 会把任何没有 `published: false` 的页面都发布出去**，包括 Markdown 静态文件（例如根目录的 `AGENTS.md` 曾因此挂到线上）。新增文件后跑一次 `scripts/check-site.ps1`，它会用白名单比对 sitemap 并检查泄漏。
+以后新增页面时注意：**Jekyll 会把任何没有 `published: false` 的页面都发布出去**，包括 Markdown 静态文件（例如根目录的 `AGENTS.md` 曾因此挂到线上）。新增文件后跑一次 `scripts/check-site.ps1`，它会按 `_pages` 声明比对 sitemap 并检查泄漏。
 
 如果本地 `_site` 里还有已删除页面的残留文件：Jekyll 3.10 不会自动清理构建目录，`check-site.ps1` 会在构建前删除 `_site`；手工操作时用 `bundle exec jekyll clean`。
 
@@ -329,7 +356,7 @@ bundle exec jekyll serve                # 后台运行；改过 _config.yml 必�
   ```powershell
   powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1
   ```
-  它会在构建前删除 `_site`，然后断言：只有 5 条 sitemap URL、没有多余 HTML、没有模板文本、404 用极简布局、文档未泄漏、exclude 未丢条目。
+  它会在构建前删除 `_site`，然后断言：sitemap 与 `_pages` 声明一致、没有多余 HTML、没有模板文本、404 用极简布局、文档未泄漏、exclude 未丢条目；同时调用 `check-docs.ps1`（文档结构）和 `check-data.ps1`（论文/方向 id 与标签）。
 
 ### ③ 推送上线（本地确认后自动执行）
 ```bash
@@ -363,7 +390,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 
 ### 部署机制细节
 - push 到 `main` → GitHub Pages 自动用 `github-pages` gem 构建（Settings → Pages：Deploy from a branch / main / root）
-- 仓库自带 CI 工作流 `.github/workflows/jekyll-build.yml`（Ruby 3.2 + `--strict_front_matter` 构建检查），但它的触发条件是 `workflow_run`——挂在 “Cleanup bad PR” 工作流完成之后，而后者只响应 `pull_request_target`。**push 到 `main` 不会触发构建检查**，所以 push 前必须本地跑一遍 `bundle exec jekyll build --strict_front_matter`，不要指望 CI 兜底。
+- 仓库自带 CI 工作流 `.github/workflows/jekyll-build.yml`（Ubuntu + Ruby 3.2 + `--strict_front_matter`），在 push 到 `main`、PR 和手动 dispatch 时运行；它只做构建校验，不负责部署。**CI 失败不会阻止 Pages 部署**（Pages 是独立流程），所以 push 前仍要本地跑一遍 `bundle exec jekyll build --strict_front_matter`，不要把 CI 当发布闸门。
 
 ## 5. 已知冲突与坑（重要）
 
@@ -372,7 +399,7 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 | 问题 | 原因 | 解决 |
 |---|---|---|
 | 敲 `jekyll` 报错/跳商店 | WindowsApps 有 535 字节的假 `jekyll` 占位 stub | 一律用 `bundle exec jekyll`；根治：设置 → 应用 → 应用执行别名 → 关闭 jekyll |
-| 构建报 `TZInfo::DataSourceNotFound` | Windows 没有系统时区库，`_config.yml` 又设了 `timezone: Etc/UTC` | 已在 Gemfile 加 `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]`（Linux CI 不受影响），勿删 |
+| 构建报 `TZInfo::DataSourceNotFound` | Windows 没有系统时区库，`_config.yml` 的 `timezone`（当前 Asia/Shanghai）需要 tzinfo-data | 已在 Gemfile 加 `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]`（Linux CI 不受影响），勿删 |
 | git push 报 `Could not resolve host: github.com` | 国内网络直连 GitHub 被重置 | 现走 SSH：先测 `ssh -T git@github.com`；22 不通则在 `core.sshCommand` 加 `-o HostName=ssh.github.com -o Port=443`。不要退回 HTTPS |
 | `bundle install` 时 `jekyll` 与 `github-pages` 版本疑虑 | Gemfile 同时写了两者 | 正常现象，Bundler 会统一解析到 3.10.x，不用管 |
 | 新终端找不到 ruby/bundle | Ruby 安装晚于终端/宿主进程启动 | 新开终端即可；旧会话先 `export PATH="/c/Ruby33-x64/bin:$PATH"` |

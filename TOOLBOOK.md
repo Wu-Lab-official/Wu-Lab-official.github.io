@@ -1,7 +1,7 @@
 # 工具与踩坑手册
 
 > 本文件记录**本机实际能用的命令**和**已经踩过的坑**，目的是少走弯路：动手前扫一眼症状表，别重复报错。
-> 最后更新：2026-10-29（补 SSH 443 回退被 CC Safety Net 拦截时的临时 remote 做法；更新推送/代理口径）
+> 最后更新：2026-10-29（补 SSH 443 回退临时 remote；新增 check-data 数据校验与加页面症状）
 > 相关：[MAINTENANCE.md](MAINTENANCE.md)（怎么改页面）· [CONTENT.md](CONTENT.md)（内容来源）· 工作区 `AGENTS.md`（agent 流程）
 
 ## 1. 环境：什么能用、怎么调
@@ -122,6 +122,8 @@ curl -s "https://api.github.com/repos/Wu-Lab-official/Wu-Lab-official.github.io/
 | `-Paths "a,b,c"` 被当成一个路径 | PowerShell `-File` 不解析数组 | 脚本内按逗号拆分（`publish.ps1` 已处理）|
 | 论文年份/卷页对不上 | `信息.txt` 是手写清单，有笔误 | 以 Crossref 为准，差异记 `CONTENT.md` §3 |
 | 改完文档不确定有没有写坏（编号/表格/引用）| 多处手改容易错位，肉眼很难全查 | 跑 `powershell -File scripts\\check-docs.ps1`：标题编号、§ 引用、表格列数、最后更新、相对链接 |
+| 新增论文/方向后页面少一条或标签筛选不对 | `tags` 与 `research.yml` 的 id 不一致，或 `paper_ids` 指向不存在的论文；研究页对缺失 id 会静默跳过 | 跑 `check-data.ps1`；标签只能用在 `research.yml` 里定义的 5 个 id |
+| 新增页面后 `check-site` 报 missing/stray | 页面没放 `_pages/`、`permalink` 写错，或该页需要 `sitemap: false` | 对照 `MAINTENANCE.md` §3.3；页面白名单由 `_pages` 的 permalink 自动推导 |
 | `Could not read from remote repository` / `Host key verification failed` | 代理/网络/首次连 SSH | 先直连试；不要改 remote 地址 |
 
 ## 4. 常用命令速查
@@ -135,8 +137,11 @@ bundle exec jekyll build --strict_front_matter
 # 本地预览（改 _config.yml 后必须重启）
 bundle exec jekyll serve --port 4001
 
-# 完整性检查：清 _site + 构建 + 7 项站点断言 + 文档断言（check-docs.ps1）
+# 完整性检查：清 _site + 构建 + 站点断言 + 文档/数据断言（check-docs.ps1 / check-data.ps1）
 powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1
+
+# 只查数据：论文 id/标签、方向 paper_ids、DOI 格式、成员照片
+powershell -ExecutionPolicy Bypass -File scripts\check-data.ps1
 
 # 发布（agent 会话也能直接 push；SSH 配置见 §2.5）
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 说明" -Paths 路径1,路径2

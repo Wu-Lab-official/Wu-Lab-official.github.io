@@ -5,7 +5,7 @@
 - 线上：https://wu-lab-official.github.io/
 - 状态：内部建设阶段，尚未绑定正式域名
 - 技术：Jekyll 3.10（`github-pages` gem）+ 自建极简主题，GitHub Pages 部署
-- 页面：首页 `/`、研究方向 `/research/`、论文 `/publications/`、团队 `/people/`、加入我们 `/join/`、404
+- 页面：首页 `/`、研究方向 `/research/`、论文 `/publications/`、团队 `/people/`、加入我们 `/join/`、404。新增页面见 [MAINTENANCE.md](MAINTENANCE.md) §3.3。
 
 ## 目录
 
@@ -17,8 +17,8 @@
 | `_data/people.yml` | 团队成员/校友（空数组时页面显示“待补充”）|
 | `_data/news.yml` | 首页动态与“最近更新”日期 |
 | `_layouts/minimal.html`、`_includes/minimal/` | 极简主题骨架 |
-| `assets/minimal/` | 样式、脚本、照片、图标 |
-| `scripts/` | `publish.ps1`（构建 → 提交 → 推送 → 线上校验）、`check-site.ps1`（站点断言）、`check-docs.ps1`（文档断言）|
+| `assets/minimal/` | 样式、背景引擎、交互脚本、照片、图标 |
+| `scripts/` | `publish.ps1`（构建 → 提交 → 推送 → 线上校验）、`check-site.ps1`（站点断言）、`check-docs.ps1`（文档断言）、`check-data.ps1`（论文/方向/照片数据断言）|
 
 旧 AcademicPages 渲染层已于 2026-10-24 删除（取回方式见 [MAINTENANCE.md](MAINTENANCE.md) §0.1），模板示例内容已清理。
 

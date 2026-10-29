@@ -3,7 +3,7 @@
 > 规则：页面上每一句事实都要能在本表找到来源。没有来源的内容写“待补充”，不推测、不用行业惯例补。
 > 来源之间冲突时，优先级：**Crossref / 期刊正式记录 > 官方单位主页 > PI 提供的资料**（`信息.txt` 会有笔误）。
 > 本文件在 `_config.yml` 的 exclude 列表内，不发布到线上。
-> 最后更新：2026-10-24（修正来源表 S1/S2 分行与 §5 小节编号；补复核周期）
+> 最后更新：2026-10-29（补页面已用到的简介事实；修正 §5.1 已删除路径；标注 DOI/PDF 字段已支持）
 
 ## 1. 来源清单
 
@@ -31,6 +31,10 @@
 | 教育经历 5 条 | 港大博士、首尔大学联培、韩国外国语大学硕士、成功大学学士、上海大学学士 | S1、S2 | 2026-10-24 | 已确认 |
 | 工作经历 4 条 | 清华（2026–）、香港先进生物医学仪器中心（2025.09–2026.07）、港大机械系（2023.08–2025.08）、港大化学系博后（2021.09–2023.08）| S1、S2 | 2026-10-24 | 已确认 |
 | 学术兼职 | The Innovation、Exploration、Nano-Micro Letters、Research 等青年编委 | S1、S2 | 2026-10-24 | 已确认（页面只列 4 个，S1 另有 4 个未列出）|
+| 职务称谓 | 香港先进生物医学仪器中心研究助理教授、首席科学家；香港大学工学院/机械工程系研究助理教授 | S1、S2 | 2026-10-24 | 已确认（页面按 S1 概括）|
+| 媒体报告 | Nature、人民日报、新华网等学术刊物和媒体的专题评述/报道 | S1 | 2026-10-24 | 已确认（页面用“等”概括）|
+| 学术兼职（补充）| The Innovation、Exploration、Nano-Micro Letters、Research 青年编委及特刊编辑 | S1、S2 | 2026-10-24 | 已确认（“特刊编辑”见 S1）|
+| 应用方向 | 微创诊疗、靶向药物递送、材料自组装、可穿戴器件、环境清理 | S1 | 2026-10-24 | 已确认 |
 | 研究方向 5 条 | 微纳机器人 / 智能软物质 / 微流控与器件 / 外场操控 / 颗粒与自组装 | S1 §研究领域 | 2026-10-24 | 已确认 |
 | 团队照片 | `assets/minimal/profile.jpg`（400×599，2:3 不裁切）| S4 | 2026-10-24 | 已确认 |
 
@@ -54,6 +58,8 @@
 | 14 | 2021 | Self-rectifying resistance switching memory… | 10.1088/1361-6528/abc782 | 一致（32(8), 085203；Crossref 在线年 2020，按卷期年 2021）|
 | 15 | 2017 | Effect of internal field on the high resistance state retention… | 10.1063/1.4979598 | **文章号改为 143502**（原写 14350）|
 
+**字段状态**：`_data/publications.yml` 已支持可选 `doi`/`pdf` 字段，当前 15 条都未填值；填之前先查 Crossref 或期刊页。
+
 ### 与 `信息.txt` 的差异（已按 Crossref 修正）
 
 1. Nano Research 那条：S1 写 2024，实际卷 18(7) 为 2025 年。
@@ -68,8 +74,8 @@
 |---|---|---|
 | 成员 | 姓名、身份（博士/硕士/博后）、入学年份、照片、研究方向 | PI |
 | 校友 | 去向、毕业年份 | PI |
-| 论文 | DOI 链接、PDF（`files/` 下）、BibTeX、完整作者列表 | PI / 逐篇补 |
-| 招生 | 名额、申请流程、截止日期、待遇、联合培养政策 | 学院通知 / PI |
+| 论文 | DOI 值、PDF（放 `files/`，需先新建目录）、BibTeX、完整作者列表；`publications.yml` 的 `doi`/`pdf` 字段已支持 | PI / 逐篇补 |
+| 招生 | 名额、申请流程、截止日期、待遇、联合培养政策；页面目前只写“博士后/博士/硕士”类别，类别本身也需书面确认 | 学院通知 / PI |
 | 学术主页 | Google Scholar、ORCID、ResearchGate | PI |
 | 新闻 | 组内动态、获奖、参会 | PI |
 | 基金 | 项目编号与经费（一般不公开）| PI |
@@ -82,10 +88,12 @@
 
 | 位置 | 内容 | 是否公开 |
 |---|---|---|
-| 只在本地工作区 `D:\wu-lab`（不进 git）| `信息.txt`、`图片.jpg`、`_design/`、`AGENTS.md`、`.commitmsg`、`_site/`、`.sass-cache/`、`.dsh*/`、`.zcode/` | 否 |
-| 进仓库但不上线（exclude 或下划线开头）| `MAINTENANCE.md`、`CONTENT.md`、`TOOLBOOK.md`、`WORKLOG.md`、`README.md`、`scripts/`、`_config.yml`、`_data/`、`_layouts/`、`_includes/`、`_sass/` | **是（可被 clone）**，但不出现在网站上 |
-| 进仓库并上线（任何人可访问）| `_pages/` 生成的 5 个页面、`assets/minimal/`、`assets/css/`、`assets/js/`、`images/`、`files/`、`404.html`、`robots.txt`、`sitemap.xml`、`feed.xml` | **是** |
+| 只在本地工作区 `D:\wu-lab`（不进 git）| `信息.txt`、`图片.jpg`、`_design/`、`AGENTS.md`、`.commitmsg`、`_site/`、`.dsh*/`、`.zcode/` | 否 |
+| 进仓库但不上线（exclude 或下划线开头）| `MAINTENANCE.md`、`CONTENT.md`、`TOOLBOOK.md`、`WORKLOG.md`、`README.md`、`scripts/`、`_config.yml`、`_data/`、`_layouts/`、`_includes/`、`Gemfile` | **是（可被 clone）**，但不出现在网站上 |
+| 进仓库并上线（任何人可访问）| `_pages/` 生成的页面（当前 5 个 + 404）、`assets/minimal/`、`favicon.ico`、`robots.txt`、`sitemap.xml`、`files/`（有 PDF 时）| **是** |
 | 已公开的个人信息 | `assets/minimal/profile.jpg`（团队页照片）、`_config.yml` 中的姓名/邮箱/单位 | 是，属团队页展示用途，PI 已知 |
+
+> `feed.xml`/`redirects.json` 只在本地 `bundle exec` 构建时出现，线上是 404，不属于发布内容。
 
 ### 5.2 绝对不能提交（公开仓库）
 
@@ -99,7 +107,7 @@
 
 1. `git status` 看新增文件，确认没有上面这些；
 2. `git ls-files | grep -iE '信息|图片|简历|token|secret|\.env|id_rsa|\.pem'` 应为空；
-3. 跑 `scripts/check-site.ps1`，确认线上页面只有 5 个、没有内部文件；
+3. 跑 `scripts/check-site.ps1`，确认线上页面与 `_pages` 声明一致（当前 5 个）、没有内部文件；
 4. 需要备份 `信息.txt`/`图片.jpg` 时，放私有网盘或加密压缩包，不要进仓库。
 
 ## 6. 维护约定

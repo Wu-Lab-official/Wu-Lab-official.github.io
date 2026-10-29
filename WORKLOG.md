@@ -290,3 +290,33 @@
   - `check-site.ps1` → `PASS: docs ok (6 files)` + `PASS: 6 html, 5 sitemap urls, no leaks`
   - 最终构建表格顺序为 2025→2024→…→2017；无测试数据残留
 - **推送**：`58b7935` 已推送（`ssh.github.com:443` 临时 remote，推完已恢复）；线上 `/publications/` 200，15 行、首行 2025、末行 2017，无测试数据；`.pub-links` 样式已上线
+
+## 2026-10-29 ｜ 会话 21：文档事实校准、加页面路径与数据断言
+
+- **背景**：用户要求评估上一轮维护的文档并做优化；同时问“以后加页面方不方便、能不能维持一致性”。本轮不改页面外观，只改文档与校验脚本。
+- **文档校准（P0）**
+  - `MAINTENANCE.md` §4 部署机制：删掉“CI 由 `workflow_run` 触发、push 不触发”的过期结论；改为 push/PR/dispatch 触发、只做构建校验，并说明 **CI 失败不阻止 Pages 部署**，本地 build 仍不能省
+  - `CONTENT.md` §5.1 隐私表：移除已删除的 `_sass/`、`assets/css|js/`、`images/`、`feed.xml`，补 `favicon.ico`、`files/`（有 PDF 时）；注明 `feed.xml`/`redirects.json` 只在本地构建出现、线上 404
+  - `MAINTENANCE.md` §3.2：`files/` 改为“需要时新建，空目录不会进 git”；补 `check-data.ps1`
+  - `MAINTENANCE.md` §5：TZInfo 行的 `timezone: Etc/UTC` 改为当前 `Asia/Shanghai`；§2 Node 行改为“构建不需要，改引擎后用 `node --check`”
+  - `CONTENT.md` §2：补“职务称谓（首席科学家）/媒体报告/特刊编辑/应用方向”四行；§3 标注 DOI/PDF 字段已支持、当前只缺值；§4 招生行注明“类别也需书面确认”
+  - `MAINTENANCE.md` 头部与目录、`README.md`、`TOOLBOOK.md` 同步更新
+- **加页面的路径（一致性）**
+  - `MAINTENANCE.md` 新增 §3.3：建文件、front matter、复用 `.page-head`/`.section`、导航、事实登记、检查、视觉验收七步
+  - `check-site.ps1` 不再硬编码 5 个页面：从 `_pages/*.html|md` 的 front matter 读取 `permalink`（`sitemap: false` 排除 sitemap），自动生成 HTML/sitemap 期望；仍拦截 `_pages` 之外的多余 HTML
+  - 导航高亮本来就看 `page.url`，新页面加入 `_data/navigation.yml` 后自动有 `aria-current`；布局、head、OG、canonical、页脚全部复用
+- **新脚本**
+  - 新增 `scripts/check-data.ps1`（ASCII-only）：论文 id 唯一、`tags` 必须属于 `research.yml` 的 id、`paper_ids` 必须存在、DOI 形状、成员照片路径存在；由 `check-site.ps1` 在构建前调用
+  - `AGENTS.md` 更新：10-29 背景引擎/数据化/当前状态、验证步骤加 `node --check` 与 `check-data`、文档清单补 TOOLBOOK/README、新增“加页面看 §3.3”硬性约定
+- **验证**
+  - `check-docs.ps1` → `PASS: docs ok (6 files)`
+  - `check-data.ps1` → `PASS: data ok (15 papers, 5 directions)`
+  - `check-site.ps1`（完整构建）→ `PASS: 6 html, 5 sitemap urls, no leaks`，构建 0.223s
+  - `node --check assets/minimal/ion-engine.js` 通过
+  - 反向测试：临时数据触发 duplicate id / unknown tag / missing paper / missing photo 四条 FAIL，符合预期；临时 `_pages/zz-test.md` 被自动识别为 `missing page`/`missing sitemap url`，确认白名单确实从 `_pages` 推导；两处临时文件已删除
+- **推送**：待推送（本轮完成后提交）
+- **遗留/取舍**
+  - 白名单改为信任 `_pages`：以后有意新增页面不会再被脚本拦住（这是“方便加页面”的代价）；`_pages` 之外的残留 HTML、模板 demo 文本仍会被抓
+  - `check-data.ps1` 用行级解析，假设 `id`/`tags`/`doi`/`paper_ids` 保持当前单行写法；改成多行 YAML 结构时要同步脚本
+  - 未做浏览器截图：本轮没有改页面渲染/样式；如需真机验收，按 §3.3 第 7 步在加页面时做
+  - `files/` 目录仍未创建（等有 PDF 再建）
