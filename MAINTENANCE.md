@@ -82,7 +82,7 @@
 
 状态键：`wulab-bg-v3`（跨页粒子快照）、`wulab-bg-paused-v3`（暂停偏好）。**模式变化时丢弃快照并重建**，同模式跨页续接。移动端默认播放，桌面端尊重 `prefers-reduced-motion`。
 
-可调参数集中在文件顶部和各 `update*` 函数：粒子数、速度区间、短程排斥半径与权重、光源吸引半径与可见亮度阈值、寿命/淡入比例、螺旋长度与方向场。研究页螺旋微粒的体型由顶部 `SPIRAL_SPECIES`（长度/长径比/权重，当前只保留细长型 6.6–9.8:1）与 `SPIRAL_PITCH`（固定螺距 15px，`turns = len / pitch`）决定，振幅由 `len / (2 × aspect)` 推出；改完先跑 `node --check assets/minimal/ion-engine.js`。深色三处要同步：`style.css` 的 `html[data-theme="dark"]` 变量、`_layouts/minimal.html` 的内联变量、`ion-engine.js` 的 `DARK_VARS`。
+可调参数集中在文件顶部和各 `update*` 函数：粒子数、速度区间、短程排斥半径与权重、光源吸引半径与可见亮度阈值、寿命/淡入比例、螺旋长度与方向场。研究页螺旋微粒的体型由顶部 `SPIRAL_SPECIES`（长度/长径比/权重，当前只保留细长型 8.4–12.4:1、振幅统一 ≈2.5px）与 `SPIRAL_PITCH`（固定螺距 15px，`turns = len / pitch`）决定，振幅由 `len / (2 × aspect)` 推出；改完先跑 `node --check assets/minimal/ion-engine.js`。深色三处要同步：`style.css` 的 `html[data-theme="dark"]` 变量、`_layouts/minimal.html` 的内联变量、`ion-engine.js` 的 `DARK_VARS`。
 
 旧 AcademicPages 渲染层（`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、`images/profile.png`、`_pages/about.md`、`_data/ui-text.yml|cv.json|authors.yml`）已于 2026-10-24 全部删除，**仓库里没有回退副本**。需要取回某个文件时从 git 历史取，不要凭记忆重建：
 
