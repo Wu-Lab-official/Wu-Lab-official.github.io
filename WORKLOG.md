@@ -337,3 +337,18 @@
   - 邱文浩原图 1122×1402（约 4:5），居中裁成 3:4 时左右各去约 35 px；若本人觉得构图偏，换原图按同规格重导即可
   - 本会话 bash 对仓库目录无写权限（TOOLBOOK §2 已登记），照片导出与构建用一次性 `danger-full-access`，文本改动走 `write`/`edit` 工具
 
+## 2026-10-31 ｜ 会话 23：导航栏加“首页”
+
+- **需求**：除点左上角品牌名外，也能从菜单直接回首页。
+- **改动**
+  - `_data/navigation.yml`：`main` 首位加 `- title: "首页" / url: /`；其余四项不变。高亮复用现有逻辑（`page.url == item.url`），首页 `permalink: /` 因此能在首页正确加 `aria-current="page"`，其他页面不加
+  - `MAINTENANCE.md` §0.1 导航行同步为“首页/研究/论文/团队/加入我们”，并注明 `url: /` 与高亮机制
+  - 页面结构、`header.html`、样式未改：5 项在桌面端（≥821px）宽度充足，移动端本来就走折叠菜单
+- **验证**
+  - 重启 `bundle exec jekyll serve` 后 `/`、`/people/`、`/research/`、`/publications/`、`/join/` 全部 200
+  - 生成的 HTML：首页 `<a href="/" aria-current="page">首页</a>`，团队页同一链接无 `aria-current`，说明高亮未误判
+  - `scripts/check-site.ps1` → `PASS: docs ok (6 files)` / `PASS: data ok (15 papers, 5 directions)` / `PASS: 6 html, 5 sitemap urls, no leaks`
+- **遗留/取舍**
+  - 桌面 5 项导航在 821–900px 窄桌面下略挤但未换行；若以后再加菜单项，建议把折叠断点从 820px 上调
+
+

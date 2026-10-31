@@ -1,4 +1,6 @@
 main:
+  - title: "首页"
+    url: /
   - title: "研究"
     url: /research/
   - title: "论文"

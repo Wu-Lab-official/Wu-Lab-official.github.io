@@ -54,7 +54,7 @@
 | `_data/publications.yml` | 代表性论文（**唯一数据源**：id/年份/作者/标题/期刊/卷页/tags/featured）|
 | `_data/people.yml` | 团队成员/校友（成员、校友数组；空数组显示“待补充”；members 按姓名拼音排序，导师在页面 PI 区块单独置顶）|
 | `_data/news.yml` | 首页动态 |
-| `_data/navigation.yml` | 顶部导航（研究/论文/团队/加入我们）|
+| `_data/navigation.yml` | 顶部导航（首页/研究/论文/团队/加入我们；`url: /` 是首页，高亮靠 `page.url` 比较）|
 | `assets/minimal/style.css` | 极简主题样式 + 背景层级 / 404 深色变量 |
 | `assets/minimal/app.js` | 移动菜单、论文筛选/搜索、复制引用 |
 | `assets/minimal/ion-engine.js` | 背景引擎：离子云/追逐/棒状/螺旋/趋光、状态继承、光标互动 |
