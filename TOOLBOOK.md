@@ -1,7 +1,7 @@
 # 工具与踩坑手册
 
 > 本文件记录**本机实际能用的命令**和**已经踩过的坑**，目的是少走弯路：动手前扫一眼症状表，别重复报错。
-> 最后更新：2026-10-29（补 SSH 443 回退临时 remote；新增 check-data 数据校验与加页面症状）
+> 最后更新：2026-10-31（SSH 配置值改为指向 `MAINTENANCE.md` §0.6，本节只留诊断；对齐 -F 提交口径）
 > 相关：[MAINTENANCE.md](MAINTENANCE.md)（怎么改页面）· [CONTENT.md](CONTENT.md)（内容来源）· 工作区 `AGENTS.md`（agent 流程）
 
 ## 1. 环境：什么能用、怎么调
@@ -34,12 +34,7 @@
 
 remote 已从 HTTPS 换成 SSH，凭据是仓库级 Deploy Key，**不再走 Git Credential Manager**，所以 agent 会话也能推。
 
-| 项 | 值 |
-|---|---|
-| remote | `git@github.com:Wu-Lab-official/Wu-Lab-official.github.io.git` |
-| 私钥 / 公钥 | `D:\wu-lab\.ssh\wu-lab-deploy` / `.pub`（ed25519，无口令）|
-| 仓库级配置 | `core.sshCommand` 指定 **系统 OpenSSH**（`C:/Windows/System32/OpenSSH/ssh.exe`）+ 私钥 + `IdentitiesOnly` + 独立 `known_hosts` |
-| GitHub 侧 | 仓库 Settings → Deploy keys → `wu-lab-agent`，勾 **Allow write access** |
+> 配置值（remote、私钥路径、`core.sshCommand`、GitHub 侧 Deploy Key）只在 [MAINTENANCE.md](MAINTENANCE.md) §0.6 维护一份，这里不复制；本节只记认证测试、443 回退和症状。
 
 ```bash
 # 认证测试（看到 Hi Wu-Lab-official/... 即成功）

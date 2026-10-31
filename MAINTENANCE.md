@@ -2,9 +2,10 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-10-31（成员照片目录 `assets/minimal/people/` 与成员条目维护路径；同步 §0.2 现状）
+> 本文档最后更新：2026-10-31（文档去重与受众拆分：机器/沙箱细节归 TOOLBOOK、待办收口到 §9、check-docs 增加提交日期比对）
 >
 > 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
+> **读者**：本组维护者（含 PI）与 agent。本文只写“做什么、改哪里、怎么验证”；命令细节、沙箱限制、症状表归 [TOOLBOOK.md](TOOLBOOK.md)，不在这里重复。
 
 ## 目录
 
@@ -29,7 +30,7 @@
 | 线上地址 | https://wu-lab-official.github.io |
 | 仓库 | `Wu-Lab-official/Wu-Lab-official.github.io`（本地：`D:\wu-lab\John-z39.github.io`）|
 | 默认分支 | `main`（2026-09-29 由 master 改名，旧 master 已删除）|
-| 模板 | 旧模板 academicpages.github.io v0.9.x **已于 2026-10-24 删除**（取回方式见 §3.2）；当前渲染层是自建极简主题（见 §0.1），不走 Minimal Mistakes |
+| 模板 | 旧模板 academicpages.github.io v0.9.x **已于 2026-10-24 删除**（取回方式见 §0.1）；当前渲染层是自建极简主题（见 §0.1），不走 Minimal Mistakes |
 | Jekyll | 3.10.0（由 `github-pages` gem 锁定，与 GitHub Pages 线上一致）|
 | 部署方式 | push 到 main → GitHub Pages 自动构建（无需本地构建上传）|
 
@@ -210,25 +211,19 @@ C:/Windows/System32/OpenSSH/ssh.exe -i D:/wu-lab/.ssh/wu-lab-deploy -o Identitie
 
 安全边界：这把 key 只能写这一个仓库，不能改设置、不能访问其他仓库；私钥不进仓库、不发给别人。删掉 GitHub 上的 deploy key 即失效。
 
-故障：22 端口被墙时，把 `core.sshCommand` 里的 `-o HostName=ssh.github.com -o Port=443` 加上（GitHub 官方 443 入口）。回滚到 HTTPS：`git remote set-url origin https://github.com/Wu-Lab-official/Wu-Lab-official.github.io.git` 并 `git config --unset core.sshCommand`。
+故障（`Permission denied (publickey)`、`Connection timed out`、私钥权限、22 端口被墙时的 443 配置）见 [TOOLBOOK.md](TOOLBOOK.md) §2.5，本文件不复制。
+两条底线不变：**不要改回 HTTPS**，**不要把 token 塞进 URL**。
 
 ### 0.7 代理（Clash）与联网检查
 
-**用户经常忘记开 Clash**，所以每轮涉及联网前先查端口，`closed` 就先提醒他启动，不要反复重试。
+**用户经常忘记开 Clash**：每轮涉及联网前先测端口，`closed` 就先提醒他启动，不要闷头重试。
 
 ```bash
 (echo > /dev/tcp/127.0.0.1/7897) 2>/dev/null && echo open || echo closed
-# PowerShell: Test-NetConnection 127.0.0.1 -Port 7897 -InformationLevel Quiet
 ```
 
-| 情况 | 怎么做 |
-|---|---|
-| 端口 `closed`，且本轮要抓网页 / 调 Crossref / 走 HTTPS | 提醒用户启动 `D:\Clash Verge\clash-verge.exe`；明确告知会卡在哪一步 |
-| 端口 `open` | 正常干活；HTTPS 命令加 `-x http://127.0.0.1:7897` 或 `git -c http.proxy=...` |
-| `git push`（SSH remote）失败 | **与 Clash 无关**；按 §0.6 查 deploy key / `core.sshCommand` |
-| `curl` 返回 `000` / 连接超时 | 直连被墙且没走代理：要么开 Clash，要么加 `-x` |
-
-代理是备用通道，不是硬依赖：GitHub HTTPS 与 SSH 多数时候直连可用，不要为了“保险”强制走代理。
+端口值、PowerShell 检测命令、`curl -x` 与 `git -c http.proxy` 的用法、四种症状对照，全部在 [TOOLBOOK.md](TOOLBOOK.md) §2.7，本文件不重复。
+只记两条硬结论：**代理是备用通道，不是硬依赖**；**SSH 推送不走 HTTP 代理**，推不动按 §0.6 查。
 
 ## 1. 快速命令速查
 
@@ -240,10 +235,10 @@ bundle exec jekyll serve          # 预览 http://127.0.0.1:4000，Ctrl+C 停止
 bundle exec jekyll build --strict_front_matter   # 与 CI 相同参数的纯构建测试
 powershell -ExecutionPolicy Bypass -File scripts\check-site.ps1   # 完整性检查：清 _site + 构建 + 站点断言 + 文档/数据断言
 
-# —— 推送上线（代理可选，见 §5）——
+# —— 推送上线（SSH，与代理无关；见 §0.6）——
 git add 具体文件.md              # 手动提交只加改动文件
-git commit -m "说明"
-git push origin main            # 走 SSH（Deploy Key），不需要代理和密码；22 不通时见 §0.6
+git commit -F 提交信息.txt        # 中文必须用 -F 读 UTF-8 文件；-m 会按 ANSI 转码成乱码
+git push origin main            # 走 SSH（Deploy Key），不需要代理和密码
 # 已提交但 push 失败时，补推用：scripts\publish.ps1 -PushOnly
 ```
 
@@ -370,7 +365,7 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -Message "content: 
 # 1) 暂存具体文件（别盲目 add -A）
 git add 路径/文件.md
 # 2) 提交，信息格式 <type>: 摘要，type ∈ content/feat/fix/docs/chore
-git commit -m "content: 更新课题组简介"
+git commit -F 提交信息.txt        # 中文别用 -m：PS 5.1 按 ANSI 传参会乱码（TOOLBOOK §1）
 # 3) 推送：走 SSH Deploy Key（2026-10-24 起），无需代理、无需密码
 git push origin main
 # 4) 等 60–90 秒后验证线上
@@ -397,32 +392,13 @@ curl -s -o /dev/null -w "%{http_code}\n" https://wu-lab-official.github.io/改�
 
 ## 5. 已知冲突与坑（重要）
 
-> 完整的“症状 → 原因 → 处理”表和命令速查见 [TOOLBOOK.md](TOOLBOOK.md)；这里只留最容易反复踩的几条。
+> 完整的“症状 → 原因 → 处理”表在 [TOOLBOOK.md](TOOLBOOK.md) §3；这里只留**站点配置层**的三条，其余不重复。
 
 | 问题 | 原因 | 解决 |
 |---|---|---|
-| 敲 `jekyll` 报错/跳商店 | WindowsApps 有 535 字节的假 `jekyll` 占位 stub | 一律用 `bundle exec jekyll`；根治：设置 → 应用 → 应用执行别名 → 关闭 jekyll |
-| 构建报 `TZInfo::DataSourceNotFound` | Windows 没有系统时区库，`_config.yml` 的 `timezone`（当前 Asia/Shanghai）需要 tzinfo-data | 已在 Gemfile 加 `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]`（Linux CI 不受影响），勿删 |
-| git push 报 `Could not resolve host: github.com` | 国内网络直连 GitHub 被重置 | 现走 SSH：先测 `ssh -T git@github.com`；22 不通则在 `core.sshCommand` 加 `-o HostName=ssh.github.com -o Port=443`。不要退回 HTTPS |
-| `bundle install` 时 `jekyll` 与 `github-pages` 版本疑虑 | Gemfile 同时写了两者 | 正常现象，Bundler 会统一解析到 3.10.x，不用管 |
-| 新终端找不到 ruby/bundle | Ruby 安装晚于终端/宿主进程启动 | 新开终端即可；旧会话先 `export PATH="/c/Ruby33-x64/bin:$PATH"` |
-| 改了 `_config.yml` 预览没变化 | 配置文件不热加载 | Ctrl+C 停掉 serve 再重启 |
-| agent 会话构建/预览报 `Permission denied`（读 `C:\Ruby33-x64\bin`）| DSH 沙箱默认只允许写工作区，Ruby 在 `C:\` 下 | 申请 `danger-full-access` 跑构建；或让用户在自己的终端跑 `publish.ps1`。不要改用别的命令绕过沙箱 |
-| agent 会话 `git push` 报 `could not read Username` / `cannot create standard input pipe for git-credential-helper-selector` | 沙箱禁止 Git 拉起 credential helper 的管道（HTTPS 推送才会走它）| 改走 SSH Deploy Key（§0.6）；确认 `git remote get-url origin` 是 `git@github.com:...`。不要用 token 塞 URL |
-| agent 会话 `git push` 报 `Permission denied (publickey)` | deploy key 被删 / 未勾 write access / `core.sshCommand` 指向错 | 重新加 key 并勾 write；`ssh -i <key> -T git@github.com` 应显示 `Hi Wu-Lab-official/...` |
-| agent 会话 `git push` 报 `Connection timed out` | 22 端口被墙 | `core.sshCommand` 加 `-o HostName=ssh.github.com -o Port=443` |
-| `publish.ps1` 语法报错、中文变乱码 | 文件被存成无 BOM 的 UTF-8，PowerShell 5.1 按 GBK 解析 | 保持 UTF-8 **with BOM**（`head -c 3` 应为 `ef bb bf`）；本机只有 5.1，`pwsh` 未安装 |
-| 论文年份/卷页对不上 | `信息.txt` 是 PI 手写清单，有笔误（如 Nano Research 年份、APL 文章号）| 一律以 Crossref 为准：`https://api.crossref.org/works/{DOI}`；差异记在 `CONTENT.md` §3 |
-| 抓清华 SIGS 页面后中文乱码 | 页面是 UTF-8，但 Windows 控制台按 GBK 输出 | 用 `curl -o` 存文件、Python 按 `utf-8` 读、结果写 UTF-8 文件再查看；不要直接 print 到控制台 |
-| 删掉的页面本地还能访问 | Jekyll 3.10 不清理 `_site` 里的旧产物 | `bundle exec jekyll clean`，或直接用 `scripts/check-site.ps1`（构建前删除 `_site`）|
-| 新增 Markdown 文件莫名上了线 | 无 front matter 的 `.md` 会被当静态文件复制 | 新增文档进 `_config.yml` 的 exclude；跑 `check-site.ps1` 复核 |
-| 构建“成功”但 6 个页面全没了 | `_config.yml` 缺 `include: [_pages]`，下划线目录默认被忽略 | 补回 `include: [_pages]`；`check-site.ps1` 会报 missing page |
-| push 后 Actions 不跑构建检查 | 旧工作流用 `workflow_run` 挂在已删除的 `Cleanup bad PR` 上 | 已改 `on: push/pull_request`（2026-10-24），见 `.github/workflows/jekyll-build.yml` |
-| 每次 push 都多一条 Actions 失败 | 模板残留 `Scrape Talk Locations` 去跑已删除的 `talkmap.py` | 已删除该工作流 |
-| 线上仍挂着旧模板字体/样式 | 旧 `assets/css\|js\|webfonts\|fonts` 无人引用但仍被复制 | 2026-10-24 已删，线上只剩 `assets/minimal` |
-
-### Ruby 版本提示
-本机 3.3、CI 用 3.2，兼容良好。**暂不要升级到 Ruby 3.4+**（bundled gems 移除问题），升级前先在分支上试 `bundle install`。
+| 构建报 `TZInfo::DataSourceNotFound` | Windows 没有系统时区库，`_config.yml` 的 `timezone`（当前 Asia/Shanghai）需要 tzinfo-data | 已在 Gemfile 加 `gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]`，勿删（Linux CI 不受影响）|
+| 构建“成功”但页面一个都不生成 | `_config.yml` 缺 `include: [_pages]`，下划线目录默认被忽略 | 补回 `include: [_pages]`；`check-site.ps1` 会报 missing page |
+| 升级 Ruby 后 `bundle install` 崩 | Ruby 3.4+ 移除 bundled gems | 本机 3.3、CI 用 3.2，兼容良好；暂不升级，要升先在分支上试 `bundle install` |
 
 ## 6. 故障排查
 
@@ -506,3 +482,20 @@ ruby -v             # 应显示 3.3.12 (x64-mingw-ucrt)
 - Pages 构建需 1–2 分钟，连续提交会排队；不要因为“没立刻变”重复 push。
 - 免费额度：站点 1 GB、月流量 100 GB、构建 10 次/小时；公开仓库的 Actions 不计分钟数。
 - 备份：仓库本身就是代码与内容的备份；`信息.txt`、`图片.jpg` 不在仓库，需另存私有位置。
+
+## 9. 当前待办（唯一入口）
+
+> 未完成事项只在这里维护。`CONTENT.md` §4 是内容类明细，`WORKLOG.md` 的“遗留”是历史记录，工作区 `AGENTS.md` 不再单列待办。
+
+| 项 | 缺什么 / 下一步 | 谁推进 | 明细 |
+|---|---|---|---|
+| 成员资料 | 3 名硕士缺入学年份、研究方向（写 `note`）；后续新增成员 | PI / 本人 | `CONTENT.md` §4 |
+| 校友 | 去向、毕业年份 | PI | `CONTENT.md` §4 |
+| 论文元数据 | `doi` / `pdf` 字段已支持，15 条均未填值；BibTeX、完整作者列表 | 逐篇补 | `CONTENT.md` §3 |
+| 招生信息 | 名额、流程、截止日期、待遇、联合培养；页面现有类别也需书面确认 | 学院 / PI | `CONTENT.md` §4 |
+| 学术主页 | Google Scholar、ORCID、ResearchGate | PI | `CONTENT.md` §4 |
+| 组内新闻 | 目前只有“网站上线”“课题组组建”两条 | PI | `CONTENT.md` §4 |
+| 本地私有备份 | `信息.txt`、`图片.jpg`、`照片/` 原图、工作区 `AGENTS.md` | 用户 | `CONTENT.md` §5.1 |
+| 仓库/组织设置 | 13 项：About 描述与 Topics、分支保护、Actions 权限、Dependabot、组织资料等 | 管理员 | §8.2 |
+| 正式域名 | 未购买/未绑定；先定裸域还是 `www` | PI / 管理员 | §8.3 |
+| 文档收尾（P2） | CONTENT 两条“学术兼职”合并、`_data/news.yml` 字段说明、工作区 `.commitmsg` 清理、§8.1 加核对日期列、线上回滚 runbook | agent | `WORKLOG.md` 会话 28 |

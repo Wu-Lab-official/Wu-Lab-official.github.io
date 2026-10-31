@@ -24,10 +24,11 @@
 
 ## 文档
 
-- [MAINTENANCE.md](MAINTENANCE.md)：怎么改、在哪改、发布、故障排查
-- [CONTENT.md](CONTENT.md)：内容来源登记、论文核对记录、待补清单
+- [MAINTENANCE.md](MAINTENANCE.md)：怎么改、在哪改、发布、故障排查；**未完成项见 §9**
+- [CONTENT.md](CONTENT.md)：内容来源登记、论文核对记录、待补清单（内容类）
 - [TOOLBOOK.md](TOOLBOOK.md)：本机命令、沙箱/推送/代理踩坑
-- [WORKLOG.md](WORKLOG.md)：历次改动记录
+- [WORKLOG.md](WORKLOG.md)：历次改动记录（开头有主题索引）
+- 工作区 `AGENTS.md`（不在仓库内）：agent 工作规范与交接说明
 
 ## 本地预览与发布
 
