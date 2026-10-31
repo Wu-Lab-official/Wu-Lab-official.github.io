@@ -32,6 +32,25 @@
 
   var MODES = { ion: 1, chase: 1, rod: 1, spiral: 1, photo: 1 };
 
+  /* 螺旋微粒的“物种”：只做细长型，长径比 6.6–9.8 : 1，振幅基本一致（≈3.2px），
+     所以长度变化只改“有多长”，不改“有多粗”。螺距固定，长粒子圈数自然更多。 */
+  var SPIRAL_SPECIES = [
+    { len: 42, aspect: 6.6, weight: 0.48 },
+    { len: 52, aspect: 8.2, weight: 0.34 },
+    { len: 62, aspect: 9.8, weight: 0.18 }
+  ];
+  var SPIRAL_PITCH = 15;
+
+  function pickSpiralSpecies() {
+    var r = Math.random();
+    var acc = 0;
+    for (var i = 0; i < SPIRAL_SPECIES.length; i++) {
+      acc += SPIRAL_SPECIES[i].weight;
+      if (r <= acc) return SPIRAL_SPECIES[i];
+    }
+    return SPIRAL_SPECIES[SPIRAL_SPECIES.length - 1];
+  }
+
   function isDarkRoot() {
     return root.getAttribute("data-theme") === "dark" || root.classList.contains("theme-dark");
   }
@@ -325,11 +344,18 @@
     } else if (mode === "spiral") {
       if (fresh || !p.speed) p.speed = rand(26, 34);
       p.speed = clamp(p.speed, 24, 36);
-      p.len = fresh ? rand(28, 38) : clamp(p.len || 32, 26, 40);
-      p.wid = fresh ? 1.8 : clamp(p.wid || 1.8, 1.4, 2.0);
-      p.turns = fresh ? rand(2.1, 2.5) : clamp(p.turns || 2.3, 2, 2.6);
+      if (fresh || !p.len || !p.amp) {
+        var sp = pickSpiralSpecies();
+        p.len = sp.len * rand(0.97, 1.03);
+        p.amp = p.len / (2 * sp.aspect);
+      } else {
+        p.len = clamp(p.len, 38, 66);
+        p.amp = clamp(p.amp, 2.8, 3.6);
+      }
+      p.wid = fresh ? 1.8 : clamp(p.wid || 1.8, 1.6, 2.0);
+      p.turns = p.len / SPIRAL_PITCH;
       p.size = p.len;
-      p.alpha = fresh ? rand(0.28, 0.40) : clamp(p.alpha || 0.34, 0.24, 0.42);
+      p.alpha = fresh ? rand(0.30, 0.42) : clamp(p.alpha || 0.36, 0.26, 0.44);
       p.omega = 0.38 * p.speed;
       if (fresh) p.spin = Math.random() * TAU;
     } else if (mode === "photo") {
@@ -943,8 +969,9 @@
       var p = parts[i];
       var c = palette.colors[p.color];
       var L = p.len;
-      var amp = Math.max(4.5, p.wid * 3.0);
+      var amp = p.amp || Math.max(4.5, p.wid * 3.0);
       var turns = p.turns;
+      var segs = Math.max(48, Math.round(turns * 22));
 
       ctx.save();
       ctx.translate(p.x, p.y);
@@ -953,10 +980,10 @@
 
       /* 侧视单螺旋：一条正弦链，绕长轴自旋 */
       ctx.strokeStyle = rgba(c, p.alpha * 0.14);
-      ctx.lineWidth = 7;
+      ctx.lineWidth = Math.max(3.2, amp * 1.15);
       ctx.beginPath();
-      for (var k = 0; k <= 48; k++) {
-        var t = k / 48;
+      for (var k = 0; k <= segs; k++) {
+        var t = k / segs;
         var x = -L / 2 + L * t;
         var y = Math.sin(t * turns * TAU + p.spin) * amp;
         if (k === 0) ctx.moveTo(x, y);
@@ -965,10 +992,10 @@
       ctx.stroke();
 
       ctx.strokeStyle = rgba(c, p.alpha);
-      ctx.lineWidth = 2.6;
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      for (k = 0; k <= 48; k++) {
-        t = k / 48;
+      for (k = 0; k <= segs; k++) {
+        t = k / segs;
         x = -L / 2 + L * t;
         y = Math.sin(t * turns * TAU + p.spin) * amp;
         if (k === 0) ctx.moveTo(x, y);
@@ -976,12 +1003,12 @@
       }
       ctx.stroke();
 
-      for (k = 2; k <= 46; k += 3) {
-        t = k / 48;
+      for (k = 2; k <= segs - 2; k += 3) {
+        t = k / segs;
         x = -L / 2 + L * t;
         var sa = t * turns * TAU + p.spin;
         if (Math.cos(sa) > 0.35) {
-          drawDot(x, Math.sin(sa) * amp, 0.9, c, p.alpha * 0.55);
+          drawDot(x, Math.sin(sa) * amp, 0.85, c, p.alpha * 0.5);
         }
       }
 
@@ -1217,6 +1244,7 @@
         omega: p.omega,
         len: p.len,
         wid: p.wid,
+        amp: p.amp,
         turns: p.turns,
         noiseX: p.noiseX,
         noiseY: p.noiseY,
@@ -1296,6 +1324,7 @@
         omega: d.omega || 0,
         len: d.len || 22,
         wid: d.wid || 2,
+        amp: d.amp || 0,
         turns: d.turns || 2.3,
         noiseX: d.noiseX || 0,
         noiseY: d.noiseY || 0,
