@@ -437,10 +437,12 @@
   - **去重**：`AGENTS.md`（工作区，不在仓库内）删掉与 MAINTENANCE §0.5 重复的“五份文档分工表 + 收尾五项”和与 WORKLOG 重复的 ✅ 历史清单，改为指针；`TOOLBOOK.md` §2.5 删掉与 MAINTENANCE §0.6 重复的配置表
   - **待办收口**：`MAINTENANCE.md` 新增 §9“当前待办（唯一入口）”，10 项，各行指到明细；`CONTENT.md` §4 明确只列内容类缺项并指向 §9
   - **可检索性**：WORKLOG 顶部加“主题索引”（10 组主题 → 会话号）；README 文档列表补 §9 与工作区 AGENTS
-  - `check-docs.ps1` 新增 pass 3：文档“最后更新”不得早于该文件最后一次提交日期（改了正文没改日期、且已提交时才会报）
+  - 试过给 `check-docs.ps1` 加“最后更新 vs 最后提交日期”比对，**已回退**：沙箱内脚本 spawn git 会弹 `0xc0000142` 且拿不到输出，只有用户自己的终端能满足条件，留着只会误导；改为脚本内注释 + 手工 `git log -1 --date=short --format=%ad -- <file>`
+  - `TOOLBOOK.md` §2 新增两行：“沙箱子进程初始化失败（0xc0000142 / WinError 5）”与 `conda info` 的 `PermissionError`——同源，都是沙箱受限令牌，不是软件装坏
 - **验证**
   - `check-docs.ps1` 当场抓到两处 § 引用歧义（同一行先提 `TOOLBOOK.md` 又写 `§0.6`，被解析成“TOOLBOOK 的 0.6”），拆行后通过——新规则本身也验证了这套检查能咬住真实错误
   - `check-site.ps1`：`PASS: docs ok` / `PASS: data ok (15 papers, 5 directions)` / `PASS: 6 html, 5 sitemap urls, no leaks`
+  - 顺带确认 git 本身正常：bash 里 `git --version` = 2.50.0、`git log` 输出正确；`0xc0000142` 弹窗只出现在沙箱内 spawn 子进程时
   - 本轮只改 exclude 文档与检查脚本，`_site` 产出与改前一致；推送后复核 `/`、`/people/` 200
 - **遗留**：P2 五项未做（CONTENT 两条“学术兼职”合并、`news.yml` 字段说明、工作区 `.commitmsg` 清理、§8.1 加核对日期列、线上回滚 runbook），已列入 §9；工作区 `AGENTS.md` 仍不在仓库内，换机即丢，备份列入 §9
 

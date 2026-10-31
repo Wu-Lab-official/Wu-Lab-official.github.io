@@ -148,26 +148,11 @@ foreach ($d in $docs) {
   }
 }
 
-# ---- pass 3: "last updated" stamp must not lag behind the file's last commit ----
-# Catches the case where a doc was edited and committed without bumping its stamp.
-# Files outside the repo (workspace AGENTS.md) and non-git copies are skipped.
-foreach ($d in $docs) {
-  $name = $d[0]
-  $path = $d[1]
-  if (-not $path.StartsWith($Root)) { continue }
-  $rel = $path.Substring($Root.Length).TrimStart('\', '/').Replace('\', '/')
-  $last = & git -C $Root log -1 --date=short --format=%ad -- $rel 2>$null
-  if ($LASTEXITCODE -ne 0 -or -not $last) { continue }
-  $lastDate = ($last | Select-Object -First 1).Trim()
-  if ($lastDate -notmatch '^\d{4}-\d{2}-\d{2}$') { continue }
-  $content = $linesByName[$name] -join "`n"
-  $m = [regex]::Match($content, [regex]::Escape($stamp) + '.{0,6}(\d{4}-\d{2}-\d{2})')
-  if (-not $m.Success) { continue }   # missing stamp is already reported in pass 2
-  $stampDate = $m.Groups[1].Value
-  if ([string]::CompareOrdinal($stampDate, $lastDate) -lt 0) {
-    $fail.Add(("{0} last-updated {1} is older than its last commit {2}" -f $name, $stampDate, $lastDate))
-  }
-}
+# NOTE: pass 3 used to compare each "last updated" stamp with the file's last commit
+# date by shelling out to git. That was removed on 2026-10-31: under the agent sandbox
+# every nested process launch fails (0xc0000142 / CreateProcessAsUserW denied), so the
+# check both missed data and popped Windows error dialogs. Compare by hand when needed:
+#   git log -1 --date=short --format=%ad -- <file>
 
 Write-Host ""
 if ($fail.Count -eq 0) {

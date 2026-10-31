@@ -2,7 +2,7 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-10-31（文档去重与受众拆分：机器/沙箱细节归 TOOLBOOK、待办收口到 §9、check-docs 增加提交日期比对）
+> 本文档最后更新：2026-10-31（文档去重与受众拆分：机器/沙箱细节归 TOOLBOOK、待办收口到 §9、补沙箱内不能 spawn 的坑）
 >
 > 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
 > **读者**：本组维护者（含 PI）与 agent。本文只写“做什么、改哪里、怎么验证”；命令细节、沙箱限制、症状表归 [TOOLBOOK.md](TOOLBOOK.md)，不在这里重复。
@@ -175,7 +175,7 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -PushOnly
 4. 踩了新坑 → `TOOLBOOK.md` 的“症状→原因→处理”加行？
 5. 跑过 `scripts/check-site.ps1`（内含 `check-docs.ps1` 与 `check-data.ps1`，断言文档结构、论文/方向引用）？
 
-原则：文档与改动同一个提交；页面数、sitemap 数等数字以 `scripts/check-site.ps1` 输出为准；不写“以后再补”，缺什么写进 `CONTENT.md` §4；每份文档头部保留“最后更新”。
+原则：文档与改动同一个提交；页面数、sitemap 数等数字以 `scripts/check-site.ps1` 输出为准；不写“以后再补”，缺什么写进 §9；每份文档头部保留“最后更新”，改了正文就改日期——`check-docs.ps1` 只校验格式，对不上时手工比一次 `git log -1 --date=short --format=%ad -- <文件>`。
 
 ### 0.6 SSH Deploy Key（推送凭据，换机必看）
 

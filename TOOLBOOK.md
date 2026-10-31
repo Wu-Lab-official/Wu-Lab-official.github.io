@@ -1,7 +1,7 @@
 # 工具与踩坑手册
 
 > 本文件记录**本机实际能用的命令**和**已经踩过的坑**，目的是少走弯路：动手前扫一眼症状表，别重复报错。
-> 最后更新：2026-10-31（SSH 配置值改为指向 `MAINTENANCE.md` §0.6，本节只留诊断；对齐 -F 提交口径）
+> 最后更新：2026-10-31（SSH 配置值改为指向 `MAINTENANCE.md` §0.6；新增沙箱子进程初始化失败 0xc0000142 / WinError 5 两行）
 > 相关：[MAINTENANCE.md](MAINTENANCE.md)（怎么改页面）· [CONTENT.md](CONTENT.md)（内容来源）· 工作区 `AGENTS.md`（agent 流程）
 
 ## 1. 环境：什么能用、怎么调
@@ -27,6 +27,9 @@
 | `mv` / `cp` / `sed -i` 改工作区文件报 `Permission denied`（例如 `mv: unable to remove target`）| 本会话 bash 的文件写被整体拦，只有专用文件工具能写工作区 | 用 `write` / `edit` 工具改文件；`sed -i`、`printf > 文件` 都不可用；删除/提交/推送/构建申请一次性 `danger-full-access` |
 | `cannot create standard input pipe for git-credential-helper-selector: Permission denied` | 沙箱拦 git 拉起凭据助手的子进程管道——**只有 HTTPS 推送会走它** | 改走 SSH Deploy Key（§2.5），agent 会话可直接 push；不要退回 HTTPS，也不要把 token 塞进 URL |
 | `.ps1` 报“语句块或类型定义中缺少右 }” | 文件无 BOM，5.1 按 GBK 解析 | 重新保存为 UTF-8 with BOM（`head -c 3` 应为 `ef bb bf`）|
+
+| 弹窗 `git.exe - Application Error`、`应用程序无法正常启动(0xc0000142)`；同时命令无输出、`$LASTEXITCODE` 为空 | 沙箱用受限令牌启动子进程，初始化失败；本机 runner 甚至会直接报 `CreateProcessAsUserW failed (Win32 5)`。沙箱里 `where.exe`/`cmd.exe`/`git.exe` 全是同样表现 | 不要**在沙箱内**让脚本再 spawn 外部程序（PowerShell 里 `& git …`、`& conda …` 都算）；构建、推送、publish 用一次性 `danger-full-access`；自检脚本不要 shell out 到 git/conda |
+| `conda info` 报 `PermissionError: [WinError 5]` + ERROR REPORT | 同上；conda 的 CUDA 虚拟包探测要先建命名管道 | 在 App 里跑 conda 时加 `CONDA_OVERRIDE_CUDA=0`，或用 full access；日常在自己的终端里跑无需处理 |
 
 原则：**不绕过沙箱**（别用 pwsh 重试被 bash 拒绝的操作）；一次审批只对一条命令有效。
 
