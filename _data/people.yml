@@ -1,6 +1,8 @@
 # 团队成员 / 校友（唯一数据源）
 # 页面会自动渲染；空数组时显示“待补充”。
-# 新增成员时复制下面注释里的字段，取消注释并填写即可。
+# 排序约定：members 按姓名拼音升序；导师吴昌进在 _pages/people.html 的 PI 区块置顶，不写在这里。
+# 字段：name（必填）/ role / email / photo / note，不需要的字段直接省略。
+# 照片：原图放工作区 `照片/`，导出为 480×640（3:4）到 assets/minimal/people/<拼音>.jpg，去掉 EXIF。
 #
 # members:
 #   - name: 张三
@@ -15,5 +17,18 @@
 #     year: "2026"
 #     note: 现于某单位
 
-members: []
+members:
+  - name: 邱文浩
+    role: 硕士研究生
+    email: qiu-wh26@mails.tsinghua.edu.cn
+    photo: /assets/minimal/people/qiuwenhao.jpg
+  - name: 张芸科
+    role: 硕士研究生
+    email: yk-zhang26@mails.tsinghua.edu.cn
+    photo: /assets/minimal/people/zhangyunke.jpg
+  - name: 周奕衡
+    role: 硕士研究生
+    email: zhouyihe22@mails.tsinghua.edu.cn
+    photo: /assets/minimal/people/zhouyihe.jpg
+
 alumni: []

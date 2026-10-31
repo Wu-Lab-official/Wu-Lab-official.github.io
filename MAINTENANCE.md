@@ -2,7 +2,7 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-10-29（校准 CI/隐私表/目录；补背景引擎参数、新增页面清单与数据校验）
+> 本文档最后更新：2026-10-31（成员照片目录 `assets/minimal/people/` 与成员条目维护路径；同步 §0.2 现状）
 >
 > 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
 
@@ -52,13 +52,14 @@
 | `_pages/404.md` | 自定义 404 页 `/404.html`（极简布局）|
 | `_data/research.yml` | 5 个研究方向、问题、正文；`paper_ids` 引用论文 id |
 | `_data/publications.yml` | 代表性论文（**唯一数据源**：id/年份/作者/标题/期刊/卷页/tags/featured）|
-| `_data/people.yml` | 团队成员/校友（成员、校友数组；空数组显示“待补充”）|
+| `_data/people.yml` | 团队成员/校友（成员、校友数组；空数组显示“待补充”；members 按姓名拼音排序，导师在页面 PI 区块单独置顶）|
 | `_data/news.yml` | 首页动态 |
 | `_data/navigation.yml` | 顶部导航（研究/论文/团队/加入我们）|
 | `assets/minimal/style.css` | 极简主题样式 + 背景层级 / 404 深色变量 |
 | `assets/minimal/app.js` | 移动菜单、论文筛选/搜索、复制引用 |
 | `assets/minimal/ion-engine.js` | 背景引擎：离子云/追逐/棒状/螺旋/趋光、状态继承、光标互动 |
 | `assets/minimal/profile.jpg` | 团队页照片（原始 2:3，不裁切）|
+| `assets/minimal/people/<拼音>.jpg` | 成员照片（480×640，3:4，已去 EXIF；原图只留在工作区 `照片/`）|
 | `assets/minimal/favicon.svg` | 站点图标 |
 
 背景按页面 `bg_mode` 分模式：**同一模式**跨页面用 `sessionStorage` 续接粒子；**模式变化**（如首页 ion → 研究页 spiral）丢弃旧快照、重新初始化，避免把上一模式的分布硬套到新形状。404 固定 `photo + theme: dark`，是唯一的深色页面；移动菜单依赖 `.masthead { z-index: 3 }` 高于 `main`，否则下拉导航会被正文盖住。
@@ -100,7 +101,7 @@ GitHub Pages 设置：**Deploy from a branch → main → /(root)**。不要选 
 
 - 这是课题组网站的**内部建设阶段**，还没有购买/绑定正式域名；线上地址是 GitHub Pages 组织站 `https://wu-lab-official.github.io/`，不是最终发布形态。
 - 旧个人站 `john-z39.github.io` 只作备份，不再作为本项目维护对象。
-- 当前状态：极简主题 5 个页面 + 404（页面数以 `check-site.ps1` 输出为准）；模板示例内容已全部清理；15 条代表性论文已逐条用 Crossref 核对并修正；导师信息、研究方向、论文是真实内容；成员、团队照片、DOI/PDF 值、招生细节仍缺（DOI/PDF 字段已支持，只缺值）。
+- 当前状态：极简主题 5 个页面 + 404（页面数以 `check-site.ps1` 输出为准）；模板示例内容已全部清理；15 条代表性论文已逐条用 Crossref 核对并修正；导师信息、研究方向、论文、3 名硕士成员（姓名/身份/邮箱/照片）是真实内容；仍缺成员入学年份与研究方向、校友、DOI/PDF 值、招生细节（DOI/PDF 字段已支持，只缺值）。
 - 现有内容来源：`信息.txt`（PI 提供，在工作区根目录、不在仓库内）、清华 SIGS 官方导师主页、论文正式记录（Crossref）。**来源与核对日期登记在 `CONTENT.md`**，改内容前先查它。
 - 缺失内容统一写“待补充”或直接留空，**不要用示例、推测、行业惯例填充**。
 
@@ -275,6 +276,8 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 | 改首页“动态” | `_data/news.yml`（首页“最近更新”也取这里第一条）|
 | 改导航文字/顺序 | `_data/navigation.yml` |
 | 改团队页、导师简介、教育/工作经历 | `_pages/people.html`；成员/校友数据改 `_data/people.yml` |
+| 增删成员、改成员身份/邮箱 | `_data/people.yml`（members 按姓名拼音升序；导师不写在这里）。照片先导出到 `assets/minimal/people/<拼音>.jpg`，再在条目里写 `photo:` |
+| 换某位成员照片 | 覆盖 `assets/minimal/people/<拼音>.jpg`（480×640，3:4，去 EXIF），文件名不变则不用改 YAML |
 | 改加入我们、岗位、FAQ | `_pages/join.html` |
 | 改 404 页 | `_pages/404.md`（需保留 `layout: minimal`，否则 404 会失去极简布局）|
 | 改某页背景模式 | 页面 front matter `bg_mode`：`ion`/`chase`/`rod`/`spiral`/`photo` |
@@ -300,7 +303,7 @@ git push origin main            # 走 SSH（Deploy Key），不需要代理和�
 ├── _includes/minimal/     head / header / footer / background
 ├── _pages/                home、research、publications、people、join、404
 ├── _data/                 research / publications / people / news / navigation
-├── assets/minimal/        style.css、app.js、ion-engine.js、profile.jpg、favicon.svg
+├── assets/minimal/        style.css、app.js、ion-engine.js、profile.jpg、favicon.svg、people/（成员照片）
 ├── favicon.ico            根图标（响应浏览器默认的 /favicon.ico）
 ├── files/                 论文 PDF（需要时新建；空目录不会进 git）
 ├── scripts/               publish.ps1、check-site.ps1、check-docs.ps1、check-data.ps1

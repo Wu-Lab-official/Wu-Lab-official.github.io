@@ -320,3 +320,20 @@
   - `check-data.ps1` 用行级解析，假设 `id`/`tags`/`doi`/`paper_ids` 保持当前单行写法；改成多行 YAML 结构时要同步脚本
   - 未做浏览器截图：本轮没有改页面渲染/样式；如需真机验收，按 §3.3 第 7 步在加页面时做
   - `files/` 目录仍未创建（等有 PDF 再建）
+
+## 2026-10-31 ｜ 会话 22：团队页新增 3 名硕士成员
+
+- **背景**：PI 提供 3 名硕士成员的姓名、清华邮箱与照片（原图在工作区 `照片/`），要求按姓名拼音排序、导师置顶。此前 `_data/people.yml` 的 `members` 还是空数组，页面显示“成员名单待补充”。
+- **改动**
+  - `_data/people.yml`：写入 3 条成员，`role` 统一为 `硕士研究生`，附清华邮箱与照片路径；顺序按拼音升序 **邱文浩（Qiu）→ 张芸科（Zhang）→ 周奕衡（Zhou）**；注释里补排序约定与照片规格。导师不写进 `members`，仍由 `_pages/people.html` 的 PI 区块置顶（页面结构未改）
+  - 新增 `assets/minimal/people/`：`qiuwenhao.jpg` / `zhangyunke.jpg` / `zhouyihe.jpg`，从 `照片/` 原图居中裁到 3:4（匹配 `.member-photo` 的 `aspect-ratio`）、缩到 480×640、q84 渐进式，去 EXIF；单张 26–28 KB（原图 84–129 KB 不进仓库）
+  - 文档同步：`CONTENT.md` 增 S5 来源、§2 三条成员事实、§4 待补收敛、§5.1/§5.2 隐私边界（成员邮箱按 PI 要求公开，学号/手机仍禁）；`MAINTENANCE.md` §0.1 文件表、§0.2 现状、§3.1 两行改法、§3.2 目录树补 `people/`
+- **验证**
+  - 本地 `bundle exec jekyll serve`：`/`、`/people/`、3 张成员照片全部 200（照片 27–29 KB）
+  - 生成的 `/people/` HTML 确认 3 张卡片的 `img.alt`、`h3`、`role`、`mailto` 顺序为 邱→张→周，导师 PI 区块仍在其上
+  - `scripts/check-site.ps1` → `PASS: docs ok (6 files)` / `PASS: data ok (15 papers, 5 directions)` / `PASS: 6 html, 5 sitemap urls, no leaks`
+- **遗留/取舍**
+  - 入学年份与研究方向未提供，卡片只显示身份与邮箱，未写 `note`（不推测）
+  - 邱文浩原图 1122×1402（约 4:5），居中裁成 3:4 时左右各去约 35 px；若本人觉得构图偏，换原图按同规格重导即可
+  - 本会话 bash 对仓库目录无写权限（TOOLBOOK §2 已登记），照片导出与构建用一次性 `danger-full-access`，文本改动走 `write`/`edit` 工具
+
