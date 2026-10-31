@@ -32,14 +32,14 @@
 
   var MODES = { ion: 1, chase: 1, rod: 1, spiral: 1, photo: 1 };
 
-  /* 螺旋微粒的“物种”：只做细长型，振幅统一压到 ≈2.5px，长度靠圈数体现。
-     长径比 8.4–12.4 : 1；螺距固定，长粒子圈数自然更多。 */
+  /* 螺旋微粒的“物种”：细长型，振幅统一 ≈3.4px，螺距固定 12px（卷得紧）。
+     长度靠圈数体现，长径比 6.2–9.1 : 1。 */
   var SPIRAL_SPECIES = [
-    { len: 42, aspect: 8.4, weight: 0.48 },
-    { len: 52, aspect: 10.4, weight: 0.34 },
-    { len: 62, aspect: 12.4, weight: 0.18 }
+    { len: 42, aspect: 6.2, weight: 0.48 },
+    { len: 52, aspect: 7.6, weight: 0.34 },
+    { len: 62, aspect: 9.1, weight: 0.18 }
   ];
-  var SPIRAL_PITCH = 15;
+  var SPIRAL_PITCH = 12;
 
   function pickSpiralSpecies() {
     var r = Math.random();
@@ -350,7 +350,7 @@
         p.amp = p.len / (2 * sp.aspect);
       } else {
         p.len = clamp(p.len, 38, 66);
-        p.amp = clamp(p.amp, 2.2, 2.8);
+        p.amp = clamp(p.amp, 3.0, 3.8);
       }
       p.wid = fresh ? 1.8 : clamp(p.wid || 1.8, 1.6, 2.0);
       p.turns = p.len / SPIRAL_PITCH;
@@ -980,7 +980,7 @@
 
       /* 侧视单螺旋：一条正弦链，绕长轴自旋 */
       ctx.strokeStyle = rgba(c, p.alpha * 0.14);
-      ctx.lineWidth = Math.max(3.4, amp * 1.3);
+      ctx.lineWidth = Math.max(3.2, amp * 1.15);
       ctx.beginPath();
       for (var k = 0; k <= segs; k++) {
         var t = k / segs;
@@ -992,7 +992,7 @@
       ctx.stroke();
 
       ctx.strokeStyle = rgba(c, p.alpha);
-      ctx.lineWidth = 2.3;
+      ctx.lineWidth = 2;
       ctx.beginPath();
       for (k = 0; k <= segs; k++) {
         t = k / segs;
