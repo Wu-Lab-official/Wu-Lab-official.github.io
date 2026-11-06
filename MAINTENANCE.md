@@ -2,7 +2,7 @@
 
 > 基于 [AcademicPages](https://academicpages.github.io) 模板（Jekyll 静态站点）+ GitHub Pages 托管
 > 参考教程：[Building an Academic Website — Rob Williams](https://jayrobwilliams.com/posts/2020/06/academic-website/)
-> 本文档最后更新：2026-11-06（§0.1 补粒子总数倍数 `COUNT_MULT` 与追逐拥挤斥力下限 `CHASE_CROWD_MIN`）
+> 本文档最后更新：2026-11-06（§0.1 补粒子总数倍数 `COUNT_MULT`、追逐拥挤斥力下限 `CHASE_CROWD_MIN`、棒状两级排斥 `ROD_BODY_*` / `ROD_GROUP_*`）
 >
 > 相关文档：[CONTENT.md](CONTENT.md)（来源登记 / 论文核对 / 待补 / 隐私边界）· [TOOLBOOK.md](TOOLBOOK.md)（工具与踩坑）· [WORKLOG.md](WORKLOG.md)（改动记录）· 工作区 `AGENTS.md`（agent 规范）
 > **读者**：本组维护者（含 PI）与 agent。本文只写“做什么、改哪里、怎么验证”；命令细节、沙箱限制、症状表归 [TOOLBOOK.md](TOOLBOOK.md)，不在这里重复。
@@ -83,7 +83,7 @@
 
 状态键：`wulab-bg-v3`（跨页粒子快照）、`wulab-bg-paused-v3`（暂停偏好）。**模式变化时丢弃快照并重建**，同模式跨页续接。移动端默认播放，桌面端尊重 `prefers-reduced-motion`。
 
-可调参数集中在文件顶部和各 `update*` 函数：粒子数、速度区间、短程排斥半径与权重、光源吸引半径与可见亮度阈值、寿命/淡入比例、螺旋长度与方向场。粒子总数由 `targetCount()` 给出，顶部 `COUNT_MULT` 按模式整体放大（当前 `rod`/`chase` ×2，目标数与上下限同步翻倍，ion/spiral/photo 为 1）；追逐模式的拥挤斥力触发下限是 `CHASE_CROWD_MIN`（邻居数，当前 16），低于它不向外推。研究页螺旋微粒的体型由顶部 `SPIRAL_SPECIES`（长度/长径比/权重，当前细长型 6.2–9.1:1、振幅统一 ≈3.4px）与 `SPIRAL_PITCH`（固定螺距 12px，`turns = len / pitch`）决定，振幅由 `len / (2 × aspect)` 推出；改完先跑 `node --check assets/minimal/ion-engine.js`。深色三处要同步：`style.css` 的 `html[data-theme="dark"]` 变量、`_layouts/minimal.html` 的内联变量、`ion-engine.js` 的 `DARK_VARS`。
+可调参数集中在文件顶部和各 `update*` 函数：粒子数、速度区间、短程排斥半径与权重、光源吸引半径与可见亮度阈值、寿命/淡入比例、螺旋长度与方向场。粒子总数由 `targetCount()` 给出，顶部 `COUNT_MULT` 按模式整体放大（当前 `rod`/`chase` ×2，目标数与上下限同步翻倍，ion/spiral/photo 为 1）；追逐模式的拥挤斥力触发下限是 `CHASE_CROWD_MIN`（邻居数，当前 16），低于它不向外推。棒状模式有两级排斥：极短程“体积”排斥（`ROD_BODY_*`，把棒当胶囊体、按朝向算接触距离，防止棒身叠压）和长程群体排斥（`ROD_GROUP_*`，190px 内邻居数超过下限时沿“离开群体质心”的方向推，防止所有棒并成一个团）；螺旋复用 `updateRods(dt, true)` 但走 `spiral` 分支，两级排斥都不生效。研究页螺旋微粒的体型由顶部 `SPIRAL_SPECIES`（长度/长径比/权重，当前细长型 6.2–9.1:1、振幅统一 ≈3.4px）与 `SPIRAL_PITCH`（固定螺距 12px，`turns = len / pitch`）决定，振幅由 `len / (2 × aspect)` 推出；改完先跑 `node --check assets/minimal/ion-engine.js`。深色三处要同步：`style.css` 的 `html[data-theme="dark"]` 变量、`_layouts/minimal.html` 的内联变量、`ion-engine.js` 的 `DARK_VARS`。
 
 旧 AcademicPages 渲染层（`_layouts/default|single|archive|splash|talk`、全部旧 `_includes`、`_sass/`、`assets/css|js|webfonts|fonts`、`images/profile.png`、`_pages/about.md`、`_data/ui-text.yml|cv.json|authors.yml`）已于 2026-10-24 全部删除，**仓库里没有回退副本**。需要取回某个文件时从 git 历史取，不要凭记忆重建：
 

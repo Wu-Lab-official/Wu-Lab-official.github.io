@@ -24,6 +24,17 @@
   /* 追逐模式拥挤斥力的触发下限（邻居数）：低于此值不算拥挤，不向外推 */
   var CHASE_CROWD_MIN = 16;
 
+  /* 棒状粒子的两级排斥：
+     ① 极短程“体积”排斥——把棒当胶囊体，按朝向算支撑半径，棒身一旦叠压就推开；
+     ② 长程群体排斥——190px 内的邻居过多时，沿“离开群体质心”的方向推，
+        避免所有棒并成一个团，让群体之间保持距离。 */
+  var ROD_BODY_PAD = 1.2;
+  var ROD_BODY_RANGE = 70;
+  var ROD_BODY_FORCE = 58;
+  var ROD_GROUP_R = 190;
+  var ROD_GROUP_MIN = 10;
+  var ROD_GROUP_FORCE = 20;
+
   var LIGHT = {
     colors: [[102, 8, 116], [90, 104, 138], [154, 141, 128]],
     line: [102, 8, 116],
@@ -751,12 +762,28 @@
   }
 
   function updateRods(dt, spiral) {
+    var cosH = null, sinH = null;
+    if (!spiral) {
+      cosH = new Array(parts.length);
+      sinH = new Array(parts.length);
+      for (var k = 0; k < parts.length; k++) {
+        cosH[k] = Math.cos(parts[k].heading);
+        sinH[k] = Math.sin(parts[k].heading);
+      }
+    }
+
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i];
       var s2 = 0, c2 = 0, cnt = 0;
       var sepX = 0, sepY = 0;
       var attrX = 0, attrY = 0;
+      var repelX = 0, repelY = 0;
+      var groupCnt = 0, groupX = 0, groupY = 0;
       var sepR = spiral ? 32 : 21;
+      var pCos = cosH ? cosH[i] : 0;
+      var pSin = sinH ? sinH[i] : 0;
+      var pHalf = p.len * 0.5;
+      var pWid = p.wid * 0.5;
 
       for (var j = 0; j < parts.length; j++) {
         if (i === j) continue;
@@ -778,6 +805,43 @@
           attrX += dx / ad;
           attrY += dy / ad;
         }
+        if (spiral) continue;
+
+        if (d2 < ROD_GROUP_R * ROD_GROUP_R) {
+          groupCnt++;
+          groupX += q.x;
+          groupY += q.y;
+        }
+
+        /* ① 体积排斥：d 方向上的支撑半径之和 = 两根棒的“接触距离” */
+        if (d2 < ROD_BODY_RANGE * ROD_BODY_RANGE && d2 > 0.0001) {
+          var bd = Math.sqrt(d2);
+          var nx = dx / bd, ny = dy / bd;
+          var extP = pHalf * (nx * pCos + ny * pSin);
+          var extP2 = pWid * (ny * pCos - nx * pSin);
+          var qCos = cosH[j], qSin = sinH[j];
+          var extQ = q.len * 0.5 * (nx * qCos + ny * qSin);
+          var extQ2 = q.wid * 0.5 * (ny * qCos - nx * qSin);
+          var reachP = Math.sqrt(extP * extP + extP2 * extP2);
+          var reachQ = Math.sqrt(extQ * extQ + extQ2 * extQ2);
+          var overlap = reachP + reachQ + ROD_BODY_PAD - bd;
+          if (overlap > 0) {
+            var push = Math.min(1, overlap / 8) * ROD_BODY_FORCE;
+            repelX -= nx * push;
+            repelY -= ny * push;
+          }
+        }
+      }
+
+      /* ② 长程群体排斥：只在局部拥挤（邻居数超过下限）时生效 */
+      if (!spiral && groupCnt > ROD_GROUP_MIN) {
+        var gx = p.x - groupX / groupCnt;
+        var gy = p.y - groupY / groupCnt;
+        var gd = Math.sqrt(gx * gx + gy * gy) || 1;
+        var gStrength =
+          Math.min(1, (groupCnt - ROD_GROUP_MIN) / ROD_GROUP_MIN) * ROD_GROUP_FORCE;
+        repelX += (gx / gd) * gStrength;
+        repelY += (gy / gd) * gStrength;
       }
 
       if (cnt > 2) {
@@ -805,8 +869,8 @@
       noiseStep(p, dt, spiral ? 1.2 : 3, 1.0);
       p.vx = Math.cos(p.heading) * p.speed + p.noiseX;
       p.vy = Math.sin(p.heading) * p.speed + p.noiseY;
-      p.x += (p.vx + sepX * 26 + attrX * 2.75) * dt;
-      p.y += (p.vy + sepY * 26 + attrY * 2.75) * dt;
+      p.x += (p.vx + sepX * 26 + attrX * 2.75 + repelX) * dt;
+      p.y += (p.vy + sepY * 26 + attrY * 2.75 + repelY) * dt;
 
       if (spiral) {
         p.spin += p.omega * dt;
