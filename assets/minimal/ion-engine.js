@@ -35,6 +35,21 @@
   var ROD_GROUP_MIN = 10;
   var ROD_GROUP_FORCE = 20;
 
+  /* 追逐模式的长程群体斥力：生效半径比 boids 的 150px 远得多，
+     邻居数超过“全局平均密度的 1.45 倍”时才缓慢外推——距离远、力度小。
+     半径随视口短边缩放，手机上不会退化成“从屏幕中心往外推”。 */
+  var CHASE_FAR_R = 420;
+  var CHASE_FAR_SCALE = 0.42;
+  var CHASE_FAR_DENSITY = 1.45;
+  var CHASE_FAR_FORCE = 0.22;
+
+  /* 追逐模式的整体滑移流场：整片粒子沿 x 方向滑移，
+     横向速度随纵向位置线性变化（上下层相对滑动），方向缓慢换向；
+     纵向只加一点点起伏，避免整团被推到画面外。 */
+  var CHASE_FLOW_SPEED = 7;
+  var CHASE_FLOW_SHEAR = 9;
+  var CHASE_FLOW_RISE = 2.2;
+
   var LIGHT = {
     colors: [[102, 8, 116], [90, 104, 138], [154, 141, 128]],
     line: [102, 8, 116],
@@ -634,6 +649,16 @@
 
   function updateChase(dt) {
     var cx = state.w * 0.5, cy = state.h * 0.5;
+    var vw = state.w || 1, vh = state.h || 1;
+    var farR = Math.min(CHASE_FAR_R, Math.max(220, CHASE_FAR_SCALE * Math.min(vw, vh)));
+    var farR2 = farR * farR;
+    var farMin = Math.max(
+      8,
+      Math.round(((parts.length * Math.PI * farR2) / (vw * vh)) * CHASE_FAR_DENSITY)
+    );
+    var flowPhase = state.t * 0.00021;
+    var flowBase = CHASE_FLOW_SPEED * Math.sin(flowPhase);
+    var flowCross = Math.cos(flowPhase * 0.7) * CHASE_FLOW_RISE;
 
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i];
@@ -642,12 +667,18 @@
       var aliX = 0, aliY = 0;
       var cohX = 0, cohY = 0;
       var cnt = 0;
+      var farCnt = 0, farSumX = 0, farSumY = 0;
 
       for (var j = 0; j < parts.length; j++) {
         if (i === j) continue;
         var q = parts[j];
         var dx = q.x - p.x, dy = q.y - p.y;
         var d2 = dx * dx + dy * dy;
+        if (d2 < farR2) {
+          farCnt++;
+          farSumX += q.x;
+          farSumY += q.y;
+        }
         if (d2 > 150 * 150) continue;
         cnt++;
         cohX += q.x;
@@ -684,6 +715,16 @@
         ax += (crowdX / crowdD) * crowd;
         ay += (crowdY / crowdD) * crowd;
         p.tumble = Math.min(p.tumble, 0.25);
+      }
+
+      /* 长程群体斥力：420px 级别的邻居质心外推，力度很小，只负责把“大团”摊开 */
+      if (farCnt > farMin) {
+        var fdx = p.x - farSumX / farCnt;
+        var fdy = p.y - farSumY / farCnt;
+        var fdd = Math.sqrt(fdx * fdx + fdy * fdy) || 1;
+        var farPush = Math.min(1, (farCnt - farMin) / (farMin * 0.8)) * CHASE_FAR_FORCE;
+        ax += (fdx / fdd) * farPush;
+        ay += (fdy / fdd) * farPush;
       }
 
       if (p.target < 0 || p.target >= parts.length || p.targetTimer <= 0) {
@@ -742,8 +783,10 @@
       }
 
       noiseStep(p, dt, 4, 1.0);
-      p.x += (p.vx + p.noiseX) * dt;
-      p.y += (p.vy + p.noiseY) * dt;
+      /* 整体滑移流场：横向漂移 + 随高度线性变化的剪切（上下层相对滑动） */
+      var shear = (p.y / vh - 0.5) * 2;
+      p.x += (p.vx + p.noiseX + flowBase + CHASE_FLOW_SHEAR * shear) * dt;
+      p.y += (p.vy + p.noiseY + flowCross) * dt;
 
       p.tumble -= dt;
       if (p.tumble <= 0) {
