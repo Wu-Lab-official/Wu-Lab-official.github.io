@@ -18,6 +18,12 @@
   var PAUSE_KEY = "wulab-bg-paused-v3";
   var MAX_SOURCES = 3;
 
+  /* 粒子总数倍数：棒状 / 追逐两模式整体翻倍（目标数、上下限同步 ×2） */
+  var COUNT_MULT = { rod: 2, chase: 2 };
+
+  /* 追逐模式拥挤斥力的触发下限（邻居数）：低于此值不算拥挤，不向外推 */
+  var CHASE_CROWD_MIN = 16;
+
   var LIGHT = {
     colors: [[102, 8, 116], [90, 104, 138], [154, 141, 128]],
     line: [102, 8, 116],
@@ -265,9 +271,10 @@
 
   function targetCount() {
     var factor = mode === "chase" ? 1.05 : mode === "rod" ? 0.70 : mode === "spiral" ? 0.50 : 1;
-    var n = Math.round((state.w * state.h / 16000) * factor);
-    var max = state.w < 720 ? 58 : 115;
-    var min = state.w < 720 ? 28 : 30;
+    var mult = COUNT_MULT[mode] || 1;
+    var n = Math.round((state.w * state.h / 16000) * factor * mult);
+    var max = (state.w < 720 ? 58 : 115) * mult;
+    var min = (state.w < 720 ? 28 : 30) * mult;
     return Math.max(min, Math.min(max, n));
   }
 
@@ -658,11 +665,11 @@
         ay += (aliY / am) * 0.62;
       }
 
-      if (cnt > 8) {
+      if (cnt > CHASE_CROWD_MIN) {
         var crowdX = p.x - cohX / cnt;
         var crowdY = p.y - cohY / cnt;
         var crowdD = Math.sqrt(crowdX * crowdX + crowdY * crowdY) || 1;
-        var crowd = Math.min(4, cnt - 8) * 0.35;
+        var crowd = Math.min(4, cnt - CHASE_CROWD_MIN) * 0.35;
         ax += (crowdX / crowdD) * crowd;
         ay += (crowdY / crowdD) * crowd;
         p.tumble = Math.min(p.tumble, 0.25);
